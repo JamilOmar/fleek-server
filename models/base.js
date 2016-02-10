@@ -26,7 +26,7 @@ base.prototype.create = function()
 //******************************************************
 base.prototype.IsEmpty =function()
 {
-     return  Object.keys(this).length >0;
+     return  this.id == null;
 }
 //********************************************************************************************
-        module.exports =  base;
+module.exports =  base;

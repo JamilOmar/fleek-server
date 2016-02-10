@@ -9,6 +9,7 @@ require('rootpath')();
 var baseDAL  = require('./baseDAL');
 var providerScheduleModel  = require('models/providerSchedule');
 var util = require('util');
+var userModel  = require('models/user');
 var logger = require('utilities/logger');
 //*******************************************************************************************
 
@@ -46,7 +47,7 @@ providerScheduleDAL.prototype.updateProviderSchedule  = function(data,id, result
 //Method to Select providerSchedule By Id
 //*******************************************************************************************
 providerScheduleDAL.prototype.getProviderScheduleById = function(id, resultMethod,connection) {
-    var getProviderScheduleByIdQuery ="SELECT * FROM `chameleon`.`ProviderSchedule` WHERE `IsActive` = 1 AND `ProviderScheduleId` =?";
+    var getProviderScheduleByIdQuery ="SELECT providerSchedule.`ProviderScheduleId` ,providerSchedule.`ProviderId` , providerSchedule.`Name` ,providerSchedule.`IsDefault`, providerSchedule.`CreationDate`, providerSchedule.`ModificationDate` ,providerSchedule.`IsActive`, provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl' FROM `chameleon`.`ProviderSchedule` providerSchedule INNER JOIN `User` provider on provider.`UserId` = providerSchedule.`ProviderId`  WHERE providerSchedule.`IsActive` = 1  AND provider.`IsActive` = 1 AND provider.`IsProvider` =1 AND providerSchedule.`ProviderScheduleId` =?";
                 providerScheduleDAL.prototype.getByArguments(getProviderScheduleByIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getProviderScheduleById" , result);
@@ -73,10 +74,20 @@ providerScheduleDAL.prototype.deactivateProviderSchedule = function(data, result
 //Method to select the ProviderSchedule by Provider Id
 //*******************************************************************************************
 providerScheduleDAL.prototype.getProviderScheduleByProviderId = function(id, resultMethod,connection) {
-    var getProviderScheduleByProviderIdQuery ="SELECT p.* FROM `chameleon`.`ProviderSchedule` p INNER JOIN `User` u on u.`UserId` = p.`ProviderId` WHERE  u.`IsActive` = 1 and u.`UserId` =? and p.`IsActive` =1";
+    var getProviderScheduleByProviderIdQuery ="SELECT providerSchedule.`ProviderScheduleId` ,providerSchedule.`ProviderId` , providerSchedule.`Name` ,providerSchedule.`IsDefault`, providerSchedule.`CreationDate`, providerSchedule.`ModificationDate` ,providerSchedule.`IsActive`, provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl' FROM `chameleon`.`ProviderSchedule` providerSchedule INNER JOIN `User` provider on provider.`UserId` = providerSchedule.`ProviderId`  WHERE providerSchedule.`IsActive` = 1  AND provider.`IsActive` = 1 AND provider.`IsProvider` =1 AND providerSchedule.`ProviderId` =?";
                 providerScheduleDAL.prototype.getByArguments(getProviderScheduleByProviderIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getProviderScheduleByProviderId",id , result);
+                    return resultMethod(err,providerScheduleDAL.prototype.self.mapperSqlToModelCollection(result));
+                },connection);  
+};
+//Method to select the ProviderSchedule by ProviderSchedule Id and Provider Id
+//*******************************************************************************************
+providerScheduleDAL.prototype.getProviderScheduleByIdProviderId = function(id, providerId, resultMethod,connection) {
+    var getProviderScheduleByIdProviderIdQUery ="SELECT providerSchedule.`ProviderScheduleId` ,providerSchedule.`ProviderId` , providerSchedule.`Name` ,providerSchedule.`IsDefault`, providerSchedule.`CreationDate`, providerSchedule.`ModificationDate` ,providerSchedule.`IsActive`, provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl' FROM `chameleon`.`ProviderSchedule` providerSchedule INNER JOIN `User` provider on provider.`UserId` = providerSchedule.`ProviderId`  WHERE providerSchedule.`IsActive` = 1  AND provider.`IsActive` = 1 AND provider.`IsProvider` =1 AND providerSchedule.`ProviderScheduleId`=? AND providerSchedule.`ProviderId` =?";
+                providerScheduleDAL.prototype.getByArguments(getProviderScheduleByIdProviderIdQUery,[id,providerId],function (err,result)
+                {
+                    logger.log("debug","getProviderScheduleByIdProviderId",id , result);
                     return resultMethod(err,providerScheduleDAL.prototype.self.mapperSqlToModelCollection(result));
                 },connection);  
 };
@@ -98,6 +109,8 @@ providerScheduleDAL.prototype.mapperSqlToModel = function(data)
            providerSchedule.creationDate = data.CreationDate;
            providerSchedule.modificationDate = data.ModificationDate;
            providerSchedule.isActive = data.IsActive
+           providerSchedule.provider = new userModel();
+           providerSchedule.provider.basicInformation(data.provider_UserId ,data.provider_Name, data.provider_Lastname , data.provider_Username , data.provider_PictureUrl);
            data = null;
             return providerSchedule;
         }
@@ -140,6 +153,8 @@ providerScheduleDAL.prototype.mapperSqlToModelCollection = function(dataRequeste
            providerSchedule.creationDate = data.CreationDate;
            providerSchedule.modificationDate = data.ModificationDate;
            providerSchedule.isActive = data.IsActive
+           providerSchedule.provider = new userModel();
+           providerSchedule.provider.basicInformation(data.provider_UserId ,data.provider_Name, data.provider_Lastname , data.provider_Username , data.provider_PictureUrl);
            data = null;
             return providerSchedule;
                 providerScheduleCollection.push(providerSchedule);

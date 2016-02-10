@@ -4,7 +4,6 @@ var uuid = require('node-uuid');
 var config = require('config');
 var cache = require('data/cache/cache.js');
 var userLogic = require('./userLogic');
-var userFriendModel = require('models/userFriend');
 var userFriendDAL = require('data/dal/userFriendDal');
 var logger = require('utilities/logger');
 var moment = require('moment');
@@ -156,7 +155,7 @@ try
                     }
                      
                      
-                 },null);
+                 },connection);
              },
 //check if they are already friends
 //*******************************************************************************************
@@ -220,6 +219,7 @@ try
             ],function(err,result){
             connection.release();    
             userFriendData = null;
+            userL = null;
             return  resultMethod(err,result);});
              });
         });
@@ -227,6 +227,7 @@ try
     catch(err)
     {
          userFriendData = null;
+         userL = null;
          return resultMethod(err,null );
     }
     

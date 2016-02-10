@@ -639,7 +639,7 @@ userLogic.prototype.loginUser = function(data, resultMethod) {
      var userData = new userDAL();
         mod_vasync.waterfall([
 //*******************************************************************************************
-        function Get (callback){
+        function authorize (callback){
         if(data.username == null || data.username == undefined)
         {
             return callback(new Error("No username provided",null));

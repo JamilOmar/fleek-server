@@ -19,7 +19,10 @@ var providerScheduleDayLogic = function()
   
    providerScheduleDayLogic.prototype.self = this;
 };
-//validation of the required fields for the Schedule creation
+//*******************************************************************************************
+//
+//Validation of the required fields for the Schedule creation
+//
 //*******************************************************************************************
 providerScheduleDayLogic.prototype.validateFields = function(providerScheduleDay) {
 
@@ -36,7 +39,10 @@ providerScheduleDayLogic.prototype.validateFields = function(providerScheduleDay
                    
 
 }
-//validation of the required fields for the Schedule creation
+//*******************************************************************************************
+//
+//Validation of the required fields for the Schedule creation
+//
 //*******************************************************************************************
 providerScheduleDayLogic.prototype.validateTime = function(providerScheduleDay,dataRequested) { 
 //convert the string into dates
@@ -86,8 +92,10 @@ providerScheduleDayLogic.prototype.validateTime = function(providerScheduleDay,d
         return false;
     }
 }
-
-//create
+//*******************************************************************************************
+//
+//Create provider schedule day
+//
 //*******************************************************************************************
 providerScheduleDayLogic.prototype.createProviderScheduleDay = function(providerScheduleDay, resultMethod) {
 var providerScheduleDayData = new providerScheduleDayDAL();
@@ -212,8 +220,10 @@ try
     }
         
 };
-
-//update
+//*******************************************************************************************
+//
+//Update the provider schedule day
+//
 //*******************************************************************************************
 providerScheduleDayLogic.prototype.updateProviderScheduleDay = function(providerScheduleDay, resultMethod) {
 var providerScheduleDayData = new providerScheduleDayDAL();
@@ -336,8 +346,10 @@ try
         
 };
 
-
-//get providerScheduleDay by Id
+//*******************************************************************************************
+//
+//Get providerScheduleDay by Id
+//
 //*******************************************************************************************
 providerScheduleDayLogic.prototype.getProviderScheduleDayById = function(id, resultMethod) {
      var providerScheduleDayData = new providerScheduleDayDAL();
@@ -351,8 +363,10 @@ providerScheduleDayLogic.prototype.getProviderScheduleDayById = function(id, res
             providerScheduleDayData = null;
             return  resultMethod(err,result);});
 };
-
-//get providerScheduleDay by provider schedule Id
+//*******************************************************************************************
+//
+//Get providerScheduleDay by provider schedule Id
+//
 //*******************************************************************************************
 providerScheduleDayLogic.prototype.getProviderScheduleDayByProviderScheduleId = function(id, resultMethod) {
     var providerScheduleDayData = new providerScheduleDayDAL();
@@ -367,8 +381,10 @@ providerScheduleDayLogic.prototype.getProviderScheduleDayByProviderScheduleId = 
             return  resultMethod(err,result);});
 }
 
-
-//deactivate
+//*******************************************************************************************
+//
+//Deactivate
+//
 //*******************************************************************************************
 providerScheduleDayLogic.prototype.deactivateProviderScheduleDay = function(providerScheduleDay, resultMethod) {
     var providerScheduleDayData = new providerScheduleDayDAL();
@@ -440,7 +456,26 @@ try
     }
         
 };
-
+//*******************************************************************************************
+//
+//Deactivate all the data by the provider schedule Id
+//
+//*******************************************************************************************
+providerScheduleDayLogic.prototype.deactivateAllProviderScheduleDayByProviderScheduleId = function(id, resultMethod,connection) {
+  var providerScheduleDayData = new providerScheduleDayDAL();
+try
+{
+ providerScheduleDayData.deactivateProviderScheduleDay(id,function (err,result)
+                    {
+                        return  resultMethod(err,result);
+                    });
+}
+ catch(err)
+    {
+         providerScheduleDayData = null;
+         return resultMethod(err,null );
+    }
+}
 
 
 //********************************************************************************************

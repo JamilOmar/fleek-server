@@ -1,11 +1,53 @@
 {
-  "name": "chameleon",
-  "version": "0.0.1",
+  "name": "fleek-server",
+  "version": "0.0.2",
   "description": "Fleek rest server ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "author": "Jamil Falconi",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "apnagent": "^1.1.3",
+    "algoliasearch": "^3.12.0",
+    "arangojs": "^3.8.4",
+    "aws-sdk": "^2.1.39",
+    "bcrypt-nodejs": "^0.0.3",
+    "body-parser": "^1.13.2",
+    "config": "^1.14.0",
+    "busboy": "^0.2.11",
+    "express": "^4.13.1",
+    "heapdump": "^0.3.6",
+    "install": "^0.1.8",
+    "memwatch-next": "^0.2.7",
+    "jwt-simple": "^0.3.1",
+    "moment": "^2.10.6",
+    "morgan": "^1.6.1",
+    "node-linq": "^0.0.5",
+    "mysql": "^2.8.0",
+    "node-uuid": "^1.4.3",
+    "redis": "^1.0.0",
+    "passport": "^0.3.0",
+    "npm": "^3.3.9",
+    "rootpath": "^0.1.2",
+    "synchronize": "^0.9.12",
+    "solr-client": "^0.5.0",
+    "validator": "^4.5.2",
+    "vasync": "^1.6.3",
+    "winston": "^1.1.1",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JamilOmar/fleek-server.git"
+  },
+  "keywords": [
+    "fleek",
+    "server"
+  ],
+  
+  "homepage": "https://github.com/JamilOmar/fleek-server"
 }
