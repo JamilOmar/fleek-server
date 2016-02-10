@@ -1,0 +1,11 @@
+{
+  "name": "chameleon",
+  "version": "0.0.1",
+  "description": "Fleek rest server ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jamil Falconi",
+  "license": "ISC"
+}

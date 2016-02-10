@@ -1,0 +1,68 @@
+{
+  // Customer module configs
+  "chameleon": {
+    "dbConfig": {
+        //pool connection limit
+    "connectionLimit" : 100,
+        //host
+    "host": "localhost",
+        // database user
+    "user":"chameleon",
+        //password
+    "password" : "Pa$$w0rd",
+        //database name
+   "database" : "Chameleon",
+        //database support big numbers
+    "supportBigNumbers" : true
+    },
+    "arangodb": {
+      "initialLimit": 100,
+      // Set low for development
+      "initialDays": 1
+    },
+    "security":
+    {
+      "salt":"Fl33kk@pp2016P@$$w0rdG3n"
+      
+    },
+    "apn": {
+        //certificate path
+      "certificatePath": "/certificate/Certificates.p12",
+        //passphrase for certificate
+      "passphrase":"Pa$$w0rd",
+      //apn mode
+        "mode": "sandbox"
+    },
+      "amazonS3":{
+      "accessKeyId"  : "AKIAI3544BQYNHGF6LOA",
+      "secretAccessKey"   : "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"
+      
+      },
+        "redis":
+      {
+          "host":"127.0.0.1",
+          "port":6370 
+            
+        
+      },  
+      "sms":
+      {
+        "authId": "MAMZM0MTRLMWU0YWQZYZ",
+        "authToken": "NmZkYjA3MTkwZGRmYTU1MTU3NGYzZWE1YWI3YmVj"
+      },
+         "responseWs":
+      {
+            "codeError":"ERROR",
+            "codeSuccess" : "OK",
+            "codeCancel" : "CANCEL"
+        
+      },
+      "date":
+      {
+            "format":"YYYY-mm-dd HH:ii:ss"
+          
+        
+      }
+      
+  }
+}
