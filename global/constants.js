@@ -1,4 +1,4 @@
-var constants=
+const constants=
 {
     //by user id
 	REDIS_USER : "USER-",

@@ -1,34 +1,48 @@
 require('rootpath')();
 var config = require('config');
-var responseWs = require('models/response.js');
-var userLogic = require('logic/userLogic.js');
+var responseWs = require('models/response');
+var userLogic = require('logic/userLogic');
+
+
+
+var passport = require('passport');
+//var BasicStrategy = require('passport-http').BasicStrategy;
+/*
+passport.use(new BasicStrategy(
+  function(username, password, callback) {
+    User.findOne({ username: username }, function (err, user) {
+      if (err) { return callback(err); }
+
+      // No user found with that username
+      if (!user) { return callback(null, false); }
+
+      // Make sure the password is correct
+      user.verifyPassword(password, function(err, isMatch) {
+        if (err) { return callback(err); }
+
+        // Password did not match
+        if (!isMatch) { return callback(null, false); }
+
+        // Success
+        return callback(null, user);
+      });
+    });
+  }
+));
+
+
+*/
+
 
 //Create the object
 //*******************************************************************************************
 function securityCheckLogic()
 {
-   this.accessKeyId     = config.get('chameleon.amazonS3.accessKeyId');
-   this.secretAccessKey = config.get('chameleon.amazonS3.secretAccessKey');
+
    securityCheckLogic.prototype.self = this;
 }
 
-//check the client
-//*******************************************************************************************
-securityCheckLogic.prototype.checkClient = function(req, res, next) {
-//for app purpose
-   if(req.headers.secretaccesskey == "hola"
-   && req.headers.accesskeyid == "h")
-   {
-        next()
-   }
-   else
-   {
-        var response = new responseWs();
-        response.createResponse("not authorize", config.get('chameleon.responseWs.codeError'));
-        res.json(response);
-        response = null;
-   }
-};
+
 //check the user token
 //*******************************************************************************************
 securityCheckLogic.prototype.checkUserToken = function(req, res, next) {

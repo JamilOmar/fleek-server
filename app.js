@@ -12,13 +12,11 @@ module.exports = function() {
   
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
-    //global request security
-    app.use(securityCheckL.checkClient);
     //globa check token if is not authentication service
     app.all(/^((?!authenticationService).)*$/,securityCheckL.checkUserToken);
     //creation of the routes
     var routes = require('./routes/index');
-    app.use('/', routes);
+    app.use('/api/v1', routes);
     var userService = require('./routes/userService');
     app.use('/userService', userService);
     var serviceTypeService = require('./routes/serviceTypeService');

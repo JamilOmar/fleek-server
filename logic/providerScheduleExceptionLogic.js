@@ -36,7 +36,7 @@ providerScheduleExceptionLogic.prototype.validateFields = function(providerSched
 
 //create
 //*******************************************************************************************
-providerScheduleExceptionLogic.prototype.createProviderScheduleException = function(providerScheduleException, resultMethod) {
+providerScheduleExceptionLogic.prototype.createProviderScheduleException = function(currentUserId,providerScheduleException, resultMethod) {
 var providerScheduleExceptionData = new providerScheduleExceptionDAL();
 try
 {
@@ -86,6 +86,38 @@ try
                     {  
                         return callback(err,null);
                         
+                    }
+                },
+//check if previous data e
+//*******************************************************************************************
+                function checkExistingProviderSchedule (callback)
+                {
+                    providerScheduleData.getProviderScheduleById(providerSchedule.id,function (err,result)
+                    {
+                        return  callback(err,result);
+                    },connection);
+                },
+//authorize
+//check if the user who is calling is the same user who created the provider schedule
+//*******************************************************************************************
+                 function authorize(data,callback)
+                {
+                    //Validate if the object exists and has the same provider
+                    if( Object.keys(data).length ==0 || data.providerId != providerSchedule.providerId)
+                    {
+                         return callback({name: "Error at create provider Schedule", message:"Invalid operation."},null);
+                    }
+                    else
+                    {
+                        //Authorize
+                       if(currentUserId == providerSchedule.providerId && !(currentUserId == providerSchedule.providerId))
+                        {
+                            return callback(null,providerSchedule);
+                        }
+                        else
+                        {
+                            return callback({name: "Error at create provider Schedule", message:"Invalid operation."},null);
+                        }
                     }
                 },
                 function getPreviousData(providerScheduleException,callback)
@@ -286,6 +318,9 @@ try
                     var localDate = new Date();
                     providerScheduleException.date = providerScheduleException.date.toISOString();
                     providerScheduleException.modificationDate = localDate;
+                    delete providerScheduleException.isActive;
+                    delete providerScheduleException.creationDate;
+                    delete providerScheduleException.providerScheduleId;
                     return callback(null,providerScheduleException);   
                 },    
                 //method to update the providerScheduleException    

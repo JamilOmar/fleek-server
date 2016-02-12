@@ -46,7 +46,7 @@ providerScheduleExceptionDAL.prototype.updateProviderScheduleException  = functi
 //Method to Select providerScheduleException By Schedule Id , Year  And Month 
 //*******************************************************************************************
 providerScheduleExceptionDAL.prototype.getProviderScheduleExceptionByProviderScheduleIdYearMonthDay= function(id,year,month,day, resultMethod,connection) {
-    var getProviderScheduleExceptionByProviderScheduleIdYearMonthDayQuery ="SELECT * FROM `chameleon`.`providerScheduleException` WHERE `ProviderScheduleId` =? AND `IsActive` = 1 AND YEAR(`Date`) = ? AND MONTH(`Date`) = ? AND DAY(`Date`) = ?";
+    var getProviderScheduleExceptionByProviderScheduleIdYearMonthDayQuery ="SELECT providerScheduleException.`ProviderScheduleExceptionId`  , providerScheduleException.`ProviderScheduleId` , providerScheduleException.`Date` , providerScheduleException.`Description` ,  providerScheduleException.`CreationDate` , providerScheduleException.`ModificationDate` , providerScheduleException.`IsActive` FROM `providerScheduleException` providerScheduleException  INNER JOIN `ProviderSchedule` providerSchedule on providerScheduleException.`ProviderScheduleId` = providerSchedule.`ProviderScheduleId` WHERE providerSchedule.`IsActive` =1 AND providerScheduleException.`IsActive` =1 AND providerScheduleException.`ProviderScheduleExceptionId` = ? AND YEAR(providerScheduleException.`Date`) = ? AND MONTH(providerScheduleException.`Date`) = ? AND DAY(providerScheduleException.`Date`) = ?";
                 providerScheduleExceptionDAL.prototype.getByArguments(getProviderScheduleExceptionByProviderScheduleIdYearMonthDayQuery,[id,year,month,day],function (err,result)
                 {
                     logger.log("debug","getProviderScheduleExceptionByProviderScheduleIdYearMonthDay" , result);
@@ -54,20 +54,10 @@ providerScheduleExceptionDAL.prototype.getProviderScheduleExceptionByProviderSch
                 },connection);  
 };
 
-//Method to Select providerScheduleException By Schedule Id, Provider , Year  And Month 
-//*******************************************************************************************
-providerScheduleExceptionDAL.prototype.getProviderScheduleExceptionByProviderScheduleIdProviderIdYearMonthDay= function(id,year,month,day, resultMethod,connection) {
-    var getProviderScheduleExceptionByProviderScheduleIdProviderIdYearMonthDayQuery ="SELECT pse.* FROM `chameleon`.`providerScheduleException` pse INNER JOIN `ProviderSchedule` ps ON ps.`ProviderScheduleId` = pse.`ProviderScheduleId` INNER JOIN `User` u on u.`UserId` = ps.`ProviderId`  WHERE ps.ProviderScheduleId` =? AND u.UserId =?  AND YEAR(pse.`Date`) = ? AND MONTH(pse.`Date`) = ? AND DAY(pse.`Date`) = ?  AND pse.`IsActive` = 1  AND ps.`IsActive` =1 AND u.`IsActive` =1";
-                providerScheduleExceptionDAL.prototype.getByArguments(getProviderScheduleExceptionByProviderScheduleIdProviderIdYearMonthDayQuery,[id,year,month,day],function (err,result)
-                {
-                    logger.log("debug","getProviderScheduleExceptionByProviderScheduleIdProviderIdYearMonthDay" , result);
-                    return resultMethod(err,providerScheduleExceptionDAL.prototype.self.mapperSqlToModelCollection(result));
-                },connection);  
-};
 //Method to Select providerScheduleException By Id
 //*******************************************************************************************
 providerScheduleExceptionDAL.prototype.getProviderScheduleExceptionById = function(id, resultMethod,connection) {
-    var getProviderScheduleExceptionByIdQuery ="SELECT * FROM `chameleon`.`providerScheduleException` WHERE `IsActive` = 1 AND `ProviderScheduleExceptionId` =?";
+    var getProviderScheduleExceptionByIdQuery ="SELECT providerScheduleException.`ProviderScheduleExceptionId`  , providerScheduleException.`ProviderScheduleId` , providerScheduleException.`Date` , providerScheduleException.`Description` ,  providerScheduleException.`CreationDate` , providerScheduleException.`ModificationDate` , providerScheduleException.`IsActive` FROM `providerScheduleException` providerScheduleException  INNER JOIN `ProviderSchedule` providerSchedule on providerScheduleException.`ProviderScheduleId` = providerSchedule.`ProviderScheduleId` WHERE providerSchedule.`IsActive` =1 AND providerScheduleException.`IsActive` =1 AND providerScheduleException.`ProviderScheduleExceptionId` = ? ";
                 providerScheduleExceptionDAL.prototype.getByArguments(getProviderScheduleExceptionByIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getProviderScheduleExceptionById" , result);
@@ -93,7 +83,7 @@ providerScheduleExceptionDAL.prototype.deactivateProviderScheduleException = fun
 //Method to select the providerScheduleException by Provider Id
 //*******************************************************************************************
 providerScheduleExceptionDAL.prototype.getProviderScheduleExceptionByProviderScheduleId = function(id, resultMethod,connection) {
-    var getProviderScheduleExceptionByProviderScheduleIdQuery ="SELECT pse.* FROM `providerScheduleException` pse INNER JOIN `ProviderSchedule` ps on pse.`ProviderScheduleId` = ps.`ProviderScheduleId` WHERE ps.`IsActive` =1 AND pse.`IsActive` =1 AND ps.`ProviderScheduleId` = ? ORDER BY pse.`Date`";
+    var getProviderScheduleExceptionByProviderScheduleIdQuery ="SELECT providerScheduleException.`ProviderScheduleExceptionId`  , providerScheduleException.`ProviderScheduleId` , providerScheduleException.`Date` , providerScheduleException.`Description` ,  providerScheduleException.`CreationDate` , providerScheduleException.`ModificationDate` , providerScheduleException.`IsActive` FROM `providerScheduleException` providerScheduleException  INNER JOIN `ProviderSchedule` providerSchedule on providerScheduleException.`ProviderScheduleId` = providerSchedule.`ProviderScheduleId` WHERE providerSchedule.`IsActive` =1 AND providerScheduleException.`IsActive` =1 AND providerScheduleException.`ProviderScheduleId` = ? ORDER BY providerScheduleException.`Date`";
                 providerScheduleExceptionDAL.prototype.getByArguments(getProviderScheduleExceptionByProviderScheduleIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getProviderScheduleExceptionByProviderScheduleId",id , result);

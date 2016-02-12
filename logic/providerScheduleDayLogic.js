@@ -97,7 +97,7 @@ providerScheduleDayLogic.prototype.validateTime = function(providerScheduleDay,d
 //Create provider schedule day
 //
 //*******************************************************************************************
-providerScheduleDayLogic.prototype.createProviderScheduleDay = function(providerScheduleDay, resultMethod) {
+providerScheduleDayLogic.prototype.createProviderScheduleDay = function(currentUserId,providerScheduleDay, resultMethod) {
 var providerScheduleDayData = new providerScheduleDayDAL();
 try
 {
@@ -225,7 +225,7 @@ try
 //Update the provider schedule day
 //
 //*******************************************************************************************
-providerScheduleDayLogic.prototype.updateProviderScheduleDay = function(providerScheduleDay, resultMethod) {
+providerScheduleDayLogic.prototype.updateProviderScheduleDay = function(currentUserId,providerScheduleDay, resultMethod) {
 var providerScheduleDayData = new providerScheduleDayDAL();
 try
 {
