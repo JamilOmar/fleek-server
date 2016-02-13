@@ -7,8 +7,8 @@ var config = require('config');
 var userDAL = require('data/dal/userDal');
 var cache = require('data/cache/cache.js');
 var logger = require('utilities/logger');
+var cryptotHelper = require('security/helper/cryptoHelper') 
 var moment = require('moment');
-var jwt = require('jwt-simple');
 //*******************************************************************************************
 //constants
 var constants = require('global/constants.js');
@@ -17,96 +17,9 @@ var userLogic = function()
 {
    userLogic.prototype.self = this;
 };
-//encrypt
-//*******************************************************************************************
-userLogic.prototype.encrypt = function(password) {
-  
-    if((!password || 0 === password.length))
-    {
-        throw {name: "Error at encryption", message:"User is empty"};
-    }
-    else
-    {
-        return crypto.createHmac('sha256',"Fl33kk@pp2016P@$$w0rdG3n").update(password).digest("base64"); 
-    }
-}
 
-//compare
-//*******************************************************************************************
-userLogic.prototype.compare = function(password,hashed){  
-    if((!password || 0 === password.length)) 
-    {
-          return false;
-    }
-    else
-    {
-        var  result =crypto.createHmac('sha256',"Fl33kk@pp2016P@$$w0rdG3n").update(password).digest("base64"); 
-        return  hashed == result;
-     }
-}
-//generate jwt token
-//*******************************************************************************************
-userLogic.prototype.generateToken = function(user){  
-    var expires = moment().add('days', 15).valueOf();
-    var token = jwt.encode({
-        id: user.id,
-        exp: expires
-    }, "Fl33kk@pp2016P@$$w0rdG3n");
-  
-    return token;
-}
-//validate jwt token
-//*******************************************************************************************
-userLogic.prototype.checkToken = function(token){  
-    
-    try
-    {
-       var decoded = jwt.decode(token, "Fl33kk@pp2016P@$$w0rdG3n");
-       return decoded;
-    }
-    catch(err)
-    {
-         logger.log("error","checkToken" , err);
-         return null;
-    }
-}
-//signup Users
-//*******************************************************************************************
-userLogic.prototype.signup = function(user, resultMethod) {
-      mod_vasync.waterfall([
-//prepare the data
-//*******************************************************************************************    
-            function prepare(callback)
-            {
-                userLogic.prototype.self.createUser(user,function (err,data)
-                {
-                return callback(err,data);
-                });
-            },
-//*******************************************************************************************
-            function generateToken(userSaved,callback)
-            {
-                try
-                {
-                    var resultObject = null;       
-                    var token =  userLogic.prototype.self.generateToken(userSaved);
-                    resultObject =  { authenticated:true ,token : token , user: userSaved };
-                    return  callback(null,resultObject);
-                }
-                catch(err)
-                {
-                        logger.log("error","signup" , err);
-                        callback(err,null);
-                } 
-            }
-                 ],
-//*******************************************************************************************
-            function(err,result)
-            {
-            
-                return  resultMethod(err,result);
-            });
-}
+
+
 
 //create users
 //*******************************************************************************************
@@ -153,7 +66,7 @@ try
                     }
                     else
                     {
-                         return callback({name: "Error at creation", message:"Username already taken"},null);
+                         return callback({name: "Error at creation", message:"Username already exists."},null);
                     }
                 },
 //create hash
@@ -164,7 +77,7 @@ try
                     {
                         
                         
-                        user.password =   userLogic.prototype.self.encrypt(user.password);
+                        user.password =   cryptotHelper.encrypt(user.password);
                         return callback(null,user);
                     }
                     catch (err)
@@ -441,7 +354,7 @@ try
                     {
                         try
                         {
-                            user.password =   userLogic.prototype.self.encrypt(user.password);
+                            user.password =   cryptotHelper.encrypt(user.password);
                             return callback(null,user);
                         }
                         catch (err)
@@ -635,17 +548,17 @@ userLogic.prototype.getUserByUsername = function(username, resultMethod) {
 //select User By Username
 //
 //*******************************************************************************************
-userLogic.prototype.loginUser = function(data, resultMethod) {
+userLogic.prototype.loginUser = function(username, password, resultMethod) {
      var userData = new userDAL();
         mod_vasync.waterfall([
 //*******************************************************************************************
         function authorize (callback){
-        if(data.username == null || data.username == undefined)
+        if(username == null || username == undefined)
         {
-            return callback(new Error("No username provided",null));
+            return callback(new Error({name: "Error at login user", message:"Invalid parameters."},null));
             
         }
-        userData.getUserByUsername(data.username,function (err,result)
+        userData.getUserByUsername(username,function (err,result)
         {
             return  callback(err,result);
         },null);
@@ -656,20 +569,18 @@ userLogic.prototype.loginUser = function(data, resultMethod) {
          {
            try
            {
-                var resultObject = null;                       
-                var result =  userLogic.prototype.self.compare(data.password, user.password);
+                       
+                var result =  cryptotHelper.compare(password, user.password);
                 if(result)
                 {
-                    var token =  userLogic.prototype.self.generateToken(user);
-                    resultObject =  { authenticated:result ,token : token , user: user };
-                    return  callback(null,resultObject); 
+                    return  callback(null,user); 
                 }
-                else{
-                    
-                    resultObject =  { authenticated:result ,token : null , user: null };
+                else
+                {
+                    return  callback({name: "Error at login user", message:"Invalid password."},null); 
                       
                 }
-                    return  callback(null,resultObject); 
+                   
            }
           catch (err)
            {

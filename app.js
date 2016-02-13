@@ -6,14 +6,13 @@ module.exports = function() {
     var config = require('config');
     var logger = require('./utilities/logger');
     var bodyParser = require('body-parser');
-    var securityCheckLogic = require('./logic/securityCheckLogic.js');
     var app = express();
-    var securityCheckL = new securityCheckLogic();
+    var hooks = require('./security/hooks/');
   
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     //globa check token if is not authentication service
-    app.all(/^((?!authenticationService).)*$/,securityCheckL.checkUserToken);
+    app.all(/^((?!authenticationService).)*$/, hooks.tokenValidation);
     //creation of the routes
     var routes = require('./routes/index');
     app.use('/api/v1', routes);

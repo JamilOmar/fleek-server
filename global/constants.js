@@ -19,7 +19,11 @@ const constants=
         APPROVED :1,
         REJECTED :-1
         
-    }
+    },
+     //namespace for context value
+    USER_CONTEXT_NAMESPACE : "USER_CONTEXT_NAMESPACE",
+    //user for context value
+    USER_CONTEXT :"USER_CONTEXT"
     
 	
 };
