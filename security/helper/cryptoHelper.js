@@ -2,6 +2,11 @@ require('rootpath')();
 var logger = require('utilities/logger');
 var config = require('config');
 var crypto = require('crypto');
+//*******************************************************************************************
+//
+//cryptography helper
+//
+//*******************************************************************************************
 var cryptoHelper =
 {
 
@@ -32,4 +37,5 @@ compare : function(item,hashed){
      }
 }
 }
+//*******************************************************************************************
 module.exports = cryptoHelper;

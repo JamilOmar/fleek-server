@@ -5,15 +5,15 @@ var config = require('config');
 var logger = require('utilities/logger');
 var router = express.Router();
 var responseWs = require('models/response.js');
-var passport = require('security/authentication');
+var authenticationController = require('security/authentication');
 var tokenHelper = require('security/helper/tokenHelper');
 //*******************************************************************************************
 //login
 //*******************************************************************************************
-router.post('/login', function(req, res) {
+router.post('/login', function(req, res,next) {
     var response =  new responseWs();
-    passport.authenticate('basic', { session : false }, function(err, user, info){
-              if(err)
+    authenticationController.authenticate('basic', function(err, user, info){
+              if(err || user==false)
                 {
                 logger.log("error","login",err);
                 response.createResponse({authenticated :false, token : null , user: null }, config.get('chameleon.responseWs.codeError'));
@@ -35,7 +35,7 @@ router.post('/login', function(req, res) {
                 }
                 }
              response = null;
-        });
+        })(req, res, next);
     }); 
 //sign up 
 //*******************************************************************************************

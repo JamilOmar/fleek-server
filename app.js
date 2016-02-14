@@ -4,18 +4,21 @@ module.exports = function() {
     //creation of the express object
     var express = require('express');
     var config = require('config');
+    var passport = require('passport');
     var logger = require('./utilities/logger');
     var bodyParser = require('body-parser');
     var app = express();
     var hooks = require('./security/hooks/');
   
+    app.disable('x-powered-by');
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
-    //globa check token if is not authentication service
+    app.use(passport.initialize());
+    //global check token if is not authentication service
     app.all(/^((?!authenticationService).)*$/, hooks.tokenValidation);
     //creation of the routes
     var routes = require('./routes/index');
-    app.use('/api/v1', routes);
+    app.use('/', routes);
     var userService = require('./routes/userService');
     app.use('/userService', userService);
     var serviceTypeService = require('./routes/serviceTypeService');

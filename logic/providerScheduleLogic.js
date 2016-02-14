@@ -13,6 +13,7 @@ var logger = require('utilities/logger');
 var cache = require('data/cache/cache.js');
 var uuid = require('node-uuid');
 var userLogic = require('./userLogic');
+var context = require('security/context');
 //*******************************************************************************************
 //constants
 var constants = require('global/constants');
@@ -29,7 +30,7 @@ var providerScheduleLogic = function()
 //
 //
 //*******************************************************************************************
-providerScheduleLogic.prototype.createProviderSchedule = function(currentUserId, providerSchedule, resultMethod) {
+providerScheduleLogic.prototype.createProviderSchedule = function( providerSchedule, resultMethod) {
 var providerScheduleData = new providerScheduleDAL();
 var userL = new userLogic();
 try
@@ -55,7 +56,7 @@ try
 //*******************************************************************************************
             function authorize(callback)
             {
-                if(currentUserId == providerSchedule.providerId && !(currentUserId == providerSchedule.providerId))
+                if(context.getUser.id == providerSchedule.providerId  && context.getUser.isProvider)
                 {
                     return callback(null,providerSchedule);
                 }
@@ -65,24 +66,7 @@ try
                 }
                 
             },
-//validate if the user exists and if is a provider
-//*******************************************************************************************
-             function validateProvider(providerSchedule,callback)
-             {
-                 userL.checkUser(providerSchedule.providerId,function(err,data)
-                 {
-                    if( Object.keys(data).length ==0 || data.isProvider ==false)
-                    {
-                         return callback({name: "Error at create provider Schedule", message:"Invalid operation."},null);
-                    }
-                    else
-                    {
-                        return callback(null,providerSchedule);
-                    }
-                     
-                     
-                 },connection);
-             },
+
 //Check if the user has an schedule , version 1 will only accept on schedule per user             
 //*******************************************************************************************            
                 function check(callback)
@@ -180,7 +164,7 @@ try
 //
 //
 //*******************************************************************************************
-providerScheduleLogic.prototype.updateProviderSchedule = function(currentUserId,providerSchedule, resultMethod) {
+providerScheduleLogic.prototype.updateProviderSchedule = function(providerSchedule, resultMethod) {
 var providerScheduleData = new providerScheduleDAL();
 try
 {
@@ -215,21 +199,16 @@ try
                  function authorize(data,callback)
                 {
                     //Validate if the object exists and has the same provider
-                    if( Object.keys(data).length ==0 || data.providerId != providerSchedule.providerId)
+                    if( Object.keys(data).length ==0 || data.providerId != providerSchedule.providerId ||
+                    context.getUser.id != providerSchedule.providerId)
                     {
-                         return callback({name: "Error at create provider Schedule", message:"Invalid operation."},null);
+                        return callback({name: "Error at create provider Schedule", message:"Invalid operation."},null);
                     }
                     else
                     {
-                        //Authorize
-                       if(currentUserId == providerSchedule.providerId && !(currentUserId == providerSchedule.providerId))
-                        {
-                            return callback(null,providerSchedule);
-                        }
-                        else
-                        {
-                            return callback({name: "Error at create provider Schedule", message:"Invalid operation."},null);
-                        }
+
+                        return callback(null,providerSchedule);
+                    
                     }
                 },
 //prepare the data 
@@ -364,7 +343,7 @@ providerScheduleLogic.prototype.validateProviderScheduleByIdProviderId = functio
 //
 //
 //*******************************************************************************************
-providerScheduleLogic.prototype.deactivateProviderSchedule = function(currentUserId,providerSchedule, resultMethod) {
+providerScheduleLogic.prototype.deactivateProviderSchedule = function(providerSchedule, resultMethod) {
     var providerScheduleData = new providerScheduleDAL();
 try
 {
@@ -398,21 +377,16 @@ try
                  function authorize(data,callback)
                 {
                     //Validate if the object exists and has the same provider
-                    if( Object.keys(data).length ==0 ||data.providerId != providerSchedule.providerId)
+                    if( Object.keys(data).length ==0 ||data.providerId != providerSchedule.providerId
+                    ||context.getUser.id != providerSchedule.providerId )
                     {
                          return callback({name: "Error at create provider Schedule", message:"Invalid operation."},null);
                     }
                     else
                     {
-                        //Authorize
-                       if(currentUserId == providerSchedule.providerId && !(currentUserId == providerSchedule.providerId))
-                        {
-                            return callback(null,providerSchedule);
-                        }
-                        else
-                        {
-                            return callback({name: "Error at create provider Schedule", message:"Invalid operation."},null);
-                        }
+                      
+                        return callback(null,providerSchedule);
+                       
                     }
                 },                    
 //method to prepare the data

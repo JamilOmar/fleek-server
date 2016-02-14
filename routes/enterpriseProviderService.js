@@ -10,7 +10,7 @@ require('rootpath')();
 var mod_vasync  = require("vasync");
 var enterpriseProviderDAL = require('data/dal/enterpriseProviderDAL');
 var logger = require('utilities/logger');
-var securityCheckLogic = require('logic/securityCheckLogic.js');
+
 //Security Check Token
 //******************************************************************************************* 
 router.use(securityCheckLogic.checkUserToken);

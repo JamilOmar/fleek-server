@@ -7,6 +7,7 @@ var userLogic = require('./userLogic');
 var userFriendDAL = require('data/dal/userFriendDal');
 var logger = require('utilities/logger');
 var moment = require('moment');
+var context = require('security/context');
 
 //*******************************************************************************************
 //constants
@@ -105,7 +106,7 @@ userFriendLogic.prototype.getUserFriendById = function(id, resultMethod) {
 //
 //
 //*******************************************************************************************
-userFriendLogic.prototype.addUserFriend = function(currentUserId, userFriend, resultMethod) {
+userFriendLogic.prototype.addUserFriend = function( userFriend, resultMethod) {
        var userFriendData = new userFriendDAL();
 try
 {
@@ -129,7 +130,7 @@ try
 //*******************************************************************************************
             function authorize(callback)
             {
-                if(currentUserId == userFriend.customerId && !(currentUserId == userFriend.friendId))
+                if(context.getUser.id == userFriend.customerId && !(context.getUser.id  == userFriend.friendId))
                 {
                     return callback(null,userFriend);
                 }
@@ -238,7 +239,7 @@ try
 //
 //
 //*******************************************************************************************
-userFriendLogic.prototype.approvalUserFriendValidation = function (currentUserId , userFriend, originalUserFriend)
+userFriendLogic.prototype.approvalUserFriendValidation = function (  userFriend, originalUserFriend)
 {
 var  verification = false;    
 //firts validation
@@ -249,12 +250,12 @@ if( originalUserFriend.state == constants.REQUEST_STATES.REQUESTED && originalUs
         switch (userFriend.state) {
             case constants.REQUEST_STATES.APPROVED:
             // the person who is accepting is the customer's friend
-            verification = ( originalUserFriend.friendId == currentUserId);
+            verification = ( originalUserFriend.friendId == context.getUser.id );
             break;
   
         case constants.REQUEST_STATES.REJECTED:
           // the person who is accepting is the customer's friend
-            verification = ( originalUserFriend.friendId == currentUserId || originalUserFriend.customerId == currentUserId );
+            verification = ( originalUserFriend.friendId == context.getUser.id  || originalUserFriend.customerId == context.getUser.id  );
             break;
             default:verification = false;
         break;
@@ -269,7 +270,7 @@ return verification;
 //
 //
 //*******************************************************************************************
-userFriendLogic.prototype.approvalUserFriend = function(currentUserId,userFriend, resultMethod) {
+userFriendLogic.prototype.approvalUserFriend = function(userFriend, resultMethod) {
        var userFriendData = new userFriendDAL();
 try
 {
@@ -307,7 +308,7 @@ try
             }
             else
             {
-                if (userFriendLogic.prototype.self.approvalUserFriendValidation(currentUserId, userFriend, data))
+                if (userFriendLogic.prototype.self.approvalUserFriendValidation(context.getUser.id , userFriend, data))
                 {
                     //prepare data
                     userFriend.modificationDate =new Date();
@@ -378,7 +379,7 @@ try
 //
 //
 //*******************************************************************************************
-userFriendLogic.prototype.removeUserFriend = function(currentUserId,userFriend, resultMethod) {
+userFriendLogic.prototype.removeUserFriend = function(userFriend, resultMethod) {
        var userFriendData = new userFriendDAL();
 try
 {
@@ -418,7 +419,7 @@ try
                 else
                 {
 
-                    if(currentUserId == data.customerId || currentUserId == data.friendId)
+                    if(context.getUser.id  == data.customerId || context.getUser.id  == data.friendId)
                     {
                         userFriend.modificationDate =new Date();
                         return callback(null,userFriend);

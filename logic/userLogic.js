@@ -9,6 +9,7 @@ var cache = require('data/cache/cache.js');
 var logger = require('utilities/logger');
 var cryptotHelper = require('security/helper/cryptoHelper') 
 var moment = require('moment');
+var context = require('security/context');
 //*******************************************************************************************
 //constants
 var constants = require('global/constants.js');
@@ -160,7 +161,7 @@ try
 //update users but not password
 //
 //*******************************************************************************************
-userLogic.prototype.updateUser = function(currentUserId,user, resultMethod) {
+userLogic.prototype.updateUser = function(user, resultMethod) {
 var userData = new userDAL();
 try
 {
@@ -179,26 +180,13 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
-//Validate previous data
-//*******************************************************************************************    
-
-                 function validatePreviousData(callback)
-                    {
-                       userLogic.prototype.self.checkUser(user.id,function (err,result)
-                    {
-                       
-                        return  callback(err,resultMethod);
-                    },connection);
-                    
-                    },
 //check if the item can be updated
 //*******************************************************************************************    
 
-                function checkExistingItem(existingUser , callback)
+                function checkExistingItem( callback)
                 {
                 
-                    if(Object.keys(existingUser).length <=0 || existingUser.isActive === false || 
-                    existingUser.id != currentUserId)
+                    if(user.id != context.getUser.id)
                     {
                     return callback({name: "Invalid Update", message:"User is not allowed."},null); 
                     }
@@ -293,7 +281,7 @@ try
 //update users with password
 //
 //*******************************************************************************************
-userLogic.prototype.updatePassword = function(currentUserId,user, resultMethod) {
+userLogic.prototype.updatePassword = function(user, resultMethod) {
 var userData = new userDAL();
 try
 {
@@ -313,23 +301,15 @@ try
 //*******************************************************************************************                    
                     //mod_vasync , waterfall for better order
                     mod_vasync.waterfall([
-                    function validatePreviousData(callback)
-                    {
-                        userLogic.prototype.self.checkUser(user.id,function (err,result)
-                    {
-                       
-                        return  callback(err,resultMethod);
-                    },connection);
                     
-                    },
+ 
 //check if the item can be updated
 //*******************************************************************************************    
 
-                     function checkExistingItem(existingUser , callback)
+                     function checkExistingItem(callback)
                         {
                 
-                            if(Object.keys(existingUser).length <=0 || existingUser.isActive === false||
-                            existingUser.id !=currentUserId)
+                            if(context.getUser.id != user.id)
                             {
                             return callback({name: "Invalid Update", message:"User is not allowed."},null); 
                             }
@@ -599,7 +579,7 @@ userLogic.prototype.loginUser = function(username, password, resultMethod) {
 //block the user
 //
 //*******************************************************************************************
-userLogic.prototype.blockUser = function(currentUserId,user, resultMethod) {
+userLogic.prototype.blockUser = function(user, resultMethod) {
 var userData = new userDAL();
 try
 {
@@ -618,25 +598,12 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
-//Validate previous data
-//*******************************************************************************************    
-
-                function validatePreviousData(callback)
-                {
-                    userLogic.prototype.self.checkUser(user.id,function (err,result)
-                {
-                    
-                    return  callback(err,resultMethod);
-                },null);
-                
-                },
 //check if the item can be updated
 //*******************************************************************************************    
-                function checkExistingItem(existingUser , callback)
+                function checkExistingItem( callback)
                 {
         
-                    if(Object.keys(existingUser).length <=0 || existingUser.isActive === false ||
-                    existingUser.id != currentUserId)
+                    if(context.getUser.id != user.id)
                     {
                     return callback({name: "Invalid Update", message:"User is not allowed."},null); 
                     }
@@ -728,7 +695,7 @@ try
 //deactivate User
 //
 //*******************************************************************************************
-userLogic.prototype.deactivateUser = function(currentUserId,user, resultMethod) {
+userLogic.prototype.deactivateUser = function(user, resultMethod) {
     var userData = new userDAL();
 try
 {
@@ -747,24 +714,13 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
-//*******************************************************************************************    
 
-                function validatePreviousData(callback)
-                {
-                userLogic.prototype.self.checkUser(user.id,function (err,result)
-                {
-                    
-                    return  callback(err,resultMethod);
-                },connection);
-                
-                },
 //check if the item can be updated
 //*******************************************************************************************    
-                function checkExistingItem(existingUser , callback)
+                function checkExistingItem(callback)
                 {
         
-                    if(Object.keys(existingUser).length <=0 || existingUser.isActive === false ||
-                    existingUser.id !=currentUserId)
+                    if(context.getUser.id != user.id)
                     {
                     return callback({name: "Invalid Update", message:"User is not allowed."},null); 
                     }
@@ -856,7 +812,7 @@ try
 //upload profile picture
 //
 //*******************************************************************************************
-userLogic.prototype.uploadProfilePicture = function(currentUserId,data,id, resultMethod) {
+userLogic.prototype.uploadProfilePicture = function(data,id, resultMethod) {
         var key =  uuid.v1();
         logger.log("debug","uploadProfilePicture",data);
         var instance = new awsS3();
@@ -873,8 +829,7 @@ userLogic.prototype.uploadProfilePicture = function(currentUserId,data,id, resul
             function checkExistingItem(user , callback)
             {
     
-                if(Object.keys(user).length <=0 || user.isActive === false ||
-                id!=currentUserId)
+                if(context.getUser.id != user.id)
                 {
                 return callback({name: "Invalid Update", message:"User is not allowed."},null); 
                 }

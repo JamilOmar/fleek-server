@@ -3,6 +3,11 @@ var logger = require('utilities/logger');
 var moment = require('moment');
 var jwt = require('jwt-simple');
 var config = require('config');
+//*******************************************************************************************
+//
+//token helper
+//
+//*******************************************************************************************
 var tokenHelper =
 {
 
@@ -33,4 +38,5 @@ checkToken : function(token){
     }
 }
 }
+//*******************************************************************************************
 module.exports = tokenHelper;

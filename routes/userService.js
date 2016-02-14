@@ -11,7 +11,7 @@ var Busboy = require('busboy');
 router.put('/updateUser', function(req, res) {
     var userL = new userLogic();
     var response = new responseWs();
-    userL.updateUser(req.currentUser,req.body,function(err,result){
+    userL.updateUser(req.body,function(err,result){
          userL = null;
               if(err)
                 {
@@ -32,7 +32,7 @@ router.put('/updateUser', function(req, res) {
 router.put('/updatePassword', function(req, res) {
     var userL = new userLogic();
     var response = new responseWs();
-    userL.updatePassword(req.currentUser,req.body,function(err,result){
+    userL.updatePassword(req.body,function(err,result){
          userL = null;
               if(err)
                 {
@@ -54,7 +54,7 @@ router.put('/updatePassword', function(req, res) {
 
         var userL = new userLogic();
         var response = new responseWs();
-    userL.blockUser(req.currentUser,req.body,function(err,result){  
+    userL.blockUser(req.body,function(err,result){  
              userL = null;
               if(err)
                 {
@@ -76,7 +76,7 @@ router.put('/updatePassword', function(req, res) {
 
         var userL = new userLogic();
         var response = new responseWs();
-    userL.deactivateUser(req.currentUser,req.body,function(err,result){  
+    userL.deactivateUser(req.body,function(err,result){  
               userL = null;
               if(err)
                 {
@@ -187,7 +187,7 @@ router.put('/updatePassword', function(req, res) {
         busboy.on('finish', function() {
             if(fileData != null)
             {
-            userL.uploadProfilePicture(req.currentUser,fileData,req.params.key,function(err,result){  
+            userL.uploadProfilePicture(fileData,req.params.key,function(err,result){  
                 busboy = null;
                 userL = null;
                 if(err)

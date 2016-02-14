@@ -1,8 +1,10 @@
 require('rootpath')();
 var userLogic = require('logic/userLogic');
+var tokenHelper = require('security/helper/tokenHelper');
 var passport = require('passport');
 var BasicStrategy = require('passport-http').BasicStrategy;
 var BearerStrategy = require('passport-http-bearer').Strategy;
+var context = require('security/context');
 var mod_vasync  = require("vasync");
 
 
@@ -20,10 +22,13 @@ passport.use(new BasicStrategy(
             return callback(err,user);
         });
      },
+//*******************************************************************************************     
     function storeContext(user,callback)
     {
-        return callback(null,user)
+        context.set(user ,callback(null,user));
+        
     }
+//*******************************************************************************************    
     ],
     function(err,result){
         userL = null;
@@ -47,10 +52,13 @@ passport.use(new BearerStrategy(
     var userL = new userLogic();
     //check the token 
     mod_vasync.waterfall([
+//*******************************************************************************************        
     function prepare(callback)
     {
-        var decoded = userL.checkToken( token);
+        var decoded = tokenHelper.checkToken( token);
+        return callback(null,decoded);
     },
+//*******************************************************************************************    
     function store(decoded , callback)
     {
         if(decoded != null && decoded.exp > Date.now())
@@ -62,6 +70,7 @@ passport.use(new BearerStrategy(
             return callback({name: "No Authorize", message:"User not authorize."},null );
         }
     },
+//*******************************************************************************************    
     function getUser(userId , callback)
     {
         userL.getUserById(userId,function (err, result)
@@ -71,9 +80,10 @@ passport.use(new BearerStrategy(
         });
         
     },
+//*******************************************************************************************    
     function storeContext(user,callback)
     {
-        return callback(null,user)
+        context.setUser(user ,callback);
     }
     
     ],
@@ -81,7 +91,7 @@ passport.use(new BearerStrategy(
         userL = null;
         if(err)
         {
-            return  resultMethod(err,false);
+            return  resultMethod(err,null);
         }
         else
         {
@@ -90,7 +100,7 @@ passport.use(new BearerStrategy(
     });
   }
 ));
-
+//*******************************************************************************************
 module.exports = passport;
 
 

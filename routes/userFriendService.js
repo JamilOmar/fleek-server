@@ -97,7 +97,7 @@ var responseWs = require('models/response.js');
 
         var userFriendL = new userFriendLogic();
         var response = new responseWs();
-    userFriendL.addUserFriend(req.currentUser,req.body ,function(err,result){  
+    userFriendL.addUserFriend(req.body ,function(err,result){  
               userFriendL = null;
               if(err)
                 {
@@ -119,7 +119,7 @@ var responseWs = require('models/response.js');
 
         var userFriendL = new userFriendLogic();
         var response = new responseWs();
-        userFriendL.approvalUserFriend(req.currentUser,req.body ,function(err,result){  
+        userFriendL.approvalUserFriend(req.body ,function(err,result){  
               userFriendL = null;
               if(err)
                 {
@@ -143,7 +143,7 @@ var responseWs = require('models/response.js');
 
         var userFriendL = new userFriendLogic();
         var response = new responseWs();
-        userFriendL.removeUserFriend(req.currentUser,req.body ,function(err,result){  
+        userFriendL.removeUserFriend(req.body ,function(err,result){  
               userFriendL = null;
               if(err)
                 {

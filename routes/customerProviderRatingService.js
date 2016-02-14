@@ -5,7 +5,7 @@ var config = require('config');
 var logger = require('utilities/logger');
 var router = express.Router();
 var responseWs = require('models/response.js');
-var securityCheckLogic = require('logic/securityCheckLogic.js');
+
 
 //create
 //*******************************************************************************************
@@ -13,7 +13,7 @@ router.post('/newCustomerProviderRating', function(req, res) {
     var customerProviderL = new customerProviderRatingLogic();
     var response = new responseWs();
     customerProviderL.createCustomerProviderRating(req.body,function(err,result){
-        delete customerProviderL;
+        customerProviderL = null;
               if(err)
                 {
                 logger.log("error","newCustomerProviderRating",err); 
@@ -25,7 +25,7 @@ router.post('/newCustomerProviderRating', function(req, res) {
                  response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
                 res.json(response);
                 }
-            delete response;
+            response = null
         });
     });
 //deactivate
@@ -34,7 +34,7 @@ router.post('/deactivateCustomerProviderRating', function(req, res) {
     var customerProviderL = new customerProviderRatingLogic();
     var response = new responseWs();
     customerProviderL.deactivateCustomerProviderRating(req.body,function(err,result){
-        delete customerProviderL;
+        customerProviderL = null;
               if(err)
                 {
                 logger.log("error","deactivateCustomerProviderRating",err); 
@@ -46,7 +46,7 @@ router.post('/deactivateCustomerProviderRating', function(req, res) {
                  response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
                 res.json(response);
                 }
-            delete response;
+           response = null;
         });
     });
 

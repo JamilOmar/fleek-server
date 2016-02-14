@@ -1,9 +1,10 @@
 require('rootpath')();
+var express = require('express');
 var config = require('config');
 var logger = require('utilities/logger');
 var responseWs = require('models/response.js');
-var passport = require('security/authentication');
-var context = require('security/context');
+var authenticationController = require('security/authentication');
+
 //*******************************************************************************************
 //
 //hooks for authentication
@@ -12,8 +13,8 @@ var context = require('security/context');
 var hooks ={
     
    tokenValidation : function(req, res, next) {
-    passport.authenticate('bearer', { session : false }, function(err, user, info){
-    if(err)
+    authenticationController.authenticate('bearer', { session : false }, function(err, user, info){
+    if(err || user==false)
     {
         var response = new responseWs();
         logger.log("error","login",err);
@@ -23,10 +24,12 @@ var hooks ={
     }
     else
     {
-        context.set (user , next());
+       next();
     }
-    });
+    })(req, res, next);
     }
 
 }
+//*******************************************************************************************
 module.exports = hooks;
+

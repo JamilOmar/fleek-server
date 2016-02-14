@@ -12,7 +12,7 @@ var providerScheduleDayDAL = require('data/dal/providerScheduleDayDAL');
 var logger = require('utilities/logger');
 var moment = require('moment');
 var uuid = require('node-uuid');
-
+var context = require('security/context');
 //*******************************************************************************************
 var providerScheduleDayLogic = function()
 {
@@ -97,7 +97,7 @@ providerScheduleDayLogic.prototype.validateTime = function(providerScheduleDay,d
 //Create provider schedule day
 //
 //*******************************************************************************************
-providerScheduleDayLogic.prototype.createProviderScheduleDay = function(currentUserId,providerScheduleDay, resultMethod) {
+providerScheduleDayLogic.prototype.createProviderScheduleDay = function(providerScheduleDay, resultMethod) {
 var providerScheduleDayData = new providerScheduleDayDAL();
 try
 {
@@ -225,7 +225,7 @@ try
 //Update the provider schedule day
 //
 //*******************************************************************************************
-providerScheduleDayLogic.prototype.updateProviderScheduleDay = function(currentUserId,providerScheduleDay, resultMethod) {
+providerScheduleDayLogic.prototype.updateProviderScheduleDay = function(providerScheduleDay, resultMethod) {
 var providerScheduleDayData = new providerScheduleDayDAL();
 try
 {
