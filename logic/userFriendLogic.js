@@ -1,3 +1,12 @@
+//*******************************************************************************************
+//Name: User Friend Logic
+//Description: User logic class
+//Target : User Friends Creation , Administration of Users Friends
+//Author: Jamil Falconi
+//year: 2016
+//Version : 1.0
+//*******************************************************************************************
+
 require('rootpath')();
 var mod_vasync  = require("vasync");
 var uuid = require('node-uuid');

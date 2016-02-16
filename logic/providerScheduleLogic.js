@@ -9,6 +9,8 @@
 require('rootpath')();
 var mod_vasync  = require("vasync");
 var providerScheduleDAL = require('data/dal/providerScheduleDAL');
+var providerScheduleExceptionLogic = require('logic/providerScheduleExceptionLogic');
+var providerScheduleDayLogic = require('logic/providerScheduleDayLogic');
 var logger = require('utilities/logger');
 var cache = require('data/cache/cache.js');
 var uuid = require('node-uuid');
@@ -56,7 +58,7 @@ try
 //*******************************************************************************************
             function authorize(callback)
             {
-                if(context.getUser.id == providerSchedule.providerId  && context.getUser.isProvider)
+                if(context.getUser.id == providerSchedule.providerId )
                 {
                     return callback(null,providerSchedule);
                 }
@@ -345,6 +347,8 @@ providerScheduleLogic.prototype.validateProviderScheduleByIdProviderId = functio
 //*******************************************************************************************
 providerScheduleLogic.prototype.deactivateProviderSchedule = function(providerSchedule, resultMethod) {
     var providerScheduleData = new providerScheduleDAL();
+    var providerScheduleDayL = new providerScheduleDayLogic();
+    var providerScheduleExceptionL = new providerScheduleExceptionLogic();
 try
 {
     //create a connection for the transaction
@@ -395,6 +399,26 @@ try
                 {
                     providerSchedule.modificationDate = new Date();
                     callback(null,providerSchedule);
+                },
+//method to deactivate all the provider schedule days
+//*******************************************************************************************
+                function deactivateScheduleDay(providerSchedule, callback)
+                {
+                    providerScheduleDayL.deactivateProviderScheduleDayByProviderScheduleId (providerSchedule,function (err,result)
+                    {
+                       
+                            return callback(err,providerSchedule);
+                    });
+                },
+//method to deactivate all the provider schedule Exceptions 
+//*******************************************************************************************
+                function deactivateException(providerSchedule, callback)
+                {
+                    providerScheduleExceptionL.deactivateProviderScheduleExceptionByProviderScheduleId (providerSchedule,function (err,result)
+                    {
+                       
+                            return callback(err,providerSchedule);
+                    });
                 },
 //Deactivate
 //******************************************************************************************* 

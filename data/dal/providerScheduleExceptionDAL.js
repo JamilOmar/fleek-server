@@ -80,7 +80,23 @@ providerScheduleExceptionDAL.prototype.deactivateProviderScheduleException = fun
                     return resultMethod(err,providerScheduleExceptionDAL.prototype.nonQueryResult(result));
                 },connection);
 };
-//Method to select the providerScheduleException by Provider Id
+//Method to deactivate providerScheduleException by Provider Schedule Id
+//*******************************************************************************************
+providerScheduleExceptionDAL.prototype.deactivateProviderScheduleExceptionByProviderScheduleId = function(data, resultMethod,connection) {
+           var disableParameters = 
+               [
+                 
+                  data.modificationDate,
+                      data.id,
+               ];
+           var deactivateProviderScheduleExceptionByProviderScheduleIdQuery = "UPDATE `chameleon`.`providerScheduleException` SET `IsActive`=0,`ModificationDate`=? WHERE `ProviderScheduleId`=?;";
+             providerScheduleExceptionDAL.prototype.query(deactivateProviderScheduleExceptionByProviderScheduleIdQuery,disableParameters,function (err,result)
+                {
+                    logger.log("debug","deactivateProviderScheduleExceptionByProviderScheduleId",data);
+                    return resultMethod(err,providerScheduleExceptionDAL.prototype.nonQueryResult(result));
+                     },connection);
+};
+//Method to select the providerScheduleException by Provider Schedule Id
 //*******************************************************************************************
 providerScheduleExceptionDAL.prototype.getProviderScheduleExceptionByProviderScheduleId = function(id, resultMethod,connection) {
     var getProviderScheduleExceptionByProviderScheduleIdQuery ="SELECT providerScheduleException.`ProviderScheduleExceptionId`  , providerScheduleException.`ProviderScheduleId` , providerScheduleException.`Date` , providerScheduleException.`Description` ,  providerScheduleException.`CreationDate` , providerScheduleException.`ModificationDate` , providerScheduleException.`IsActive` FROM `providerScheduleException` providerScheduleException  INNER JOIN `ProviderSchedule` providerSchedule on providerScheduleException.`ProviderScheduleId` = providerSchedule.`ProviderScheduleId` WHERE providerSchedule.`IsActive` =1 AND providerScheduleException.`IsActive` =1 AND providerScheduleException.`ProviderScheduleId` = ? ORDER BY providerScheduleException.`Date`";
@@ -88,6 +104,16 @@ providerScheduleExceptionDAL.prototype.getProviderScheduleExceptionByProviderSch
                 {
                     logger.log("debug","getProviderScheduleExceptionByProviderScheduleId",id , result);
                     return resultMethod(err,providerScheduleExceptionDAL.prototype.self.mapperSqlToModelCollection(result));
+                },connection);  
+};
+//Method to select the providerScheduleException by Id , Provider Schedule Id and Provider Id
+//*******************************************************************************************
+providerScheduleExceptionDAL.prototype.getProviderScheduleExceptionByIdProviderScheduleIdProviderId = function(id,providerScheduleId,providerId, resultMethod,connection) {
+    var getProviderScheduleExceptionByIdProviderScheduleIdProviderIdQuery ="SELECT providerScheduleException.`ProviderScheduleExceptionId`  , providerScheduleException.`ProviderScheduleId` , providerScheduleException.`Date` , providerScheduleException.`Description` ,  providerScheduleException.`CreationDate` , providerScheduleException.`ModificationDate` , providerScheduleException.`IsActive` FROM `providerScheduleException` providerScheduleException  INNER JOIN `ProviderSchedule` providerSchedule on providerScheduleException.`ProviderScheduleId` = providerSchedule.`ProviderScheduleId` WHERE providerScheduleException.`ProviderScheduleExceptionId`  = ? AND providerSchedule.`IsActive` =1 AND providerScheduleException.`IsActive` =1 AND providerScheduleException.`ProviderScheduleId` = ? AND providerSchedule.`ProviderId` = ? ";
+                providerScheduleExceptionDAL.prototype.getByArguments(getProviderScheduleExceptionByIdProviderScheduleIdProviderIdQuery,[id,providerScheduleId,providerId],function (err,result)
+                {
+                    logger.log("debug","getProviderScheduleExceptionByIdProviderScheduleIdProviderId",id , result);
+                    return resultMethod(err,providerScheduleExceptionDAL.prototype.self.mapperSqlToModel(result));
                 },connection);  
 };
 //Method for transform the information from sql to model

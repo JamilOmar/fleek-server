@@ -18,6 +18,7 @@ var uuid = require('node-uuid');
 var moment = require('moment');
 var config = require('config');
 var validator = require('validator');
+var context = require('security/context');
 //*******************************************************************************************
 //constants
 var constants = require('global/constants');

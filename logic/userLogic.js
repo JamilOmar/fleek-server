@@ -1,3 +1,11 @@
+//*******************************************************************************************
+//Name: User Logic
+//Description: User logic class
+//Target : User Creation , Administration of Users 
+//Author: Jamil Falconi
+//year: 2016
+//Version : 1.0
+//*******************************************************************************************
 require('rootpath')();
 var awsS3 = require('utilities/amazonS3');
 var uuid = require('node-uuid');
@@ -9,6 +17,7 @@ var cache = require('data/cache/cache.js');
 var logger = require('utilities/logger');
 var cryptotHelper = require('security/helper/cryptoHelper') 
 var moment = require('moment');
+var validator =require('validator');
 var context = require('security/context');
 //*******************************************************************************************
 //constants
@@ -22,6 +31,8 @@ var userLogic = function()
 
 
 
+//*******************************************************************************************
+//
 //create users
 //*******************************************************************************************
 userLogic.prototype.createUser = function(user, resultMethod) {

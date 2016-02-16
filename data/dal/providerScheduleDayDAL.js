@@ -79,7 +79,7 @@ providerScheduleDayDAL.prototype.deactivateProviderScheduleDay = function(data, 
                     return resultMethod(err,providerScheduleDayDAL.prototype.nonQueryResult(result));
                 },connection);
 };
-//Method to deactivate providerScheduleDay
+//Method to deactivate providerScheduleDay by Provider Schedule Id
 //*******************************************************************************************
 providerScheduleDayDAL.prototype.deactivateProviderScheduleDayByProviderScheduleId = function(data, resultMethod,connection) {
            var disableParameters = 
@@ -96,13 +96,23 @@ providerScheduleDayDAL.prototype.deactivateProviderScheduleDayByProviderSchedule
                      },connection);
 };
        
-//Method to select the ProviderScheduleDay by Provider Id
+//Method to select the ProviderScheduleDay by Provider Schedule Id
 //*******************************************************************************************
 providerScheduleDayDAL.prototype.getProviderScheduleDayByProviderScheduleId = function(id, resultMethod,connection) {
     var getProviderScheduleDayByProviderScheduleIdQuery ="SELECT providerScheduleDay.`ProviderScheduleDayId` , providerScheduleDay.`ProviderScheduleId` , providerScheduleDay.`StartTime`, providerScheduleDay.`DayOfWeek` ,providerScheduleDay.`EndTime` , providerScheduleDay.`CreationDate` ,providerScheduleDay.`ModificationDate` ,providerScheduleDay.`IsActive` FROM `chameleon`.`ProviderScheduleDay` providerScheduleDay INNER JOIN `ProviderSchedule` providerSchedule on providerScheduleDay.`ProviderScheduleId` = providerSchedule.`ProviderScheduleId` WHERE providerScheduleDay.`ProviderScheduleId` =? AND providerScheduleDay.`IsActive` = 1  AND providerSchedule.`IsActive` =1 ORDER BY providerScheduleDay.ProviderScheduleId,providerScheduleDay.DayOfWeek, providerScheduleDay.StartTime ";
                 providerScheduleDayDAL.prototype.getByArguments(getProviderScheduleDayByProviderScheduleIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getProviderScheduleDayByProviderScheduleId",id , result);
+                    return resultMethod(err,providerScheduleDayDAL.prototype.self.mapperSqlToModelCollection(result));
+                },connection);  
+};
+//Method to select the ProviderScheduleDay by Id, Provider Schedule Id and Provider Id
+//*******************************************************************************************
+providerScheduleDayDAL.prototype.getProviderScheduleDayByIdProviderScheduleIdProviderId = function(id,providerScheduleId,providerId, resultMethod,connection) {
+    var getProviderScheduleDayByIdProviderScheduleIdProviderIdQuery ="SELECT providerScheduleDay.`ProviderScheduleDayId` , providerScheduleDay.`ProviderScheduleId` , providerScheduleDay.`StartTime`, providerScheduleDay.`DayOfWeek` ,providerScheduleDay.`EndTime` , providerScheduleDay.`CreationDate` ,providerScheduleDay.`ModificationDate` ,providerScheduleDay.`IsActive` FROM `chameleon`.`ProviderScheduleDay` providerScheduleDay INNER JOIN `ProviderSchedule` providerSchedule on providerScheduleDay.`ProviderScheduleId` = providerSchedule.`ProviderScheduleId` WHERE providerScheduleDay.`ProviderScheduleDayId` = ? AND  providerScheduleDay.`ProviderScheduleId` =? AND providerScheduleDay.`IsActive` = 1  AND providerSchedule.`IsActive` =1 AND providerSchedule.`ProviderId` = ? ";
+                providerScheduleDayDAL.prototype.getByArguments(getProviderScheduleDayByIdProviderScheduleIdProviderIdQuery,[id,providerScheduleId,providerId],function (err,result)
+                {
+                    logger.log("debug","getProviderScheduleDayByIdProviderScheduleIdProviderId",id , result);
                     return resultMethod(err,providerScheduleDayDAL.prototype.self.mapperSqlToModelCollection(result));
                 },connection);  
 };

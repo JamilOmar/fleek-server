@@ -9,10 +9,12 @@
 require('rootpath')();
 var mod_vasync  = require("vasync");
 var providerScheduleExceptionDAL = require('data/dal/providerScheduleExceptionDAL');
+var providerScheduleLogic = require('logic/providerScheduleLogic')
 var logger = require('utilities/logger');
 var uuid = require('node-uuid');
 var moment = require('moment');
 var config = require('config');
+var context = require('security/context');
 //*******************************************************************************************
 var providerScheduleExceptionLogic = function()
 {
@@ -26,18 +28,20 @@ providerScheduleExceptionLogic.prototype.validateFields = function(providerSched
 
  
       return(
-    providerScheduleException.hasOwnProperty("date")
-    &&
-    providerScheduleException.hasOwnProperty("description"));
+    	    providerScheduleException.hasOwnProperty("date")
+        &&
+        providerScheduleException.hasOwnProperty("description"));
    
  
 }
-
-
+//*******************************************************************************************
+//
 //create
+//
 //*******************************************************************************************
 providerScheduleExceptionLogic.prototype.createProviderScheduleException = function(providerScheduleException, resultMethod) {
 var providerScheduleExceptionData = new providerScheduleExceptionDAL();
+var providerScheduleL = new providerScheduleLogic();
 try
 {
     //create a connection for the transaction
@@ -55,13 +59,23 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
-                 //method to validate the data    
-                function validate(callback)
+//authorize
+//*******************************************************************************************
+                function authorize(callback)
+                {
+                    providerScheduleL.validateProviderScheduleByIdProviderId(providerScheduleException.providerScheduleId, context.getUser.id,function (err,result) {
+                        
+                        return callback(err,result);
+                    },connection);
+                },    
+//validate the data
+//*******************************************************************************************
+                function validate(data,callback)
                 {
                     try
                     {
                    //validate if the dates and required fields are submited 
-                   if(providerScheduleExceptionLogic.prototype.validateFields(providerScheduleException))
+                   if(Object.keys(data).length >0 && providerScheduleExceptionLogic.prototype.validateFields(providerScheduleException))
                     {
                         var tmp =  moment(providerScheduleException.date);
                         tmp.format(config.get('chameleon.date.format'));
@@ -79,7 +93,7 @@ try
                     }
                     else
                     {
-                        return callback({name: "Error at create the provider schedule exception.", message:"There are missing parameters."},null);
+                        return callback({name: "Error at create the provider schedule exception.", message:"There are invalid parameters."},null);
                     }
                     }
                     catch (err)
@@ -88,7 +102,8 @@ try
                         
                     }
                 },
-
+//check if previous data exists with the same configuration
+//*******************************************************************************************
                 function getPreviousData(providerScheduleException,callback)
                 {
                     //Gets the previous day per calendar
@@ -119,7 +134,8 @@ try
                     
                     
                 },
-                //method to check if the dates are correct
+//prepare the data
+//*******************************************************************************************
                 function prepareData(providerScheduleException,callback)
                 {
                     var localDate = new Date();
@@ -130,7 +146,8 @@ try
                     providerScheduleException.isActive = true;
                     return callback(null,providerScheduleException);   
                 },    
-                //method to create the providerScheduleException    
+//method to create the providerScheduleException
+//*******************************************************************************************    
                 function createProviderScheduleException(providerScheduleException,callback)
                 {
                     providerScheduleExceptionData.createProviderScheduleException(providerScheduleException,function (err,result)
@@ -147,15 +164,19 @@ try
                             {
                                 return connection.rollback(function() {
                                     callback(err,null);});
-                            }
-                            logger.log("debug","commit" , providerScheduleException);
+                            }else
+                            {
+                                logger.log("debug","commit" , providerScheduleException)
+                                return callback(null,providerScheduleException.id );
+                            };
                         });
                           
-                    return callback(null,providerScheduleException.id );
+                    
                     },connection);
 
         },
-        //get information by id       
+//get information by 
+//*******************************************************************************************  
         function getById (id, callback)
         {
                 providerScheduleExceptionData.getProviderScheduleExceptionById(id,function (err,result)
@@ -177,12 +198,15 @@ try
     catch(err)
     {
          providerScheduleExceptionData = null;
+         providerScheduleL = null;
          return resultMethod(err,null );
     }
         
 };
-
+//*******************************************************************************************
+//
 //update
+//
 //*******************************************************************************************
 providerScheduleExceptionLogic.prototype.updateProviderScheduleException = function(providerScheduleException, resultMethod) {
 var providerScheduleExceptionData = new providerScheduleExceptionDAL();
@@ -203,13 +227,23 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
-                 //method to validate the data    
-                function validate(callback)
+//authorize
+//*******************************************************************************************
+                function authorize(callback)
+                {
+                    providerScheduleExceptionData.getProviderScheduleExceptionByIdProviderScheduleIdProviderId(providerScheduleException.id,providerScheduleException.providerScheduleId,context.getUser.id ,function (err,result) {
+                        
+                        return callback(err,result);
+                    },connection);
+                },    
+//method to validate the data
+//*******************************************************************************************    
+                function validateData(data,callback)
                 {
                     try
                     {
                    //validate if the dates and required fields are submited 
-                   if(providerScheduleExceptionLogic.prototype.validateFields(providerScheduleException))
+                   if(Object.keys(data).length >0 && providerScheduleExceptionLogic.prototype.validateFields(providerScheduleException))
                     {
                         var tmp =  moment(providerScheduleException.date);
                         tmp.format(config.get('chameleon.date.format'));
@@ -227,7 +261,7 @@ try
                     }
                     else
                     {
-                        return callback({name: "Error at update the provider schedule exception.", message:"There are missing parameters."},null);
+                        return callback({name: "Error at update the provider schedule exception.", message:"There are invalid parameters."},null);
                     }
                     }
                     catch (err)
@@ -236,6 +270,8 @@ try
                         
                     }
                 },
+//check if previous data exists with the same configuration
+//*******************************************************************************************
                 function getPreviousData(providerScheduleException,callback)
                 {
                     //Gets the previous day per calendar
@@ -281,7 +317,8 @@ try
                     
                     
                 },
-                //method to check if the dates are correct
+//method to check if the dates are correct
+//*******************************************************************************************
                 function prepareData(providerScheduleException,callback)
                 {
                     var localDate = new Date();
@@ -292,7 +329,8 @@ try
                     delete providerScheduleException.providerScheduleId;
                     return callback(null,providerScheduleException);   
                 },    
-                //method to update the providerScheduleException    
+//method to update the providerScheduleException
+//*******************************************************************************************    
                 function updateProviderScheduleException(providerScheduleException,callback)
                 {
                     providerScheduleExceptionData.updateProviderScheduleException(providerScheduleException,providerScheduleException.id,function (err,result)
@@ -317,7 +355,8 @@ try
                     },connection);
 
         },
-        //get information by id       
+//get information by id
+//*******************************************************************************************       
         function getById (id, callback)
         {
                 providerScheduleExceptionData.getProviderScheduleExceptionById(id,function (err,result)
@@ -343,8 +382,10 @@ try
     }
         
 };
-
+//*******************************************************************************************
+//
 //get providerScheduleException by Id
+//
 //*******************************************************************************************
 providerScheduleExceptionLogic.prototype.getProviderScheduleExceptionById = function(id, resultMethod) {
      var providerScheduleExceptionData = new providerScheduleExceptionDAL();
@@ -358,8 +399,10 @@ providerScheduleExceptionLogic.prototype.getProviderScheduleExceptionById = func
             providerScheduleExceptionData = null;
             return  resultMethod(err,result);});
 };
-
+//*******************************************************************************************
+//
 //get providerScheduleException by provider schedule Id
+//
 //*******************************************************************************************
 providerScheduleExceptionLogic.prototype.getProviderScheduleExceptionByProviderScheduleId = function(id, resultMethod) {
     var providerScheduleExceptionData = new providerScheduleExceptionDAL();
@@ -373,9 +416,10 @@ providerScheduleExceptionLogic.prototype.getProviderScheduleExceptionByProviderS
             providerScheduleExceptionData = null;
             return  resultMethod(err,result);});
 }
-
-
+//*******************************************************************************************
+//
 //deactivate
+//
 //*******************************************************************************************
 providerScheduleExceptionLogic.prototype.deactivateProviderScheduleException = function(providerScheduleException, resultMethod) {
     var providerScheduleExceptionData = new providerScheduleExceptionDAL();
@@ -396,14 +440,30 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
-                    
-                //method to prepare the data
-                function prepare(callback)
+                function authorize(callback)
                 {
+                    providerScheduleExceptionData.getProviderScheduleExceptionByIdProviderScheduleIdProviderId(providerScheduleException.id,providerScheduleException.providerScheduleId,context.getUser.id ,function (err,result) {
+                        
+                        return callback(err,result);
+                    },connection);
+                },    
+                    
+//method to prepare the data
+//*******************************************************************************************
+                function prepare(data , callback)
+                {
+                    if(Object.keys(data).length >0 )
+                    {
                     providerScheduleException.modificationDate =new Date();
-                    callback(null,providerScheduleException);
+                        return callback(null,providerScheduleException);
+                    }
+                    else
+                    {
+                        return callback({name: "Error at deactive the provider schedule exception.", message:"There are invalid parameters."},null);
+                    }   
                 },
-                //Deactivate 
+//Deactivate
+//******************************************************************************************* 
                 function deactivate(providerScheduleException,callback)
                 {
                     providerScheduleExceptionData.deactivateProviderScheduleException(providerScheduleException,function (err,result)
@@ -447,8 +507,25 @@ try
     }
         
 };
-
-
-
+//*******************************************************************************************
+//
+//Deactivate all the data by the provider schedule Id
+//
+//*******************************************************************************************
+providerScheduleExceptionLogic.prototype.deactivateProviderScheduleExceptionByProviderScheduleId = function(id, resultMethod,connection) {
+ var providerScheduleExceptionData = new providerScheduleExceptionDAL();
+try
+{
+ providerScheduleExceptionData.deactivateProviderScheduleExceptionByProviderScheduleId(id,function (err,result)
+                    {
+                        return  resultMethod(err,result);
+                    });
+}
+ catch(err)
+    {
+         providerScheduleExceptionData = null;
+         return resultMethod(err,null );
+    }
+}
 //********************************************************************************************
 module.exports =  providerScheduleExceptionLogic;
