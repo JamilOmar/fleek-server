@@ -1,4 +1,4 @@
-var message = function()
+var template = function()
         {
         
            this.name = null;
@@ -8,4 +8,4 @@ var message = function()
         };
 
 //********************************************************************************************
-module.exports = message;
+module.exports = template;

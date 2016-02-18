@@ -4,6 +4,7 @@ var message = function()
            this.from_email = undefined;
            this.to = [];
            this.recipient_metadata = [];
+           this.global_merge_vars = [];
          
       
         };

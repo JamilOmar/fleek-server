@@ -3,9 +3,9 @@ validator.extend ('isNullOrUndefined',function(str)
 {
     return str == null || str == undefined;
 });
-validator.extend ('isNumberAndInteger',function(number)
+validator.extend ('isNumberAndInteger',function(number,min,max)
 {
-    return Number.isInteger(number);
+    return Number.isInteger(number) && (number >= min) ;
 });
 validator.extend ('isCoordinate',function(str)
 {
