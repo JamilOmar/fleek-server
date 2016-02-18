@@ -236,7 +236,7 @@ userDAL.prototype.mapperModelToSql = function(data)
     {
      logger.log("debug","mapperModelToSql before",data);   
     var mysqlModel  ={};
-    if(data.hasOwnProperty("id"))
+    if(data.hasOwnProperty("id") )
     mysqlModel.UserId  = data.id;
     if(data.hasOwnProperty("name"))
     mysqlModel.Name = data.name;    

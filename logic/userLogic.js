@@ -18,6 +18,8 @@ var logger = require('utilities/logger');
 var cryptotHelper = require('security/helper/cryptoHelper') 
 var moment = require('moment');
 var validator =require('validator');
+require('utilities/validatorManager/validatorExtender')(validator);
+var validatorManager = require('utilities/validatorManager/validatorManager');
 var context = require('security/context');
 //*******************************************************************************************
 //constants
@@ -27,9 +29,59 @@ var userLogic = function()
 {
    userLogic.prototype.self = this;
 };
-
-
-
+userLogic.prototype.validate = function (user,callback) {
+var validatorM = new validatorManager();   
+            
+        
+           if(  !validator.isLength( user.name,{min:0, max:250}) )
+           {
+                validatorM.addException("Name is invalid.");
+           }
+            if(  !validator.isLength( user.lastname,{min:0, max:250}) )
+           {
+                validatorM.addException("Lastname is invalid.");
+           }
+            if(  !validator.isLength( user.username,{min:6, max:20}) )
+           {
+                validatorM.addException("Username is invalid.");
+           }
+            if(  !validator.isLength( user.password,{min:6, max:64}) )
+           {
+                validatorM.addException("Password is invalid.");
+           }
+            if(  !(validator.isLength( user.email,{min:0, max:254}) &&
+            validator.isEmail( user.email)) )
+           {
+                validatorM.addException("Email is invalid.");
+           }
+  
+           if(  (validator.isNullOrUndefined( user.facebookId ) ||validator.isLength( user.facebookId,{min:0, max:255})) )
+           {
+                validatorM.addException("Facebook Id is invalid.");
+           }
+           if(  (validator.isNullOrUndefined( user.pictureUrl ) ||validator.isLength( user.pictureUrl,{min:0, max:255})) )
+           {
+                validatorM.addException("Picture is invalid.");
+           }
+            if(  (validator.isNullOrUndefined( user.countryId ) ||validator.isLength( user.countryId,{min:0, max:255})) )
+           {
+                validatorM.addException("Country is invalid.");
+           }
+            if(  (validator.isNullOrUndefined( user.latitude ) ||validator.isCoordinate( user.latitude)) )
+           {
+                validatorM.addException("Latitude is invalid.");
+           }
+           if(  (validator.isNullOrUndefined( user.longitude ) ||validator.isCoordinate( user.longitude)) )
+           {
+                validatorM.addException("Longitude is invalid.");
+           }
+           
+        
+           if(validatorM.isValid())
+            return callback(null ,true );
+            else
+            return callback({name:"Error in User Validation", message : validatorM.GenerateErrorMessage()});
+}
 
 //*******************************************************************************************
 //

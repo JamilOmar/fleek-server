@@ -205,19 +205,19 @@ userFriendDAL.prototype.mapperModelToSql = function(data)
     {
      logger.log("debug","mapperModelToSql before",data);   
     var mysqlModel  ={};
-    if(data.hasOwnProperty("id"))
+    if(data.hasOwnProperty("id") && data.id != undefined)
     mysqlModel.CustomerFriendId = data.id;
-     if(data.hasOwnProperty("customerId"))    
+     if(data.hasOwnProperty("customerId")  && data.customerId != undefined)    
     mysqlModel.CustomerId  = data.customerId;
-     if(data.hasOwnProperty("friendId"))
+     if(data.hasOwnProperty("friendId") && data.friendId != undefined)
     mysqlModel.FriendId = data.friendId;
-     if(data.hasOwnProperty("creationDate"))
+     if(data.hasOwnProperty("creationDate") && data.creationDate != undefined)
     mysqlModel.CreationDate = data.creationDate;
-     if(data.hasOwnProperty("modificationDate"))
+     if(data.hasOwnProperty("modificationDate" ) && data.modificationDate != undefined)
     mysqlModel.ModificationDate = data.modificationDate;
-     if(data.hasOwnProperty("state"))
+     if(data.hasOwnProperty("state") && data.state != undefined)
     mysqlModel.State = data.state;
-     if(data.hasOwnProperty("isActive"))
+     if(data.hasOwnProperty("isActive") && data.isActive != undefined)
     mysqlModel.IsActive = data.isActive
      logger.log("debug","mapperModelToSql",mysqlModel);
       return mysqlModel;    

@@ -29,7 +29,10 @@ var reservationLogic = function()
   
    reservationLogic.prototype.self = this;
 };
+//*******************************************************************************************
+//
 //validation of the required fields for the reservation creation
+//
 //*******************************************************************************************
 reservationLogic.prototype.validateFields = function(reservation) {
 
@@ -49,7 +52,10 @@ reservationLogic.prototype.validateFields = function(reservation) {
                    
 
 }
+//*******************************************************************************************
+//
 //validation of the required fields for the reservation creation
+//
 //*******************************************************************************************
 reservationLogic.prototype.validateTime = function(reservation,providerScheduleDayList,providerScheduleDayException,dataRequested) { 
 //convert the string into dates
@@ -122,8 +128,10 @@ reservationLogic.prototype.validateTime = function(reservation,providerScheduleD
     endTimeReservation = null;
    return false;
 }
-
+//*******************************************************************************************
+//
 //Method to Create an entry to the reservation
+//
 //*******************************************************************************************
 reservationLogic.prototype.createReservation = function(reservation, resultMethod) {
     
@@ -376,9 +384,46 @@ try
     }
         
 };
-//Method to Update reservations
 //*******************************************************************************************
-reservationLogic.prototype.updateReservation = function(reservation, resultMethod) {
+//
+//reservation validation for the workflow, validates the states of the petition
+//
+//*******************************************************************************************
+reservationLogic.prototype.approvalReservationValidation = function (  reservation, originalReservation)
+{
+var  verification = false;    
+//firts validation
+//*******************************************************************************************
+if( originalReservation.state == constants.REQUEST_STATES_RESERVATION.SUBMITED && originalReservation.isActive
+&& ((originalReservation.customerId == reservation.customerId)&&(originalReservation.providerId == reservation.providerId)))
+    {
+        switch (reservation.state) {
+            case constants.REQUEST_STATES_RESERVATION.APPROVED:
+            // the person who is accepting is the customer's friend
+            verification = ( originalReservation.providerId == context.getUser.id && originalReservation.state == constants.REQUEST_STATES_RESERVATION.SUBMITED);
+            break;
+  
+        case constants.REQUEST_STATES_RESERVATION.CANCELED:
+          // the person who is accepting is the customer's friend
+            verification = ( originalReservation.providerId == context.getUser.id  || originalReservation.customerId == context.getUser.id   && originalReservation.state != constants.REQUEST_STATES_RESERVATION.COMPLETED) ;
+            break;
+         case constants.REQUEST_STATES_RESERVATION.COMPLETED:
+          // the person who is accepting is the customer's friend
+            verification = ( originalReservation.customerId == context.getUser.id   && originalReservation.state == constants.REQUEST_STATES_RESERVATION.APPROVED) ;
+            break;    
+            default:verification = false;
+        break;
+    }    
+}
+// no workflow required already decided
+return verification;    
+}
+//*******************************************************************************************
+//
+//method to Update reservations
+//
+//*******************************************************************************************
+reservationLogic.prototype.approvalReservation = function(reservation, resultMethod) {
 var reservationData = new reservationDAL();
 try
 {
@@ -397,14 +442,45 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
-                
-                //method to prepare the data    
-                function prepare(callback)
+//method to prepare the data
+//*******************************************************************************************    
+                function getData(callback)
                 {
-                    reservation.modificationDate =new Date();
-                    callback(null,reservation);
+                    reservationData.getReservationById(reservation.id,function (err,result)
+                    {
+                        return  callback(err,result);
+                    },connection);
                 },
-                //update   
+//authorize
+//*******************************************************************************************
+                function authorize(data,callback)
+                {
+                    if( Object.keys(data).length <=0)
+                    {	
+                      return callback({name: "Error at reservation's approval", message:"Invalid operation."},null);
+                    }
+                    else
+                    {
+                        if (reservationLogic.prototype.self.approvalReservationValidation( reservation, data))
+                        {
+                            //prepare data
+                                    reservation.modificationDate =new Date();
+                            delete reservation.customerId;
+                            delete reservation.providerId;
+                            delete reservation.creationDate;
+                            delete reservation.isActive;
+                            
+                            return callback(null,reservation);
+                }
+                else
+                {
+                     return callback({name: "Error at reservation's approval", message:"Invalid operation."},null);
+                }
+                
+            }
+                },
+//update
+//*******************************************************************************************   
                 function updateReservation(reservation,callback)
                 {
                     reservationData.updateReservation(reservation,reservation.id,function (err,result)
@@ -433,7 +509,8 @@ try
                     },connection);
 
         },
-        //get information by id            
+//get information by id
+//*******************************************************************************************            
         function getById (reservation, callback)
         {
            
@@ -460,9 +537,10 @@ try
     }
         
 };
-
-
+//*******************************************************************************************
+//
 //Method to Select reservation By Id
+//
 //*******************************************************************************************
 reservationLogic.prototype.getReservationById = function(id, resultMethod) {
      var reservationData = new reservationDAL();
@@ -476,7 +554,10 @@ reservationLogic.prototype.getReservationById = function(id, resultMethod) {
             reservationData = null;
             return  resultMethod(err,result);});
 };
+//*******************************************************************************************
+//
 //Method to Select reservation By Customer Id
+//
 //*******************************************************************************************
 reservationLogic.prototype.getReservationByCustomerId = function(id, resultMethod) {
      var reservationData = new reservationDAL();
@@ -490,7 +571,10 @@ reservationLogic.prototype.getReservationByCustomerId = function(id, resultMetho
             reservationData = null;
             return  resultMethod(err,result);});
 };
+//*******************************************************************************************
+//
 //Method to Select reservation By Provider Id
+//
 //*******************************************************************************************
 reservationLogic.prototype.getReservationByProviderId = function(id, resultMethod) {
      var reservationData = new reservationDAL();
@@ -506,8 +590,10 @@ reservationLogic.prototype.getReservationByProviderId = function(id, resultMetho
 };
 
 
-
+//*******************************************************************************************
+//
 //Method to deactivate reservation
+//
 //*******************************************************************************************
 reservationLogic.prototype.deactivateReservation = function(reservation, resultMethod) {
     var reservationData = new reservationDAL();
@@ -582,83 +668,5 @@ try
     }
         
 };
-
-//Method to Cancel reservation
-//*******************************************************************************************
-reservationLogic.prototype.cancelReservation = function(reservation, resultMethod) {
-    var reservationData = new reservationDAL();
-try
-{
-    //create a connection for the transaction
-    reservationData.pool.getConnection(function(err,connection){
-        //start the transaction
-         if (err) 
-                { //if there is an error in the connection
-                    return resultMethod(err,null );
-                }
-        connection.beginTransaction(function(err)
-        {  
-                if (err) 
-                { //if there is an error in the transaction return
-                    return resultMethod(err,null );
-                }
-                //mod_vasync , waterfall for better order
-                mod_vasync.waterfall([
-                    
-                //method to prepare the data
-                function prepare(callback)
-                {
-                    reservation.modificationDate = new Date();
-                    callback(null,reservation);
-                },
-                //cancel 
-                function cancel(reservation,callback)
-                {
-                    reservationData.cancelReservation(reservation,function (err,result)
-                    {
-                        if(err)
-                        {
-                            return connection.rollback(function() {
-                                callback(err,null);});
-                        }
-                        //if no error commit
-                        connection.commit(function(err) 
-                        {
-                            if(err)
-                            {
-                                return connection.rollback(function() {
-                                    callback(err,null);});
-                            }
-                            else
-                            {
-                            
-                                logger.log("debug","commit" , reservation);
-                                 return callback(err,result );
-                            }
-                       
-                        });
-                 
-                    },connection);
-
-        }
-        ],
-        function(err,result)
-        {
-                connection.release();
-                reservationData = null;
-                return  resultMethod(err,result);
-        });
-
-        });
-    });
-    }
-    catch(err)
-    {
-         reservationData = null;
-         return resultMethod(err,null );
-    }
-        
-};
-
 //********************************************************************************************
 module.exports =  reservationLogic;

@@ -12,12 +12,21 @@ const constants=
     REDIS_PROVIDER_SCHEDULE : "REDIS_PROVIDER_SCHEDULE-",
     //Language for service and service type
 	LANGUAGE : "-LANGUAGE-",
-    //requests states
+    //requests states for frienships
     REQUEST_STATES :
     {
         REQUESTED : 0,
         APPROVED :1,
         REJECTED :-1
+        
+    },
+    //requests states for reservations
+    REQUEST_STATES_RESERVATION :
+    {
+        SUBMITED : 0,
+        APPROVED :1,
+        COMPLETED :2,
+        CANCELED :-1
         
     },
      //namespace for context value

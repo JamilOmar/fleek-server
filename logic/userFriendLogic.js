@@ -300,7 +300,7 @@ try
         mod_vasync.waterfall([
 //get User friend 
 //*******************************************************************************************            
-        function getUserFriend ( callback){    
+        function getdata ( callback){    
         userFriendData.getUserFriendById(userFriend.id,function (err,result)
         {
             return  callback(err,result);
@@ -309,15 +309,15 @@ try
         }, 
 //validate if the user Friend Exists
 //*******************************************************************************************    
-        function checkExistingItem(data, callback)
+        function authorize(data, callback)
         {
             if( Object.keys(data).length <=0)
             {
-                    return callback({name: "Error at create friendship", message:"Invalid operation."},null);
+                    return callback({name: "Error at friendship approval", message:"Invalid operation."},null);
             }
             else
             {
-                if (userFriendLogic.prototype.self.approvalUserFriendValidation(context.getUser.id , userFriend, data))
+                if (userFriendLogic.prototype.self.approvalUserFriendValidation( userFriend, data))
                 {
                     //prepare data
                     userFriend.modificationDate =new Date();
@@ -336,7 +336,7 @@ try
                 }
                 else
                 {
-                     return callback({name: "Error at create friendship", message:"Invalid operation."},null);
+                     return callback({name: "Error at friendship", message:"Invalid operation."},null);
                 }
                 
             }
@@ -410,7 +410,7 @@ try
             
 //get User friend 
 //*******************************************************************************************            
-            function getUserFriend ( callback){    
+            function getData ( callback){    
                 userFriendData.getUserFriendById(userFriend.id,function (err,result)
                 {
                     return  callback(err,result);
@@ -419,7 +419,7 @@ try
             }, 
 //validate if the user Friend Exists
 //*******************************************************************************************    
-            function checkExistingItem(data, callback)
+            function authorize(data, callback)
             {
                 if( Object.keys(data).length <=0)
                 {
