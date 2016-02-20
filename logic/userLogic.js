@@ -21,6 +21,9 @@ var validator =require('validator');
 require('utilities/validatorManager/validatorExtender')(validator);
 var validatorManager = require('utilities/validatorManager/validatorManager');
 var context = require('security/context');
+var emailT = require("utilities/email/");
+var messageHelper = require("utilities/email/models/message");
+var templateHelper = require("utilities/email/models/template");
 //*******************************************************************************************
 //constants
 var constants = require('global/constants.js');
@@ -77,10 +80,11 @@ var validatorM = new validatorManager();
            }
            
         
-           if(validatorM.isValid())
-            return callback(null ,true );
+            
+            if(validatorM.isValid())
+            return callback(null ,true);
             else
-            return callback({name:"Error in User Validation", message : validatorM.GenerateErrorMessage()});
+            return callback({name:"Error in User Validation", message : validatorM.GenerateErrorMessage()},false);
 }
 
 //*******************************************************************************************
@@ -106,6 +110,14 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
+                function validateEntity(callback)
+                {
+                    userLogic.prototype.self.validate(user,function(err,result)
+                    {
+                        return callback(err,result);
+                    })
+                },
+                    
 //check the username
 //*******************************************************************************************
                 function check(callback)
@@ -115,71 +127,57 @@ try
                            return callback(err,result);
                     });
                 },
-//method to prepare the data
+//create the user
 //*******************************************************************************************    
-                function prepare(existingUser,callback)
-                {
-                    if( Object.keys(existingUser).length <=0)
-                    {
-                        var localDate = new Date();
-                        user.modificationDate = localDate;
-                        user.creationDate = localDate;
-                        user.isActive = true;
-                        user.isBlocked =false;
-                        return callback(null,user);
-                    }
-                    else
-                    {
-                         return callback({name: "Error at creation", message:"Username already exists."},null);
-                    }
-                },
-//create hash
-//******************************************************************************************* 
-                function hashPassword(user,callback)
+                function createUser(data,callback)
                 {
                     try
                     {
-                        
-                        
-                        user.password =   cryptotHelper.encrypt(user.password);
-                        return callback(null,user);
+                        if( Object.keys(data).length <=0)
+                        {
+                            var localDate = new Date();
+                            user.modificationDate = localDate;
+                            user.creationDate = localDate;
+                            user.isActive = true;
+                            user.isBlocked =false;
+                            user.password =   cryptotHelper.encrypt(user.password);
+                            userData.createUser(user,function (err,result)
+                            {
+                                if(err)
+                                {
+                                    return connection.rollback(function() {
+                                    callback(err,null);});
+                                }
+                                //if no error commit
+                                connection.commit(function(err) 
+                                {
+                                if(err)
+                                {
+                                    return connection.rollback(function() {
+                                        callback(err,null);});
+                                }
+                                else
+                                {
+                                    logger.log("debug","commit" , user);
+                                    return callback(null,result );
+                                }
+                        });
+                          
+                  
+                    },connection);
+                        }
+                        else
+                        {
+                             return callback({name: "Error at creation", message:"Username already exists."},null);
+                        }
                     }
                     catch (err)
                     {
                            logger.log("error","createUser" , err);
                            callback(err,null);
                     }
-                },    
-//method to create the user
-//*******************************************************************************************    
-                function createUser(user,callback)
-                {
-                    userData.createUser(user,function (err,result)
-                    {
-                        if(err)
-                        {
-                            return connection.rollback(function() {
-                                callback(err,null);});
-                        }
-                        //if no error commit
-                        connection.commit(function(err) 
-                        {
-                            if(err)
-                            {
-                                return connection.rollback(function() {
-                                    callback(err,null);});
-                            }
-                            else
-                            {
-                                logger.log("debug","commit" , user);
-                                return callback(null,result );
-                            }
-                        });
-                          
-                  
-                    },connection);
-
                 },
+
 //get information by id
 //*******************************************************************************************            
                 function getById (id, callback)
@@ -191,15 +189,24 @@ try
                 },
 //store the information under cache
 //******************************************************************************************* 
-                function saveInCache(user,callback)
+                function saveInCache(data,callback)
                 {
                     var cacheL =new cache();
-                    cacheL.saveCache(constants.REDIS_USER+user.id,user,function(err,result)
+                    cacheL.saveCache(constants.REDIS_USER+user.id,data,function(err,result)
                     {
                         cacheL = null; 
                         return callback(err,result);
                     });
           
+                },
+//send the email
+//*******************************************************************************************                 
+                function sendEmail (data,callback)
+                {
+                        userLogic.prototype.self.sendEmail(user,"sd",function(err,result)
+                        {
+                            return callback(err,data);
+                        });
                 }
                 ],
 //*******************************************************************************************
@@ -243,10 +250,10 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
-//check if the item can be updated
+//update the user
 //*******************************************************************************************    
 
-                function checkExistingItem( callback)
+                function updateUser( callback)
                 {
                 
                     if(user.id != context.getUser.id)
@@ -255,66 +262,54 @@ try
                     }
                     else
                     {
-                            return callback(null,user); 
-                    } 
-                },
-//method to prepare the data        
- //*******************************************************************************************                  
-      
-                function prepare(user,callback)
-                {
-                    user.modificationDate =new Date();
-                    //no update password
-                    delete user.password;
-                    delete user.creationDate;
-                    delete user.isActive;
-                    callback(null,user);
-                },
-//update
-//*******************************************************************************************    
-                function updateUser(user,callback)
-                {
-                    userData.updateUser(user,user.id,function (err,result)
-                    {
-                        if(err)
-                        {
-                            return connection.rollback(function() {
-                                callback(err,null);});
-                        }
-                        //if no error commit
-                        connection.commit(function(err) 
-                        {
+                           user.modificationDate =new Date();
+                            //no update password
+                            delete user.password;
+                            delete user.creationDate;
+                            delete user.isActive;
+                            userData.updateUser(user,user.id,function (err,result)
+                            {
                             if(err)
                             {
                                 return connection.rollback(function() {
                                     callback(err,null);});
                             }
-                            else
+                            //if no error commit
+                            connection.commit(function(err) 
                             {
-                                logger.log("debug","commit" , user);
-                                return callback(null,user );
-                            }
-                        });
+                                if(err)
+                                {
+                                    return connection.rollback(function() {
+                                        callback(err,null);});
+                                }
+                                else
+                                {
+                                    logger.log("debug","commit" , user);
+                                    return callback(null,user.id );
+                                }
+                                });
                      
                  
                     },connection);
 
-        },
+                    } 
+                },
+
 //get information by id
 //*******************************************************************************************            
-        function getById (user, callback)
+        function getById (id, callback)
         {
            
-                userLogic.prototype.self.checkUser(user.id,function (err,result)
+                userLogic.prototype.self.checkUser(id,function (err,result)
                 {
                     return  callback(err,result);
                 },connection);
         },
 //*******************************************************************************************
-        function saveInCache(user,callback)
+        function saveInCache(data,callback)
         {
             var cacheL =new cache();
-            cacheL.saveCache(constants.REDIS_USER+user.id,user,function(err,result)
+            cacheL.saveCache(constants.REDIS_USER+user.id,data,function(err,result)
             {
                 cacheL = null; 
                 return callback(err,result);
@@ -366,98 +361,86 @@ try
                     mod_vasync.waterfall([
                     
  
-//check if the item can be updated
+//update the user
 //*******************************************************************************************    
 
-                     function checkExistingItem(callback)
+                     function updateUser(callback)
                         {
-                
-                            if(context.getUser.id != user.id)
+                            try
                             {
-                            return callback({name: "Invalid Update", message:"User is not allowed."},null); 
-                            }
-                            else
-                            {
-                                    return callback(null,user); 
-                            } 
-                        }, 
-                
-//method to prepare the data
-//*******************************************************************************************    
-                    function prepare(user,callback)
-                    {
-                        user.modificationDate =new Date();
-                        delete user.creationDate;
-                        delete user.isActive;
-                        callback(null,user);
-                    },
-//create hash
-//******************************************************************************************* 
-                    function hashPassword(user,callback)
-                    {
-                        try
-                        {
-                            user.password =   cryptotHelper.encrypt(user.password);
-                            return callback(null,user);
-                        }
-                        catch (err)
-                        {
-                           logger.log("error","createUser" , err);
-                           callback(err,null);
-                        }
-                    },    
-//update
-//******************************************************************************************* 
-                    function updatePassword(user,callback)
-                    {
-                        userData.updatePassword({password:user.password, modificationDate:user.modificationDate ,id: user.id},function (err,result)
-                        {
-                            if(err)
-                            {
-                                return connection.rollback(function() {
-                                    callback(err,null);});
-                            }
-//if no error commit
-//*******************************************************************************************
-                            connection.commit(function(err) 
-                            {
-                                if(err)
+                                if(context.getUser.id != user.id)
                                 {
-                                    return connection.rollback(function() {
-                                        callback(err,null);});
+                                return callback({name: "Invalid Update", message:"User is not allowed."},null); 
                                 }
                                 else
                                 {
-                                    logger.log("debug","commit" , user);
-                                    return callback(null,user );
-                                }
-                            });
-                     
-                           
-                            },connection);
-
-                    },
+                                        user.modificationDate =new Date();
+                                        delete user.creationDate;
+                                        delete user.isActive;
+                                        user.password =   cryptotHelper.encrypt(user.password);
+                                        userData.updatePassword({password:user.password, modificationDate:user.modificationDate ,id: user.id},function (err,result)
+                                        {
+                                            if(err)
+                                            {
+                                                return connection.rollback(function() {
+                                                    callback(err,null);});
+                                            }
+//if no error commit
+//*******************************************************************************************
+                                            connection.commit(function(err) 
+                                            {
+                                                if(err)
+                                                {
+                                                    return connection.rollback(function() {
+                                                        callback(err,null);});
+                                                }
+                                                else
+                                                {
+                                                    logger.log("debug","commit" , user);
+                                                    return callback(null,user.id);
+                                                }
+                                            });
+                                     
+                                           
+                                            },connection);
+                                            }
+                            }
+                            catch (err)
+                            {
+                                logger.log("error","createUser" , err);
+                                return callback(err,null);
+                            }
+                        }, 
 //get information by id
 //*******************************************************************************************            
-                    function getById (user, callback)
+                    function getById (id, callback)
                     {
            
-                        userLogic.prototype.self.checkUser(user.id,function (err,result)
+                        userLogic.prototype.self.checkUser(id,function (err,result)
                         {
                             return  callback(err,result);
                         },connection);
                     },
 //store the data on cache
 //******************************************************************************************* 
-                    function saveInCache(user,callback)
+                    function saveInCache(data,callback)
                     {
                         var cacheL =new cache();
-                        cacheL.saveCache(constants.REDIS_USER+user.id,user,function(err,result)
+                        cacheL.saveCache(constants.REDIS_USER+user.id,data,function(err,result)
                         {
                             cacheL = null;
                             return callback(err,result);
                         });
           
+                    },
+//send the email
+//*******************************************************************************************                     
+                    function sendEmail (data,callback)
+                    {
+                        userLogic.prototype.self.sendEmail(user,"sd",function(err,result)
+                        {
+                            return callback(err,data);
+                        });
                     }
         ],
 //******************************************************************************************* 
@@ -661,9 +644,9 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
-//check if the item can be updated
+//block the user
 //*******************************************************************************************    
-                function checkExistingItem( callback)
+                function blockUser( callback)
                 {
         
                     if(context.getUser.id != user.id)
@@ -672,62 +655,149 @@ try
                     }
                     else
                     {
-                            return callback(null,user); 
+                        user.modificationDate =new Date();
+                        userData.blockUser(user,function (err,result)
+                        {
+                            if(err)
+                            {
+                                return connection.rollback(function() {
+                                callback(err,null);});
+                            }
+                            //if no error commit
+                            connection.commit(function(err) 
+                            {
+                                if(err)
+                                {
+                                return connection.rollback(function() {
+                                    callback(err,null);});
+                                }
+                                else
+                                {
+                                    logger.log("debug","commit" , user);
+                                    return callback(err,user.id );
+                                }
+                      
+                        });
+               
+                        },connection);
                     } 
                 }, 
-//method to prepare the data
-//*******************************************************************************************  
-                function prepare(user,callback)
+
+//get information by id            
+//*******************************************************************************************        
+           
+                function getById (id, callback)
                 {
-                    user.modificationDate =new Date();
-                    callback(null,user);
+                
+                        userLogic.prototype.self.checkUser(id,function (err,result)
+                        {
+                            return  callback(err,result);
+                        },connection);
                 },
-//method to deactivate the user
-//*******************************************************************************************      
-                function deactivate(user,callback)
+//*******************************************************************************************        
+                function saveInCache(data,callback)
                 {
-                    userData.blockUser(user,function (err,result)
+                    var cacheL =new cache();
+                    cacheL.saveCache(constants.REDIS_USER+user.id,data,function(err,result)
+                    {
+                        cacheL = null;
+                        return callback(err,result);
+                    });
+                
+                }
+//*******************************************************************************************          
+        ],
+        function(err,result)
+        {
+                connection.release();
+                userData = null;
+                return  resultMethod(err,result);
+        });
+
+        });
+    });
+    }
+    catch(err)
+    {
+         userData = null;
+         return resultMethod(err,null );
+    }
+        
+};
+//*******************************************************************************************
+//
+//unblock the user
+//
+//*******************************************************************************************
+userLogic.prototype.unblockUser = function(user, resultMethod) {
+var userData = new userDAL();
+try
+{
+    //create a connection for the transaction
+    userData.pool.getConnection(function(err,connection){
+        //start the transaction
+          if (err) 
+                { //if there is an error in the connection
+                    return resultMethod(err,null );
+                }
+        connection.beginTransaction(function(err)
+        {  
+                if (err) 
+                { //if there is an error in the transaction return
+                    return resultMethod(err,null );
+                }
+                //mod_vasync , waterfall for better order
+                mod_vasync.waterfall([
+//unblock the user
+//*******************************************************************************************    
+                function unblockUser( callback)
+                {
+        
+                   
+                    user.modificationDate =new Date();
+                    userData.unblockUser(user,function (err,result)
                     {
                         if(err)
                         {
                             return connection.rollback(function() {
-                                callback(err,null);});
+                            callback(err,null);});
                         }
                         //if no error commit
                         connection.commit(function(err) 
                         {
                             if(err)
                             {
-                                return connection.rollback(function() {
-                                    callback(err,null);});
+                            return connection.rollback(function() {
+                                callback(err,null);});
                             }
                             else
                             {
-                                 logger.log("debug","commit" , user);
-                                 return callback(err,user );
+                                logger.log("debug","commit" , user);
+                                return callback(err,user.id );
                             }
-                          
-                        });
-                   
+                  
+                    });
+           
                     },connection);
+                     
+                }, 
 
-        },
 //get information by id            
 //*******************************************************************************************        
            
-                function getById (user, callback)
+                function getById (id, callback)
                 {
                 
-                        userLogic.prototype.self.checkUser(user.id,function (err,result)
+                        userLogic.prototype.self.checkUser(id,function (err,result)
                         {
                             return  callback(err,result);
                         },connection);
                 },
 //*******************************************************************************************        
-                function saveInCache(user,callback)
+                function saveInCache(data,callback)
                 {
                     var cacheL =new cache();
-                    cacheL.saveCache(constants.REDIS_USER+user.id,user,function(err,result)
+                    cacheL.saveCache(constants.REDIS_USER+user.id,data,function(err,result)
                     {
                         cacheL = null;
                         return callback(err,result);
@@ -778,63 +848,51 @@ try
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
 
-//check if the item can be updated
+//deactivate
 //*******************************************************************************************    
-                function checkExistingItem(callback)
+                function deactivate(callback)
                 {
         
                     if(context.getUser.id != user.id)
                     {
-                    return callback({name: "Invalid Update", message:"User is not allowed."},null); 
+                        return callback({name: "Invalid Update", message:"User is not allowed."},null); 
                     }
                     else
                     {
-                            return callback(null,user); 
-                    } 
-                }, 
-//method to prepare the data
-//*******************************************************************************************  
-                function prepare(user,callback)
-                {
-                    user.modificationDate =new Date();
-                    callback(null,user);
-                },
-//method to create the user
-//*******************************************************************************************     
-                function deactivate(user,callback)
-                {
-                    userData.deactivateUser(user,function (err,result)
-                    {
-                        if(err)
-                        {
-                            return connection.rollback(function() {
-                                callback(err,null);});
-                        }
-                        //if no error commit
-                        connection.commit(function(err) 
+                        user.modificationDate =new Date();
+                        userData.deactivateUser(user,function (err,result)
                         {
                             if(err)
                             {
                                 return connection.rollback(function() {
                                     callback(err,null);});
                             }
-                            else
+                            //if no error commit
+                            connection.commit(function(err) 
                             {
-                                logger.log("debug","commit" , user);
-                                return callback(err,user );
-                            }
+                                if(err)
+                                {
+                                    return connection.rollback(function() {
+                                        callback(err,null);});
+                                }
+                                else
+                                {
+                                    logger.log("debug","commit" , user);
+                                    return callback(err,user );
+                                }
                        
-                        });
+                            });
                   
-                    },connection);
+                        },connection);
+                    } 
+                }, 
 
-        },
 //get information by id
 //*******************************************************************************************             
-        function getById (user, callback)
+        function getById (id, callback)
         {
            
-                userLogic.prototype.self.checkUser(user.id,function (err,result)
+                userLogic.prototype.self.checkUser(id,function (err,result)
                 {
                     return  callback(err,result);
                 },connection);
@@ -953,7 +1011,29 @@ userLogic.prototype.getImageAWS = function( data, resultMethod) {
         });
 
 };
+//********************************************************************************************
+userLogic.prototype.sendEmail = function(user,type,resultMethod)
+{
+    var m = new messageHelper();
+    var t = new templateHelper();
+    var email = new emailT();
+    m.from_email="no-reply@fleekapp.co";
+    m.subject = "test";
+    m.to.push({email:user.email});
+    m.recipient_metadata.push({userId: user.id});
+    t.name="SERVER_REGISTRATION";
+    t.content.push({name :"username" , content :user.username});
+    t.content.push({name: "body" , content: "Esta es una prueba desde fleekapp"});
 
+
+    email.sendEmail(t,m, function(err,result)
+    {
+        m = null;
+        t = null;
+        email = null;
+        return (err,result)
+    });
+}
 
 //********************************************************************************************
 module.exports = userLogic;

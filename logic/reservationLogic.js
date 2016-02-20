@@ -29,6 +29,10 @@ var reservationLogic = function()
   
    reservationLogic.prototype.self = this;
 };
+
+
+
+
 //*******************************************************************************************
 //
 //validation of the required fields for the reservation creation
@@ -39,7 +43,6 @@ reservationLogic.prototype.validateFields = function(reservation) {
 
  
       return (
-   
     reservation.hasOwnProperty("date")
     &&
     validator.isDate(reservation.date)
