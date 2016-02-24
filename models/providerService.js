@@ -12,5 +12,15 @@ var providerService = function()
           
         };
 providerService.prototype = new base();
+providerService.prototype.initializer = function (data)
+{
+           this.id = data.id;
+           this.serviceId = data.serviceId;
+           this.customName = data.customName;
+           this.price = data.price;
+           this.averageTimePerSession = data.averageTimePerSession; 
+           this.isCustom = data.isCustom;
+      
+}
 //********************************************************************************************
         module.exports =  providerService;

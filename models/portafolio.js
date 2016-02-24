@@ -13,5 +13,15 @@ var portafolio = function()
           
         };
 portafolio.prototype = new base();
+portafolio.prototype.initializer = function (data)
+{
+           this.id = data.id;
+           this.reservationId = data.reservationId;
+           this.userId = data.userId;
+           this.customerId = data.customerId; 
+           //Amazon AWS Id
+           this.repositoryId = data.repositoryId;
+           this.description = data.description;
+}
 //********************************************************************************************
         module.exports =  portafolio;

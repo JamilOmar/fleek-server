@@ -22,12 +22,7 @@ passport.use(new BasicStrategy(
             return callback(err,user);
         });
      },
-//*******************************************************************************************     
-    function storeContext(user,callback)
-    {
-        context.set(user ,callback(null,user));
-        
-    }
+
 //*******************************************************************************************    
     ],
     function(err,result){
@@ -71,9 +66,9 @@ passport.use(new BearerStrategy(
         }
     },
 //*******************************************************************************************    
-    function getUser(userId , callback)
+    function getUser(id , callback)
     {
-        userL.getUserById(userId,function (err, result)
+        userL.getUserById(id,function (err, result)
         {
               return callback(null,result);
             
@@ -83,7 +78,8 @@ passport.use(new BearerStrategy(
 //*******************************************************************************************    
     function storeContext(user,callback)
     {
-        context.setUser(user ,callback);
+       context.setUser(user ,callback);
+
     }
     
     ],

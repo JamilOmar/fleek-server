@@ -12,7 +12,9 @@ var providerScheduleDAL = require('data/dal/providerScheduleDAL');
 var providerScheduleExceptionLogic = require('logic/providerScheduleExceptionLogic');
 var providerScheduleDayLogic = require('logic/providerScheduleDayLogic');
 var logger = require('utilities/logger');
-var cache = require('data/cache/cache.js');
+var validator =require('validator');
+require('utilities/validatorManager/validatorExtender')(validator);
+var validatorManager = require('utilities/validatorManager/validatorManager');
 var uuid = require('node-uuid');
 var userLogic = require('./userLogic');
 var context = require('security/context');
@@ -25,6 +27,35 @@ var providerScheduleLogic = function()
   
    providerScheduleLogic.prototype.self = this;
 };
+
+//*******************************************************************************************
+//
+//Validation for Provider Schedule
+//
+//*******************************************************************************************
+providerScheduleLogic.prototype.validate = function (providerSchedule, callback) {
+var validatorM = new validatorManager();   
+            
+        
+           if(  !validator.isLength( providerSchedule.name,{min:0, max:60}) )
+           {
+                validatorM.addException("Name is invalid.");
+           }
+            if(  (!validator.isNullOrUndefined( providerSchedule.isDefault ) && !validator.isBoolean( providerSchedule.isDefault)) )
+           {
+                validatorM.addException("IsDefault is invalid.");
+           }
+           if(  !validator.isNullOrUndefined( providerSchedule.providerId )  )
+           {
+                validatorM.addException("providerId is invalid.");
+           }
+                      if(validatorM.isValid())
+            return callback(null ,true);
+            else
+            return callback({name:"Error in Provider Schedule Validation", message : validatorM.GenerateErrorMessage()},false);
+}
+
+
 
 //*******************************************************************************************
 //
@@ -52,6 +83,16 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
+//validate
+//*******************************************************************************************
+                function validateEntity(callback)
+                {
+                    providerScheduleLogic.prototype.self.validate(providerSchedule,function(err,result)
+                    {
+                        return callback(err);
+                    })
+                },                    
+                    
                  //method to prepare the data    
 //authorize
 //check if the user who is calling is the same user who is being send
@@ -60,7 +101,7 @@ try
             {
                 if(context.getUser.id == providerSchedule.providerId )
                 {
-                    return callback(null,providerSchedule);
+                    return callback(null);
                 }
                 else
                 {
@@ -96,13 +137,13 @@ try
                         providerSchedule.creationDate = localDate;
                         providerSchedule.isActive = true;
                         providerSchedule.isDefault = true;
-                        return callback(null,providerSchedule);
+                        return callback(null);
                         
                     }
                 },    
 //method to create the providerSchedule
 //*******************************************************************************************         
-                function createProviderSchedule(providerSchedule,callback)
+                function createProviderSchedule(callback)
                 {
                     providerScheduleData.createProviderSchedule(providerSchedule,function (err,result)
                     {
@@ -122,7 +163,7 @@ try
                             else
                             {
                                    logger.log("debug","commit" , providerSchedule);
-                                   return callback(null,providerSchedule); 
+                                   return callback(null,providerSchedule.id); 
                             }
                          
                         });
@@ -133,9 +174,9 @@ try
         },
 //get information by id
 //*******************************************************************************************                
-        function getById (providerSchedule, callback)
+        function getById (id, callback)
         {
-                providerScheduleData.getProviderScheduleById(providerSchedule.id,function (err,result)
+                providerScheduleData.getProviderScheduleById(id,function (err,result)
                 {
                     return  callback(err,result);
                 },connection);
@@ -185,6 +226,15 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
+//validate
+//*******************************************************************************************
+                function validateEntity(callback)
+                {
+                    providerScheduleLogic.prototype.self.validate(providerSchedule,function(err,result)
+                    {
+                        return callback(err);
+                    })
+                },                          
 
 //check if previous data exists
 //*******************************************************************************************
@@ -209,7 +259,7 @@ try
                     else
                     {
 
-                        return callback(null,providerSchedule);
+                        return callback(null);
                     
                     }
                 },
@@ -223,11 +273,11 @@ try
                     delete providerSchedule.isActive;
                     delete providerSchedule.creationDate;
                     delete providerSchedule.providerId;
-                    callback(null,providerSchedule);
+                    callback(null);
                 },
 //update
 //*******************************************************************************************   
-                function updateProviderSchedule(providerSchedule,callback)
+                function updateProviderSchedule(callback)
                 {
                     providerScheduleData.updateProviderSchedule(providerSchedule,providerSchedule.id,function (err,result)
                     {
@@ -247,7 +297,7 @@ try
                             else
                             {
                                 logger.log("debug","commit" , providerSchedule);
-                                return callback(null,providerSchedule );
+                                return callback(null,providerSchedule.id );
                             }
                         });
                     },connection);
@@ -258,10 +308,10 @@ try
 //Get information by id
 //
 //*******************************************************************************************      
-        function getById (providerSchedule, callback)
+        function getById (id, callback)
         {
            
-                providerScheduleData.getProviderScheduleById(providerSchedule.id,function (err,result)
+                providerScheduleData.getProviderScheduleById(id,function (err,result)
                 {
                     return  callback(err,result);
                 },connection);
@@ -389,16 +439,16 @@ try
                     else
                     {
                       
-                        return callback(null,providerSchedule);
+                        return callback(null);
                        
                     }
                 },                    
 //method to prepare the data
 //*******************************************************************************************
-                function prepare(providerSchedule, callback)
+                function prepare( callback)
                 {
                     providerSchedule.modificationDate = new Date();
-                    callback(null,providerSchedule);
+                    callback(null);
                 },
 //method to deactivate all the provider schedule days
 //*******************************************************************************************
@@ -407,24 +457,24 @@ try
                     providerScheduleDayL.deactivateProviderScheduleDayByProviderScheduleId (providerSchedule,function (err,result)
                     {
                        
-                            return callback(err,providerSchedule);
+                            return callback(err);
                     });
                 },
 //method to deactivate all the provider schedule Exceptions 
 //*******************************************************************************************
-                function deactivateException(providerSchedule, callback)
+                function deactivateException( callback)
                 {
                     providerScheduleExceptionL.deactivateProviderScheduleExceptionByProviderScheduleId (providerSchedule,function (err,result)
                     {
                        
-                            return callback(err,providerSchedule);
+                            return callback(err);
                     });
                 },
 //Deactivate
 //******************************************************************************************* 
-                function deactivate(providerSchedule,callback)
+                function deactivate(callback)
                 {
-                    providerScheduleData.deactivateProviderSchedule(providerSchedule,function (err,result)
+                    providerScheduleData.deactivateProviderSchedule(function (err,result)
                     {
                         if(err)
                         {

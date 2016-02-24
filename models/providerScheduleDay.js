@@ -11,6 +11,15 @@ var providerScheduleDay = function()
           
         };
 providerScheduleDay.prototype = new base();
+providerScheduleDay.prototype.initializer = function (data)
+{
+           this.id = data.id;
+           this.providerScheduleId = data.providerScheduleId;
+           this.startTime = data.startTime;
+           this.endTime = data.endTime; 
+           this.dayOfWeek = data.dayOfWeek;
+      
+}
 //********************************************************************************************
         module.exports = providerScheduleDay;
    

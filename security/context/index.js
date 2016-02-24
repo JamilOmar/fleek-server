@@ -1,5 +1,5 @@
 require('rootpath')();
-var createNamespace = require('continuation-local-storage');
+var cls = require('continuation-local-storage');
 //*******************************************************************************************
 //constants
 var constants = require('global/constants.js');
@@ -14,18 +14,24 @@ var context =
 //*******************************************************************************************    
     setUser : function (user,next)
     {
-        var userContext = createNamespace.createNamespace(constants.USER_CONTEXT_NAMESPACE);
+        var userContext = cls.createNamespace(constants.USER_CONTEXT_NAMESPACE);
         userContext.run(function() {
   
-        userContext.set(constants.USER_CONTEXT, user);
+        userContext.set(constants.USER_CONTEXT,	user);
         next(null,user);
     });
 //*******************************************************************************************
     },
     getUser : function()
     {
-        var userContext = createNamespace.getNamespace(constants.USER_CONTEXT_NAMESPACE);
-        return userContext.get(constants.USER_CONTEXT);
+        var userContext = cls.getNamespace(constants.USER_CONTEXT_NAMESPACE);
+        var x = userContext.get(constants.USER_CONTEXT);
+        return x;
+    },
+     destroy : function()
+    {
+       cls.destroyNamespace(constants.USER_CONTEXT_NAMESPACE );
+      
     }
     
     

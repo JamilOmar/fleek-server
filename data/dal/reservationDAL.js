@@ -224,35 +224,35 @@ reservationDAL.prototype.mapperModelToSql = function(data)
     {
      logger.log("debug","mapperModelToSql before",data);   
     var mysqlModel  ={};
-     if(data.hasOwnProperty("id"))
+     if(data.hasOwnProperty("id")&& data.id != undefined)
     mysqlModel.ReservationId  = data.id;
-     if(data.hasOwnProperty("customerId"))
+     if(data.hasOwnProperty("customerId") && data.customerId != undefined)
     mysqlModel.CustomerId = data.customerId;
-     if(data.hasOwnProperty("providerId"))
+     if(data.hasOwnProperty("providerId") && data.providerId != undefined)
     mysqlModel.ProviderId = data.providerId;
-     if(data.hasOwnProperty("providerScheduleId"))
+     if(data.hasOwnProperty("providerScheduleId") && data.providerScheduleId != undefined)
     mysqlModel.ProviderScheduleId = data.providerScheduleId;
-     if(data.hasOwnProperty("latitude"))
+     if(data.hasOwnProperty("latitude") && data.latitude != undefined)
     mysqlModel.Latitude = data.latitude;
-     if(data.hasOwnProperty("longitude"))
+     if(data.hasOwnProperty("longitude") && data.longitude != undefined)
     mysqlModel.Longitude = data.longitude;
-     if(data.hasOwnProperty("address"))
+     if(data.hasOwnProperty("address") && data.address != undefined)
     mysqlModel.Address = data.address;
-     if(data.hasOwnProperty("cancelationReason"))
+     if(data.hasOwnProperty("cancelationReason") && data.cancelationReason != undefined)
     mysqlModel.CancelationReason = data.cancelationReason;
-     if(data.hasOwnProperty("date"))
+     if(data.hasOwnProperty("date") && data.date != undefined)
     mysqlModel.Date = data.date;
-     if(data.hasOwnProperty("startTime"))
+     if(data.hasOwnProperty("startTime") && data.startTime != undefined)
     mysqlModel.StartTime = data.startTime;
-     if(data.hasOwnProperty("endTime"))
+     if(data.hasOwnProperty("endTime") && data.endTime != undefined)
     mysqlModel.EndTime = data.endTime;
-     if(data.hasOwnProperty("isCanceled"))
+     if(data.hasOwnProperty("isCanceled") && data.isCanceled != undefined)
     mysqlModel.IsCanceled = data.isCanceled;
-     if(data.hasOwnProperty("creationDate"))
+     if(data.hasOwnProperty("creationDate")&& data.creationDate != undefined)
     mysqlModel.CreationDate = data.creationDate;
-     if(data.hasOwnProperty("modificationDate"))
+     if(data.hasOwnProperty("modificationDate") && data.modificationDate != undefined)
     mysqlModel.ModificationDate = data.modificationDate;
-     if(data.hasOwnProperty("isActive"))
+     if(data.hasOwnProperty("isActive")&& data.isActive != undefined)
     mysqlModel.IsActive = data.isActive;
 
      logger.log("debug","mapperModelToSql",mysqlModel);

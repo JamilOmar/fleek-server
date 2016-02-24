@@ -11,5 +11,14 @@ var userFriend = function()
            base.call(this);
         };
 userFriend.prototype = new base();
+
+userFriend.prototype.initializer = function (data)
+{
+           this.id = data.id;
+           this.customerId = data.customerId;
+           this.friendId = data.friendId;
+           this.state = data.state;
+
+}
 //********************************************************************************************
         module.exports = userFriend;

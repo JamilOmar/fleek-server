@@ -173,17 +173,25 @@ portafolioDAL.prototype.mapperModelToSql = function(data)
     try
     {
      logger.log("debug","mapperModelToSql before",data);   
-    var mysqlModel  ={
-    PortafolioId  : data.id,
-    ReservationId : data.reservationId,
-    UserId : data.userId,
-    CustomerId : data.customerId,
-    RepositoryId : data.repositoryId,
-    Description : data.description,
-    CreationDate : data.creationDate,
-    ModificationDate : data.modificationDate,
-    IsActive : data.isActive
-    };
+    var mysqlModel  ={};
+    if(data.hasOwnProperty("id") && data.id != undefined)
+    mysqlModel.PortafolioId  = data.id;
+    if(data.hasOwnProperty("reservationId") && data.reservationId != undefined)
+    mysqlModel.ReservationId = data.reservationId;
+    if(data.hasOwnProperty("userId") && data.userId != undefined)
+    mysqlModel.UserId = data.userId;
+    if(data.hasOwnProperty("customerId") && data.customerId != undefined)
+    mysqlModel.CustomerId = data.customerId;
+    if(data.hasOwnProperty("customerId") && data.customerId != undefined)
+    mysqlModel.RepositoryId = data.customerId;
+    if(data.hasOwnProperty("description") && data.description != undefined)
+    mysqlModel.Description = data.description;
+    if(data.hasOwnProperty("creationDate") && data.creationDate != undefined)
+    mysqlModel.CreationDate = data.creationDate;
+    if(data.hasOwnProperty("modificationDate") && data.modificationDate != undefined)
+    mysqlModel.ModificationDate = data.modificationDate;
+    if(data.hasOwnProperty("isActive") && data.isActive != undefined)
+    mysqlModel.IsActive = data.isActive;
      logger.log("debug","mapperModelToSql",mysqlModel);
       return mysqlModel;    
     }

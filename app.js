@@ -49,6 +49,9 @@ module.exports = function() {
         logger.error("global",err); 
         res.status(500).send(config.get('chameleon.responseWs.codeError'));
     });
+    process.on('uncaughtException', (err) => {
+    console.log(`Caught exception: ${err}`);
+    });
 
     return app;
  

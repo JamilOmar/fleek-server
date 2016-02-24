@@ -192,19 +192,29 @@ customerProviderRatingDAL.prototype.mapperModelToSql = function(data)
 {
     try
     {
-     logger.log("debug","mapperModelToSql before",data);   
-    var mysqlModel  ={
-    CustomerProviderRatingId : data.id,    
-    ProviderId  : data.providerId,
-    CustomerId : data.customerId,
-    CustomerReservationId : data.customerReservationId,
-    Description : data.description,
-    Rating : data.rating,
-    Date : data.date,
-    CreationDate : data.creationDate,
-    ModificationDate : data.modificationDate,
-    IsActive : data.isActive
-    };
+    logger.log("debug","mapperModelToSql before",data);   
+    var mysqlModel  ={};
+    if(data.hasOwnProperty("id")&& data.id != undefined)
+    mysqlModel.CustomerProviderRatingId = data.id;
+    if(data.hasOwnProperty("providerId")&& data.providerId != undefined)    
+    mysqlModel.ProviderId  = data.providerId;
+    if(data.hasOwnProperty("customerId")&& data.customerId != undefined)
+    mysqlModel.CustomerId = data.customerId;
+    if(data.hasOwnProperty("customerReservationId")&& data.customerReservationId != undefined)
+    mysqlModel.CustomerReservationId = data.customerReservationId;
+    if(data.hasOwnProperty("description")&& data.description != undefined)
+    mysqlModel.Description = data.description;
+    if(data.hasOwnProperty("rating")&& data.rating != undefined)
+    mysqlModel.Rating = data.rating;
+    if(data.hasOwnProperty("date")&& data.date != undefined)
+    mysqlModel.Date = data.date;
+    if(data.hasOwnProperty("creationDate")&& data.creationDate != undefined)
+    mysqlModel.CreationDate = data.creationDate;
+    if(data.hasOwnProperty("modificationDate")&& data.modificationDate != undefined)
+    mysqlModel.ModificationDate = data.modificationDate;
+    if(data.hasOwnProperty("isActive")&& data.isActive != undefined)
+    mysqlModel.IsActive = data.isActive;
+    
      logger.log("debug","mapperModelToSql",mysqlModel);
       return mysqlModel;    
     }

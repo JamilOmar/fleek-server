@@ -12,5 +12,14 @@ var reservationDetail = function()
          
         };
 reservationDetail.prototype = new base();
+reservationDetail.prototype.initializer = function (data)
+{
+    this.id = data.id;
+    this.reservationId = data.reservation;
+    this.serviceId = data.serviceId;
+    this.requestInfo = data.serviceId;
+    this.startTime = data.startTime;
+    this.endTime = data.endTime;     
+}
 //********************************************************************************************
 module.exports =reservationDetail;

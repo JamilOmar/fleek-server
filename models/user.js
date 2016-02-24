@@ -12,31 +12,38 @@ var user = function()
            this.facebookId = undefined;
            this.pictureUrl = undefined; 
            this.isBlocked = undefined;
-           this.isCustomer = undefined;
            this.isProvider = undefined;
            this.countryId = undefined;
            this.latitude = undefined;
            this.longitude = undefined;
+           this.gender = undefined;
+           this.appointments = undefined;
+           this.rating = undefined;
+           this.isOpenForFriendship = undefined;
            base.call(this);
         };
-user.prototype =    new base(); 
-user.prototype.initializer = function (usr)
+user.prototype = new base(); 
+user.prototype.initializer = function (data)
 {
-           this.id = usr.id;
-           this.name = usr.name;
-           this.lastname = usr.lastname;
-           this.age = usr.age; 
-           this.username = usr.username;
-           this.password = usr.password;
-           this.email = usr.email;
-           this.facebookId = usr.facebook;
-           this.pictureUrl = usr.pictureUrl; 
-           this.isBlocked = usr.isBlocked;
-           this.isCustomer = usr.isCustomer;
-           this.isProvider = usr.isProvider;
-           this.countryId = usr.countryId;
-           this.latitude = usr.latitude;
-           this.longitude = usr.longitude;
+           this.id = data.id;
+           this.name = data.name;
+           this.lastname = data.lastname;
+           this.age = data.age; 
+           if(data.username != undefined)
+           this.username =  String(data.username).toLowerCase();
+           this.password = data.password;
+           this.email = data.email;
+           this.facebookId = data.facebook;
+           this.pictureUrl = data.pictureUrl; 
+           this.isBlocked = data.isBlocked;
+           this.isProvider = data.isProvider;
+           this.countryId = data.countryId;
+           this.latitude = data.latitude;
+           this.longitude = data.longitude;
+           this.gender = data.gender;
+           this.appointments = data.appointments;
+           this.rating = data.rating;
+           this.isOpenForFriendship = data.isOpenForFriendship;
 }
 
 

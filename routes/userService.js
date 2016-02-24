@@ -1,6 +1,7 @@
 require('rootpath')();
 var express = require('express');
 var userLogic = require('logic/userLogic.js');
+var userModel = require('models/user')
 var config = require('config');
 var logger = require('utilities/logger');
 var router = express.Router();
@@ -9,12 +10,16 @@ var Busboy = require('busboy');
 //Method to update the user
 //*******************************************************************************************
 router.put('/updateUser', function(req, res) {
+    var user =new userModel();
     var userL = new userLogic();
     var response = new responseWs();
-    userL.updateUser(req.body,function(err,result){
-         userL = null;
+    user.initializer( req.body)
+    userL.updateUser(user,function(err,result){
+        user = null;
+        userL = null;
               if(err)
                 {
+                
                 logger.log("error","updateUser",err); 
                 response.createResponse(null, config.get('chameleon.responseWs.codeError'));
                 res.json(response);
@@ -32,7 +37,7 @@ router.put('/updateUser', function(req, res) {
 router.put('/updatePassword', function(req, res) {
     var userL = new userLogic();
     var response = new responseWs();
-    userL.updatePassword(req.body,function(err,result){
+    userL.updatePassword(req.id, req.password, req.newPassword,function(err,result){
          userL = null;
               if(err)
                 {
@@ -51,10 +56,11 @@ router.put('/updatePassword', function(req, res) {
 //Method to block the user
 //*******************************************************************************************
     router.put('/blockUser', function(req, res) {
-
+        var user =new userModel();
+        user.initializer( req.body)
         var userL = new userLogic();
         var response = new responseWs();
-    userL.blockUser(req.body,function(err,result){  
+    userL.blockUser(user,function(err,result){  
              userL = null;
               if(err)
                 {
@@ -73,10 +79,11 @@ router.put('/updatePassword', function(req, res) {
 //Method to deactivate the user
 //*******************************************************************************************
     router.put('/deactivateUser', function(req, res) {
-
+        var user =new userModel();
+        user.initializer( req.body)
         var userL = new userLogic();
         var response = new responseWs();
-    userL.deactivateUser(req.body,function(err,result){  
+    userL.deactivateUser(user,function(err,result){  
               userL = null;
               if(err)
                 {
@@ -161,7 +168,6 @@ router.put('/updatePassword', function(req, res) {
 //upload profile picture
 //********************************************************************************************
     router.post('/addprofilepicture/:key', function(req, res) {
-        
         var userL = new userLogic();
         var response = new responseWs();
         var busboy = new Busboy({ headers: req.headers });

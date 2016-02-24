@@ -12,5 +12,15 @@ var customerProviderRating = function()
            base.call(this);
         };
 customerProviderRating.prototype = new base();
+customerProviderRating.prototype.initializer = function (data)
+{
+           this.id = data.id;
+           this.customerId = data.customerId;
+           this.providerId = data.providerId;
+           this.ReservationId = data.ReservationId; 
+           this.description = data.description;
+           this.rating = data.rating;
+           this.date = data.date; 
+}
 //********************************************************************************************
         module.exports =customerProviderRating;

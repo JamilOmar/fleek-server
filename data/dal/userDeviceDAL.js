@@ -156,17 +156,25 @@ userDeviceDAL.prototype.mapperModelToSql = function(data)
 {
     try
     {
-     logger.log("debug","mapperModelToSql before",data);   
-    var mysqlModel  ={
-    UserDeviceId : data.id,    
-    UserId  : data.userId,
-    DeviceSerialNumber : data.deviceSerialNumber,
-    DeviceFriendlyName  : data.deviceFriendlyName,
-    IsBlocked : data.isBlocked,
-    CreationDate : data.creationDate,
-    ModificationDate : data.modificationDate,
-    IsActive : data.isActive
-    };
+    logger.log("debug","mapperModelToSql before",data);   
+    var mysqlModel  ={};
+    if(data.hasOwnProperty("id") && data.id != undefined)
+    mysqlModel.UserDeviceId = data.id;
+    if(data.hasOwnProperty("userId") && data.userId != undefined)    
+    mysqlModel.UserId  = data.userId;
+    if(data.hasOwnProperty("deviceSerialNumber") && data.deviceSerialNumber != undefined)
+    mysqlModel.DeviceSerialNumber = data.deviceSerialNumber;
+    if(data.hasOwnProperty("deviceFriendlyName") && data.deviceFriendlyName != undefined)
+    mysqlModel.DeviceFriendlyName  = data.deviceFriendlyName;
+    if(data.hasOwnProperty("isBlocked") && data.isBlocked != undefined)
+    mysqlModel.IsBlocked = data.isBlocked;
+    if(data.hasOwnProperty("creationDate") && data.creationDate != undefined)
+    mysqlModel.CreationDate = data.creationDate;
+    if(data.hasOwnProperty("modificationDate") && data.modificationDate != undefined)
+    mysqlModel.ModificationDate = data.modificationDate;
+    if(data.hasOwnProperty("isActive") && data.isActive != undefined)
+    mysqlModel.IsActive = data.isActive;
+    
      logger.log("debug","mapperModelToSql",mysqlModel);
       return mysqlModel;    
     }

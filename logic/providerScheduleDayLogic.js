@@ -13,6 +13,9 @@ var providerScheduleLogic = require('logic/providerScheduleLogic')
 var logger = require('utilities/logger');
 var moment = require('moment');
 var uuid = require('node-uuid');
+var validator =require('validator');
+require('utilities/validatorManager/validatorExtender')(validator);
+var validatorManager = require('utilities/validatorManager/validatorManager');
 var context = require('security/context');
 //*******************************************************************************************
 var providerScheduleDayLogic = function()
@@ -20,26 +23,38 @@ var providerScheduleDayLogic = function()
   
    providerScheduleDayLogic.prototype.self = this;
 };
-//*******************************************************************************************
-//
-//Validation of the required fields for the Schedule creation
-//
-//*******************************************************************************************
-providerScheduleDayLogic.prototype.validateFields = function(providerScheduleDay) {
 
 
+//*******************************************************************************************
+//
+//Validation for Provider Schedule Day
+//
+//*******************************************************************************************
+providerScheduleDayLogic.prototype.validate = function (providerScheduleDay,callback) {
+var validatorM = new validatorManager();   
+           if(  !validator.isNullOrUndefined( providerScheduleDay.startTime )  )
+           {
+                validatorM.addException("startTime Id is invalid.");
+           }
+           if(  !validator.isNullOrUndefined( providerScheduleDay.endTime ) ) 
+           {
+                validatorM.addException("endTime is invalid.");
+           }
+            if(!validator.isNullOrUndefined( providerScheduleDay.dayOfWeek ) )
+           {
+                validatorM.addException("dayOfWeek is invalid.");
+           }
+            if(!validator.isNullOrUndefined( providerScheduleDay.providerScheduleId ) )
+           {
+                validatorM.addException("providerScheduleId is invalid.");
+           }
  
-    return (
-    providerScheduleDay.hasOwnProperty("startTime")
-    &&
-    providerScheduleDay.hasOwnProperty("endTime")
-    &&
-    providerScheduleDay.hasOwnProperty("dayOfWeek")
-    &&
-    providerScheduleDay.hasOwnProperty("providerScheduleId"));
-                   
-
+            if(validatorM.isValid())
+            return callback(null ,true);
+            else
+            return callback({name:"Error in Provider Schedule Day Validation", message : validatorM.GenerateErrorMessage()},false);
 }
+
 //*******************************************************************************************
 //
 //Validation of the required fields for the Schedule creation
@@ -118,6 +133,15 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
+//validate
+//*******************************************************************************************
+                function validateEntity(callback)
+                {
+                    providerScheduleDayLogic.prototype.self.validate(providerScheduleDay,function(err,result)
+                    {
+                        return callback(err);
+                    })
+                },                             
 //method to authorize the data
 //*******************************************************************************************    
                 function authorize(callback)
@@ -133,10 +157,10 @@ try
                 function validate(data, callback)
                 {
                    //validate if the dates and required fields are submited 
-                   if(Object.keys(data).length >0  && providerScheduleDayLogic.prototype.validateFields(providerScheduleDay))
+                   if(Object.keys(data).length >0 )
                     {
                    //if the data is correct continue       
-                        return callback(null,providerScheduleDay);
+                        return callback(null);
                     }
                     else
                     {
@@ -156,7 +180,7 @@ try
                         {
                             if(providerScheduleDayLogic.prototype.validateTime( providerScheduleDay,result) )
                             {
-                                return callback(null,providerScheduleDay);   
+                                return callback(null);   
                             }
                             else
                             {
@@ -183,7 +207,7 @@ try
                     providerScheduleDay.modificationDate = localDate;
                     providerScheduleDay.creationDate = localDate;
                     providerScheduleDay.isActive = true;
-                    return callback(null,providerScheduleDay);   
+                    return callback(null);   
                 },    
 //method to create the providerScheduleDay
 //*******************************************************************************************     
@@ -268,6 +292,15 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
+//validate
+//*******************************************************************************************
+                function validateEntity(callback)
+                {
+                    providerScheduleDayLogic.prototype.self.validate(providerScheduleDay,function(err,result)
+                    {
+                        return callback(err);
+                    })
+                },                          
                     //method to authorize the data
 //*******************************************************************************************    
                 function authorize(callback)
@@ -283,10 +316,10 @@ try
                 function validate(data,callback)
                 {
                    //validate if the dates and required fields are submited 
-                   if(Object.keys(data).length >0 && providerScheduleDayLogic.prototype.validateFields(providerScheduleDay))
+                   if(Object.keys(data).length >0 )
                     {
                    //if the data is correct continue       
-                        return callback(null,providerScheduleDay);
+                        return callback(null);
                     }
                     else
                     {
@@ -306,7 +339,7 @@ try
                         {
                             if(providerScheduleDayLogic.prototype.validateTime( providerScheduleDay,result) )
                             {
-                                return callback(null,providerScheduleDay);   
+                                return callback(null);   
                             }
                             else
                             {
@@ -330,7 +363,7 @@ try
                 {
                     var localDate = new Date();
                     providerScheduleDay.modificationDate = localDate;
-                    return callback(null,providerScheduleDay);   
+                    return callback(null);   
                 },    
 //method to create the providerScheduleDay
 //*******************************************************************************************                          
@@ -423,6 +456,25 @@ providerScheduleDayLogic.prototype.getProviderScheduleDayByProviderScheduleId = 
 
 //*******************************************************************************************
 //
+// Get ProviderScheduleDay By Provider Schedule Id DayOfWeek for external connection
+//
+//*******************************************************************************************
+providerScheduleDayLogic.prototype.getProviderScheduleDayByProviderScheduleIdDayOfWeek = function(id,dayOfWeek, resultMethod,connection) {
+    var providerScheduleDayData = new providerScheduleDayDAL();
+        mod_vasync.waterfall([ function Get (callback){
+            providerScheduleDayData.getProviderScheduleDayByProviderScheduleIdDayOfWeek(id,dayOfWeek,function (err,result)
+            {
+              return  callback(err,result);
+            },connection);
+
+        }],function(err,result){
+            providerScheduleDayData = null;
+            return  resultMethod(err,result);});
+}
+
+
+//*******************************************************************************************
+//
 //Deactivate
 //
 //*******************************************************************************************
@@ -463,7 +515,7 @@ try
                     if(Object.keys(data).length >0 )
                     {
                         providerScheduleDay.modificationDate =new Date();
-                        callback(null,providerScheduleDay);
+                        callback(null);
                     
                     }
                     else

@@ -218,17 +218,26 @@ reservationDetailDAL.prototype.mapperModelToSql = function(data)
     {
      logger.log("debug","mapperModelToSql before",data);
 
-    var mysqlModel  ={
-    ReservationDetailId  : data.id,
-    ReservationId : data.reservationId,
-    ServiceId : data.serviceId,
-    RequestInfo : data.requestInfo,
-    StartTime : data.startTime,
-    EndTime : data.endTime,
-    CreationDate : data.creationDate,
-    ModificationDate : data.modificationDate,
-    IsActive : data.isActive
-    };
+      var mysqlModel  ={};
+     if(data.hasOwnProperty("id")&& data.id != undefined)
+    mysqlModel.ReservationDetailId  = data.id;
+    if(data.hasOwnProperty("reservationId")&& data.reservationId != undefined)
+    mysqlModel.ReservationId = data.reservationId;
+    if(data.hasOwnProperty("serviceId")&& data.serviceId != undefined)
+    mysqlModel.ServiceId = data.serviceId;
+    if(data.hasOwnProperty("requestInfo")&& data.requestInfo != undefined)
+    mysqlModel.RequestInfo = data.requestInfo;
+    if(data.hasOwnProperty("startTime")&& data.startTime != undefined)
+    mysqlModel.StartTime = data.startTime;
+    if(data.hasOwnProperty("endTime")&& data.endTime != undefined)
+    mysqlModel.EndTime = data.endTime;
+    if(data.hasOwnProperty("creationDate")&& data.creationDate != undefined)
+    mysqlModel.CreationDate = data.creationDate;
+    if(data.hasOwnProperty("modificationDate")&& data.modificationDate != undefined)
+    mysqlModel.ModificationDate = data.modificationDate;
+    if(data.hasOwnProperty("isActive")&& data.isActive != undefined)
+    mysqlModel.IsActive = data.isActive;
+  
      logger.log("debug","mapperModelToSql",mysqlModel);
       return mysqlModel;    
     }

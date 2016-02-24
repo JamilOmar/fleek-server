@@ -32,7 +32,20 @@ const constants=
      //namespace for context value
     USER_CONTEXT_NAMESPACE : "USER_CONTEXT_NAMESPACE",
     //user for context value
-    USER_CONTEXT :"USER_CONTEXT"
+    USER_CONTEXT :"USER_CONTEXT",
+    //Gender
+    USER_GENDER:
+    {
+        NEUTRAL :0,
+        MALE : 1,
+        FEMALE:2
+    },
+       //RATING
+    RATING:
+    {
+        MIN :0,
+        MAX:5
+    }
     
 	
 };

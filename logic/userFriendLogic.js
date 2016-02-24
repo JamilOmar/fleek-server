@@ -141,7 +141,7 @@ try
             {
                 if(context.getUser.id == userFriend.customerId && !(context.getUser.id  == userFriend.friendId))
                 {
-                    return callback(null,userFriend);
+                    return callback(null);
                 }
                 else
                 {
@@ -151,7 +151,7 @@ try
             },
 //validate if is a real user
 //*******************************************************************************************
-             function validateFriend(userFriend,callback)
+             function validateFriend(callback)
              {
                  userL.checkUser(userFriend.friendId,function(err,data)
                  {
@@ -161,7 +161,7 @@ try
                     }
                     else
                     {
-                        return callback(null,data);
+                        return callback(null);
                     }
                      
                      
@@ -169,7 +169,7 @@ try
              },
 //check if they are already friends
 //*******************************************************************************************
-             function checkExistingItem (data, callback){
+             function checkExistingItem ( callback){
   
                 userFriendData.getUserFriendByCustomerIdFriendId(userFriend.customerId,userFriend.friendId,function (err,result)
                 {
@@ -195,13 +195,13 @@ try
                         userFriend.creationDate = localDate;
                         userFriend.state = constants.REQUEST_STATES.REQUESTED;
                         userFriend.isActive = true;
-                        callback(null,userFriend);
+                        callback(null);
                 }
             },
 //add the friend in the database
 //*******************************************************************************************            
-            function addFriend (userfriend , callback){    
-                userFriendData.addUserFriend(userfriend,function (err,result)
+            function addFriend (callback){    
+                userFriendData.addUserFriend(userFriend,function (err,result)
                 {
                     if(err)
                         {
@@ -332,7 +332,7 @@ try
                     {
                         delete userFriend.isActive;
                     }
-                    return callback(null,userFriend);
+                    return callback(null);
                 }
                 else
                 {
@@ -343,8 +343,8 @@ try
         },
 //update the data
 //*******************************************************************************************            
-        function updateFriend (userfriend , callback){    
-            userFriendData.updateUserFriend(userfriend,userfriend.id,function (err,result)
+        function updateFriend (  callback){    
+            userFriendData.updateUserFriend(userFriend,userFriend.id,function (err,result)
             {
                     if(err)
                 {
@@ -431,7 +431,7 @@ try
                     if(context.getUser.id  == data.customerId || context.getUser.id  == data.friendId)
                     {
                         userFriend.modificationDate =new Date();
-                        return callback(null,userFriend);
+                        return callback(null);
                     }
                     else
                     {
@@ -443,8 +443,8 @@ try
                 },
 //remove the user friend
 //*******************************************************************************************  
-            function removeFriend (userfriend , callback){    
-            userFriendData.removeUserFriend(userfriend,function (err,result)
+            function removeFriend (  callback){    
+            userFriendData.removeUserFriend(userFriend,function (err,result)
             {
                 if(err)
                 {

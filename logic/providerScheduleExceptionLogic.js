@@ -13,6 +13,9 @@ var providerScheduleLogic = require('logic/providerScheduleLogic')
 var logger = require('utilities/logger');
 var uuid = require('node-uuid');
 var moment = require('moment');
+var validator =require('validator');
+require('utilities/validatorManager/validatorExtender')(validator);
+var validatorManager = require('utilities/validatorManager/validatorManager');
 var config = require('config');
 var context = require('security/context');
 //*******************************************************************************************
@@ -21,18 +24,31 @@ var providerScheduleExceptionLogic = function()
   
    providerScheduleExceptionLogic.prototype.self = this;
 };
-//validation of the required fields for the Exception creation
 //*******************************************************************************************
-providerScheduleExceptionLogic.prototype.validateFields = function(providerScheduleException) {
-
-
+//
+//Validation for Provider Schedule Day
+//
+//*******************************************************************************************
+providerScheduleExceptionLogic.prototype.validate = function (providerScheduleException,callback) {
+var validatorM = new validatorManager();   
+            
+        
+     
+  
+           if(  !validator.isNullOrUndefined( providerScheduleException.startdateTime )  )
+           {
+                validatorM.addException("date Id is invalid.");
+           }
+           if(  !validator.isNullOrUndefined( providerScheduleException.description ) ) 
+           {
+                validatorM.addException("description is invalid.");
+           }
+          
  
-      return(
-    	    providerScheduleException.hasOwnProperty("date")
-        &&
-        providerScheduleException.hasOwnProperty("description"));
-   
- 
+            if(validatorM.isValid())
+            return callback(null ,true);
+            else
+            return callback({name:"Error in Provider Schedule Exception Validation", message : validatorM.GenerateErrorMessage()},false);
 }
 //*******************************************************************************************
 //
@@ -59,6 +75,15 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
+//validate
+//*******************************************************************************************
+                function validateEntity(callback)
+                {
+                    providerScheduleExceptionLogic.prototype.self.validate(providerScheduleException,function(err,result)
+                    {
+                        return callback(err);
+                    })
+                },                        
 //authorize
 //*******************************************************************************************
                 function authorize(callback)
@@ -75,7 +100,7 @@ try
                     try
                     {
                    //validate if the dates and required fields are submited 
-                   if(Object.keys(data).length >0 && providerScheduleExceptionLogic.prototype.validateFields(providerScheduleException))
+                   if(Object.keys(data).length >0 )
                     {
                         var tmp =  moment(providerScheduleException.date);
                         tmp.format(config.get('chameleon.date.format'));
@@ -227,6 +252,15 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
+//validate
+//*******************************************************************************************
+                function validateEntity(callback)
+                {
+                    providerScheduleExceptionLogic.prototype.self.validate(providerScheduleException,function(err,result)
+                    {
+                        return callback(err);
+                    })
+                },                           
 //authorize
 //*******************************************************************************************
                 function authorize(callback)
@@ -243,7 +277,7 @@ try
                     try
                     {
                    //validate if the dates and required fields are submited 
-                   if(Object.keys(data).length >0 && providerScheduleExceptionLogic.prototype.validateFields(providerScheduleException))
+                   if(Object.keys(data).length >0 )
                     {
                         var tmp =  moment(providerScheduleException.date);
                         tmp.format(config.get('chameleon.date.format'));
@@ -324,9 +358,9 @@ try
                     var localDate = new Date();
                     providerScheduleException.date = providerScheduleException.date.toISOString();
                     providerScheduleException.modificationDate = localDate;
-                    delete providerScheduleException.isActive;
-                    delete providerScheduleException.creationDate;
-                    delete providerScheduleException.providerScheduleId;
+                    providerScheduleException.isActive =undefined;
+                    providerScheduleException.creationDate= undefined;
+                    providerScheduleException.providerScheduleId=undefined;
                     return callback(null,providerScheduleException);   
                 },    
 //method to update the providerScheduleException
@@ -411,6 +445,23 @@ providerScheduleExceptionLogic.prototype.getProviderScheduleExceptionByProviderS
             {
               return  callback(err,result);
             },null);
+
+        }],function(err,result){
+            providerScheduleExceptionData = null;
+            return  resultMethod(err,result);});
+}
+//*******************************************************************************************
+//
+//get ProviderScheduleException By ProviderSchedule Id Year Month Day for external connection
+//
+//*******************************************************************************************
+providerScheduleExceptionLogic.prototype.getProviderScheduleExceptionByProviderScheduleIdYearMonthDay = function(id,year,month,day, resultMethod,connection) {
+    var providerScheduleExceptionData = new providerScheduleExceptionDAL();
+        mod_vasync.waterfall([ function Get (callback){
+            providerScheduleExceptionData.getProviderScheduleExceptionByProviderScheduleIdYearMonthDay(id,function (err,result)
+            {
+              return  callback(err,result);
+            },connection);
 
         }],function(err,result){
             providerScheduleExceptionData = null;

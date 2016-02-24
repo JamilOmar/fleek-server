@@ -9,5 +9,11 @@ var service = function()
       
         };
 service.prototype = new base();
+service.prototype.initializer = function (data)
+{
+    this.id = data.id;
+    this.name = data.name
+    this.type = data.type;     
+}
 //********************************************************************************************
-        module.exports = service;
+module.exports = service;

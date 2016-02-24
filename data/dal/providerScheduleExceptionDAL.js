@@ -208,19 +208,19 @@ providerScheduleExceptionDAL.prototype.mapperModelToSql = function(data)
     {
      logger.log("debug","mapperModelToSql before",data);   
     var mysqlModel  ={};
-    if(data.hasOwnProperty("id"))
+    if(data.hasOwnProperty("id") && data.id != undefined)
     mysqlModel.ProviderScheduleExceptionId  = data.id;
-    if(data.hasOwnProperty("providerScheduleId"))
+    if(data.hasOwnProperty("providerScheduleId") && data.providerScheduleId != undefined)
     mysqlModel.ProviderScheduleId = data.providerScheduleId;
-    if(data.hasOwnProperty("date"))
+    if(data.hasOwnProperty("date") && data.date != undefined)
     mysqlModel.Date = data.date;
-    if(data.hasOwnProperty("description"))
+    if(data.hasOwnProperty("description") && data.description != undefined)
     mysqlModel.Description = data.description;
-    if(data.hasOwnProperty("creationDate"))
+    if(data.hasOwnProperty("creationDate") && data.creationDate != undefined)
     mysqlModel.CreationDate = data.creationDate;
-    if(data.hasOwnProperty("modificationDate"))
+    if(data.hasOwnProperty("modificationDate") && data.modificationDate != undefined)
     mysqlModel.ModificationDate = data.modificationDate;
-    if(data.hasOwnProperty("isActive"))
+    if(data.hasOwnProperty("isActive") && data.isActive != undefined)
     mysqlModel.IsActive = data.isActive;
     
      logger.log("debug","mapperModelToSql",mysqlModel);

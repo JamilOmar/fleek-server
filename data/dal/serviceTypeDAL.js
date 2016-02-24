@@ -124,13 +124,18 @@ serviceTypeDAL.prototype.mapperModelToSql = function(data)
     try
     {
      logger.log("debug","mapperModelToSql before",data);   
-    var mysqlModel  ={
-    ServiceTypeId  : data.id,
-    Name : data.name,
-    CreationDate : data.creationDate,
-    ModificationDate : data.modificationDate,
-    IsActive : data.isActive
-    };
+     var mysqlModel  ={};
+    if(data.hasOwnProperty("id")  && data.id!= undefined)
+    mysqlModel.ServiceTypeId  = data.id;
+    if(data.hasOwnProperty("name")  && data.name!= undefined)
+    mysqlModel.Name = data.name;
+    if(data.hasOwnProperty("creationDate")  && data.creationDate!= undefined)
+    mysqlModel.CreationDate = data.creationDate;
+    if(data.hasOwnProperty("modificationDate")  && data.modificationDate!= undefined)
+    mysqlModel.ModificationDate = data.modificationDate;
+    if(data.hasOwnProperty("isActive")  && data.isActive!= undefined)
+    mysqlModel.IsActive = data.isActive;
+ 
      logger.log("debug","mapperModelToSql",mysqlModel);
       return mysqlModel;    
     }

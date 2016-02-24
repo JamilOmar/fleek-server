@@ -11,5 +11,13 @@ var userDevice = function()
             
         };
 userDevice.prototype = new base();
+userDevice.prototype.initializer = function (data)
+{
+            this.id =data.id;
+            this.userId = data.userId;
+            this.deviceSerialNumber =data.deviceSerialNumber;
+            this.deviceFriendlyName = data.deviceFriendlyName;
+            this.isBlocked =data.isBlocked;
+}
 //********************************************************************************************
         module.exports = userDevice;

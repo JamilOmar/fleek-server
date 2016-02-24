@@ -210,21 +210,21 @@ providerScheduleDayDAL.prototype.mapperModelToSql = function(data)
     {
      logger.log("debug","mapperModelToSql before",data);   
     var mysqlModel  ={};
-    if(data.hasOwnProperty("id"))
+    if(data.hasOwnProperty("id") && data.id != undefined)
     mysqlModel.ProviderScheduleDayId  = data.id;
-    if(data.hasOwnProperty("providerScheduleId"))
+    if(data.hasOwnProperty("providerScheduleId") && data.providerScheduleId != undefined)
     mysqlModel.ProviderScheduleId = data.providerScheduleId;
-    if(data.hasOwnProperty("startTime"))
+    if(data.hasOwnProperty("startTime") && data.startTime != undefined)
     mysqlModel.StartTime = data.startTime;
-    if(data.hasOwnProperty("endTime"))
+    if(data.hasOwnProperty("endTime") && data.endTime != undefined)
     mysqlModel.EndTime = data.endTime;
-    if(data.hasOwnProperty("dayOfWeek"))
+    if(data.hasOwnProperty("dayOfWeek") && data.dayOfWeek != undefined)
     mysqlModel.DayOfWeek = data.dayOfWeek;
-    if(data.hasOwnProperty("creationDate"))
+    if(data.hasOwnProperty("creationDate") && data.creationDate != undefined)
     mysqlModel.CreationDate = data.creationDate;
-    if(data.hasOwnProperty("modificationDate"))
+    if(data.hasOwnProperty("modificationDate") && data.modificationDate != undefined)
     mysqlModel.ModificationDate = data.modificationDate;
-    if(data.hasOwnProperty("isActive"))
+    if(data.hasOwnProperty("isActive")&& data.isActive != undefined)
     mysqlModel.IsActive = data.isActive;
     
      logger.log("debug","mapperModelToSql",mysqlModel);

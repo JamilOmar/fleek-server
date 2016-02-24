@@ -9,15 +9,17 @@
 require('rootpath')();
 var mod_vasync  = require("vasync");
 var reservationDAL = require('data/dal/reservationDAL');
-var reservationDetailDAL = require('data/dal/reservationDetailDAL');
-var providerScheduleDayDAL = require('data/dal/providerScheduleDayDAL');
-var providerScheduleExceptionDAL = require('data/dal/providerScheduleExceptionDAL');
+var providerScheduleDayLogic = require('./providerScheduleDayLogic');
+var providerScheduleExceptionLogic = require('./providerScheduleExceptionLogic');
 var reservationDetailLogic = require ('./reservationDetailLogic')
 var logger = require('utilities/logger');
 var uuid = require('node-uuid');
 var moment = require('moment');
 var config = require('config');
 var validator = require('validator');
+require('utilities/validatorManager/validatorExtender')(validator);
+var validatorManager = require('utilities/validatorManager/validatorManager');
+
 var context = require('security/context');
 //*******************************************************************************************
 //constants
@@ -32,6 +34,65 @@ var reservationLogic = function()
 
 
 
+//*******************************************************************************************
+//
+//Validation for Provider Schedule
+//
+//*******************************************************************************************
+reservationLogic.prototype.validate = function (reservation, callback) {
+var validatorM = new validatorManager();   
+            
+        
+         
+            if(  (!validator.isNullOrUndefined( reservation.customerId ) && !validator.isBoolean( providerSchedule.isDefault)) )
+           {
+                validatorM.addException("customerId is invalid.");
+           }
+           if(  !validator.isNullOrUndefined( reservation.providerId )  )
+           {
+                validatorM.addException("providerId is invalid.");
+           }
+               if(  !validator.isNullOrUndefined( reservation.providerScheduleId )  )
+           {
+                validatorM.addException("providerScheduleId is invalid.");
+           }
+                   if(  !validator.isNullOrUndefined( reservation.latitude )  )
+           {
+                validatorM.addException("latitude is invalid.");
+           }
+                   if(  !validator.isNullOrUndefined( reservation.longitude )  )
+           {
+                validatorM.addException("longitude is invalid.");
+           }
+                   if(  (!validator.isNullOrUndefined( reservation.address ) && !validator.isLength( reservation.address,{min:0, max:250})))
+           {
+                validatorM.addException("address is invalid.");
+           }
+                   if(  !validator.isNullOrUndefined( reservation.cancelationReason ) && !validator.isLength( reservation.cancelationReason,{min:0, max:250}) )
+           {
+                validatorM.addException("cancelationReason is invalid.");
+           }
+                   if(  !validator.isNullOrUndefined( reservation.date )  )
+           {
+                validatorM.addException("date is invalid.");
+           }
+                      if(  !validator.isNullOrUndefined( reservation.startTime )  )
+           {
+                validatorM.addException("startTime is invalid.");
+           }
+                     if(  !validator.isNullOrUndefined( reservation.endTime )  )
+           {
+                validatorM.addException("endTime is invalid.");
+           }
+                     if(  !validator.isNullOrUndefined( reservation.state )  )
+           {
+                validatorM.addException("state is invalid.");
+           }
+                      if(validatorM.isValid())
+            return callback(null ,true);
+            else
+            return callback({name:"Error in Provider Schedule Validation", message : validatorM.GenerateErrorMessage()},false);
+}
 
 //*******************************************************************************************
 //
@@ -140,9 +201,9 @@ reservationLogic.prototype.createReservation = function(reservation, resultMetho
     
 var reservationData = new reservationDAL();
 var reservationDetailVerification = null;
-var providerScheduleDayData = new providerScheduleDayDAL();
+var providerScheduleDayL = new providerScheduleDayLogic();
 var reservationDetailL = new reservationDetailLogic();
-var providerScheduleExceptionData = new providerScheduleExceptionDAL();
+var providerScheduleExceptionL = new providerScheduleExceptionLogic();
 try
 {
     //create a connection for the transaction
@@ -160,33 +221,28 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
-//Validate information
+//validate
 //*******************************************************************************************
-                function validate(callback)
+                function validateEntity(callback)
                 {
-                   //validate if the dates and required fields are submited 
-                   if(reservationLogic.prototype.validateFields(reservation))
+                    reservationLogic.prototype.self.validate(reservation,function(err,result)
                     {
-                   //if the data is correct continue       
-                        return callback(null,reservation);
-                    }
-                    else
-                    {
-                        return callback({name: "Error at create the reservation", message:"There are missing parameters."},null);
-                    }
+                        return callback(err);
+                    })
                 },
+
 //Check if the reservation is ok
 //*******************************************************************************************
-                function checkReservationDetail(data, callback)
+                function checkReservationDetail( callback)
                 {
                     // create object for retain reservationDetails, reservation , schedule Dates , schedule Exceptions and previous reservations
                     reservationDetailVerification = reservationDetailL.validateTime(reservation.reservationDetail);
                     
-                    return callback(null,reservationDetailVerification);
+                    return callback(null);
                 },
 //If the time is correct proceed to create the reservation time
 //*******************************************************************************************
-                function checkVerificationDate(reservationDetailVerification,callback)
+                function checkVerificationDate(callback)
                 {
                     if(reservationDetailVerification.totalTime == 0)
                     {
@@ -208,20 +264,20 @@ try
                                    return callback({name: "Error at create the reservation.", message:"There are invalid parameters."},null);
                              }   
                        
-                        return callback(null,reservationDetailVerification);
+                        return callback(null);
                     }
                 },
 //get the schedule times
 //*******************************************************************************************                
-                function getScheduleDay(reservationDetailVerification, callback)
+                function getScheduleDay( callback)
                 {
                     var reservationDay = reservation.date.day();
-                    providerScheduleDayData.getProviderScheduleDayByProviderScheduleIdDayOfWeek(reservation.providerScheduleId, reservationDay,function(err,result)
+                    providerScheduleDayLogic.getProviderScheduleDayByProviderScheduleIdDayOfWeek(reservation.providerScheduleId, reservationDay,function(err,result)
                     {
                         if(result.length > 0)
                         {
                             reservationDetailVerification.providerScheduleDay = result;
-                            return callback(err,reservationDetailVerification);
+                            return callback(err);
                         }
                         else
                         {
@@ -232,19 +288,19 @@ try
                 },
 //get if there are any schedule exception for this date
 //*******************************************************************************************                
-                function getScheduleException(reservationDetailVerification,callback)
+                function getScheduleException(callback)
                 {
-                    providerScheduleExceptionData.getProviderScheduleExceptionByProviderScheduleIdYearMonthDay(reservation.providerScheduleId,reservation.date.year(),reservation.date.month()+1,reservation.date.date()   ,function (err,result)
+                    providerScheduleExceptionLogic.getProviderScheduleExceptionByProviderScheduleIdYearMonthDay(reservation.providerScheduleId,reservation.date.year(),reservation.date.month()+1,reservation.date.date()   ,function (err,result)
                     {
                         
                           reservationDetailVerification.providerScheduleException = result;
-                          return callback(err,reservationDetailVerification);
+                          return callback(err);
                         
                     },connection);
                 },
 //get if there are any previous reservations for this date
 //*******************************************************************************************                     
-                function getPreviousReservationsData(reservationDetailVerification,callback)
+                function getPreviousReservationsData(callback)
                 {
                      reservationData.getReservationByProviderScheduleIdYearMonthDay(reservation.providerScheduleId,reservation.date.year(),reservation.date.month()+1,reservation.date.date()   ,function (err,result)
                     {
@@ -257,12 +313,12 @@ try
                 },
 //Validate data for create reservation
 //*******************************************************************************************                   
-                function validatePreviousInformation(reservationDetailVerification , callback)
+                function validatePreviousInformation(  callback)
                 {
                     if(reservationLogic.prototype.validateTime(reservation,reservationDetailVerification.providerScheduleDay,
                     reservationDetailVerification.providerScheduleException ,reservationDetailVerification.previousReservations  ))
                     {
-                         return callback(null,reservation);
+                         return callback(null);
                     }
                     else
                     {
@@ -274,7 +330,7 @@ try
  //Preparing the reservation data
 //*******************************************************************************************                   
                  //method to prepare the data    
-                function prepare(reservation,callback)
+                function prepare(callback)
                 {
                     var localDate = new Date();
                     reservation.id =uuid.v4();
@@ -283,11 +339,11 @@ try
                     reservation.isActive = true;
                     reservation.isCanceled =false;
                     reservation.date = reservation.date.toISOString();
-                    callback(null,reservation);
+                    callback(null);
                 },    
 //method to create the reservation
 //*******************************************************************************************       
-                function createReservation(reservation,callback)
+                function createReservation(callback)
                 {
                     reservationData.createReservation(reservation,function (err,result)
                     {
@@ -339,9 +395,9 @@ try
                                 connection.release();
                                 reservationData = null;
                                 reservationDetailVerification = null;
-                                providerScheduleDayData = null;
+                                providerScheduleDayL = null;
                                 reservationDetailL=null;
-                                providerScheduleExceptionData = null;
+                                providerScheduleExceptionL = null;
                                 resultMethod(err,null);});
                         }
                         //if no error commit
@@ -353,9 +409,9 @@ try
                                     connection.release();
                                     reservationData = null;
                                     reservationDetailVerification = null;
-                                    providerScheduleDayData = null;
+                                    providerScheduleDayL = null;
                                     reservationDetailL=null;
-                                    providerScheduleExceptionData = null;
+                                    providerScheduleExceptionL = null;
                                     resultMethod(err,null);});
                             }
                             else
@@ -364,9 +420,9 @@ try
                                 connection.release();
                                 reservationData = null;
                                 reservationDetailVerification = null;
-                                providerScheduleDayData = null;
+                                providerScheduleDayL = null;
                                 reservationDetailL=null;
-                                providerScheduleExceptionData = null;
+                                providerScheduleExceptionL = null;
                                 return resultMethod(null,result );
                             }
                         });
@@ -380,9 +436,9 @@ try
     {
         reservationData = null;
         reservationDetailVerification = null;
-        providerScheduleDayData = null;
+        providerScheduleDayL = null;
         reservationDetailL=null;
-        providerScheduleExceptionData = null;
+        providerScheduleExceptionL = null;
          return resultMethod(err,null );
     }
         
@@ -414,7 +470,7 @@ if( originalReservation.state == constants.REQUEST_STATES_RESERVATION.SUBMITED &
           // the person who is accepting is the customer's friend
             verification = ( originalReservation.customerId == context.getUser.id   && originalReservation.state == constants.REQUEST_STATES_RESERVATION.APPROVED) ;
             break;    
-            default:verification = false;
+         default:verification = false;
         break;
     }    
 }
@@ -445,6 +501,15 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
+//validate
+//*******************************************************************************************
+                function validateEntity(callback)
+                {
+                    reservationLogic.prototype.self.validate(reservation,function(err,result)
+                    {
+                        return callback(err);
+                    })
+                },
 //method to prepare the data
 //*******************************************************************************************    
                 function getData(callback)
@@ -467,13 +532,13 @@ try
                         if (reservationLogic.prototype.self.approvalReservationValidation( reservation, data))
                         {
                             //prepare data
-                                    reservation.modificationDate =new Date();
+                            reservation.modificationDate =new Date();
                             delete reservation.customerId;
                             delete reservation.providerId;
                             delete reservation.creationDate;
                             delete reservation.isActive;
                             
-                            return callback(null,reservation);
+                            return callback(null);
                 }
                 else
                 {
@@ -484,7 +549,7 @@ try
                 },
 //update
 //*******************************************************************************************   
-                function updateReservation(reservation,callback)
+                function updateReservation(callback)
                 {
                     reservationData.updateReservation(reservation,reservation.id,function (err,result)
                     {

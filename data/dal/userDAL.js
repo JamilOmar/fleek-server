@@ -41,7 +41,7 @@ userDAL.prototype.updateUser  = function(data,id, resultMethod,connection) {
 //Method to Select User By Facebook Id
 //*******************************************************************************************
 userDAL.prototype.getUserByFacebookId = function(facebookId, resultMethod,connection) {
-    var getUserByFacebookIdQuery ="SELECT * FROM `chameleon`.`User` WHERE `IsActive` = 1 AND `FacebookId` =?";
+    var getUserByFacebookIdQuery ="SELECT usr.`UserId` , usr.`Name` , usr.`Lastname` , usr.`Age` , usr.`Username` , usr.`FacebookId` , usr.`PictureUrl` , usr.`IsBlocked` , usr.`IsProvider` , usr.`CountryId`, usr.`Latitude` , usr.`Longitude` , usr.`CreationDate` , usr.`ModificationDate` , usr.`Email` , usr.`Password` , usr.`Gender` , usr.`Gender`, usr.`Rating` , usr.`Appointments`, usr.`IsOpenForFriendship`   FROM `chameleon`.`User` usr WHERE usr.`IsActive` = 1 AND usr.`IsBlocked` =0 AND usr.`FacebookId` =? ";
                 userDAL.prototype.getByArguments(getUserByFacebookIdQuery,facebookId,function (err,result)
                 {
                     logger.log("debug","getUserByFacebookId" , result);
@@ -51,7 +51,7 @@ userDAL.prototype.getUserByFacebookId = function(facebookId, resultMethod,connec
 //Method to Select User By Username 
 //*******************************************************************************************
 userDAL.prototype.getUserByUsername = function(username, resultMethod,connection) {
-    var getUserByUsernameQuery ="SELECT * FROM `chameleon`.`User` WHERE `IsActive` = 1 AND `Username`=?";
+    var getUserByUsernameQuery ="SELECT usr.`UserId` , usr.`Name` , usr.`Lastname` , usr.`Age` , usr.`Username` , usr.`FacebookId` , usr.`PictureUrl` , usr.`IsBlocked` , usr.`IsProvider` , usr.`CountryId`, usr.`Latitude` , usr.`Longitude` , usr.`CreationDate` , usr.`ModificationDate` , usr.`Email` , usr.`Password` , usr.`Gender` , usr.`Gender`, usr.`Rating` , usr.`Appointments`, usr.`IsOpenForFriendship`   FROM `chameleon`.`User` usr WHERE usr.`IsActive` = 1 AND usr.`IsBlocked` =0 AND usr.`Username` =?" ;
                 userDAL.prototype.getByArguments(getUserByUsernameQuery,username,function (err,result)
                 {
                     logger.log("debug","getUserByUsername" , result);
@@ -63,7 +63,7 @@ userDAL.prototype.getUserByUsername = function(username, resultMethod,connection
 //Method to Select User By Id
 //*******************************************************************************************
 userDAL.prototype.getUserById = function(id, resultMethod,connection) {
-    var getUserByIdQuery ="SELECT * FROM `chameleon`.`User` WHERE `IsActive` = 1 AND `UserId` =?";
+    var getUserByIdQuery ="SELECT usr.`UserId` , usr.`Name` , usr.`Lastname` , usr.`Age` , usr.`Username` , usr.`FacebookId` , usr.`PictureUrl` , usr.`IsBlocked` , usr.`IsProvider` , usr.`CountryId`, usr.`Latitude` , usr.`Longitude` , usr.`CreationDate` , usr.`ModificationDate` , usr.`Email` , usr.`Password` , usr.`Gender`, usr.`Rating` , usr.`Appointments`, usr.`IsOpenForFriendship`   FROM `chameleon`.`User` usr WHERE usr.`IsActive` = 1 AND usr.`IsBlocked` =0 AND usr.`UserId` =? ";
                 userDAL.prototype.getByArguments(getUserByIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getUserById" , result);
@@ -118,15 +118,20 @@ userDAL.prototype.blockUser = function(data, resultMethod,connection) {
                     return resultMethod(err,userDAL.prototype.nonQueryResult(result));
                 },connection);
 };
-//Method to select all Friends
+//Method to activate User
 //*******************************************************************************************
-userDAL.prototype.getUserFriends = function(id, resultMethod,connection) {
-     var getUserFriendsQuery ="SELECT `chameleon`.`User`.*  FROM `chameleon`.`User`   INNER JOIN `chameleon`.`CustomerFriend` on `chameleon`.`User`.`UserId` = `chameleon`.`CustomerFriend`.`FriendId`  WHERE `chameleon`.`User`.`IsActive` = 1 and `chameleon`.`CustomerFriend`.`IsActive` =1  AND `chameleon`.`CustomerFriend`.`CustomerId` =?";
-                userDAL.prototype.getByArguments(getUserFriendsQuery,id,function (err,result)
+userDAL.prototype.unblockUser = function(data, resultMethod,connection) {
+           var enableParameters = 
+               [  
+                   data.modificationDate,
+                    data.id
+               ];
+           var unblockUserQuery = "UPDATE `chameleon`.`User` SET `IsBlocked`=0,`ModificationDate`=? WHERE `UserId`=?;";
+             userDAL.prototype.query(unblockUserQuery,enableParameters,function (err,result)
                 {
-                    logger.log("debug","getUserFriends",id , result);
-                    return resultMethod(err,userDAL.prototype.self.mapperSqlToModelCollection(result));
-                },connection);  
+                    logger.log("debug","unblockUser",data);
+                    return resultMethod(err,userDAL.prototype.nonQueryResult(result));
+                },connection);
 };
 
 //Method for transform the information from sql to model
@@ -150,11 +155,14 @@ userDAL.prototype.mapperSqlToModel = function(data)
             user.facebookId = data.FacebookId;
             user.pictureUrl = data.PictureUrl;
             user.isBlocked = data.IsBlocked;
-            user.isCustomer = data.IsCustomer;
             user.isProvider = data.IsProvider;
             user.countryId = data.CountryId;
             user.latitude = data.Latitude;
             user.longitude = data.Longitude;
+            user.gender = data.Gender;
+            user.appointments = data.Appointments;
+            user.rating = data.Rating;
+            user.isOpenForFriendship = data.IsOpenForFriendship;
             user.creationDate = data.CreationDate;
             user.modificationDate = data.ModificationDate;
             user.isActive = data.IsActive
@@ -200,11 +208,14 @@ userDAL.prototype.mapperSqlToModelCollection = function(dataRequested)
                 user.facebookId = data.FacebookId;
                 user.pictureUrl = data.PictureUrl;
                 user.isBlocked = data.IsBlocked;
-                user.isCustomer = data.IsCustomer;
                 user.isProvider = data.IsProvider;
                 user.countryId = data.CountryId;
                 user.latitude = data.Latitude;
                 user.longitude = data.Longitude;
+                user.gender = data.Gender;
+                user.appointments = data.Appointments;
+                user.rating = data.Rating;
+                user.isOpenForFriendship = data.IsOpenForFriendship;
                 user.creationDate = data.CreationDate;
                 user.modificationDate = data.ModificationDate;
                 user.isActive = data.IsActive
@@ -236,42 +247,48 @@ userDAL.prototype.mapperModelToSql = function(data)
     {
      logger.log("debug","mapperModelToSql before",data);   
     var mysqlModel  ={};
-    if(data.hasOwnProperty("id") )
+    if(data.hasOwnProperty("id")  && data.id!= undefined)
     mysqlModel.UserId  = data.id;
-    if(data.hasOwnProperty("name"))
+    if(data.hasOwnProperty("name") && data.name!= undefined)
     mysqlModel.Name = data.name;    
-    if(data.hasOwnProperty("lastname"))
+    if(data.hasOwnProperty("lastname") && data.lastname!= undefined)
     mysqlModel.Lastname = data.lastname;
-    if(data.hasOwnProperty("age"))
+    if(data.hasOwnProperty("age") && data.age!= undefined)
     mysqlModel.Age = data.age;
-    if(data.hasOwnProperty("username"))
+    if(data.hasOwnProperty("username") && data.username!= undefined)
     mysqlModel.Username = data.username;
-    if(data.hasOwnProperty("password"))
+    if(data.hasOwnProperty("password") && data.password!= undefined)
     mysqlModel.Password = data.password;
-    if(data.hasOwnProperty("email"))
+    if(data.hasOwnProperty("email") && data.email!= undefined)
     mysqlModel.Email = data.email;
-    if(data.hasOwnProperty("facebookId"))
+    if(data.hasOwnProperty("facebookId") && data.facebookId!= undefined)
     mysqlModel.FacebookId = data.facebookId;
-    if(data.hasOwnProperty("pictureUrl"))
+    if(data.hasOwnProperty("pictureUrl") && data.pictureUrl!= undefined)
     mysqlModel.PictureUrl = data.pictureUrl;
-    if(data.hasOwnProperty("isBlocked"))
+    if(data.hasOwnProperty("isBlocked") && data.isBlocked!= undefined)
     mysqlModel.IsBlocked = data.isBlocked;
-    if(data.hasOwnProperty("isCustomer"))
-    mysqlModel.IsCustomer = data.isCustomer;
-    if(data.hasOwnProperty("isProvider"))
+    if(data.hasOwnProperty("isProvider")&& data.isProvider!= undefined)
     mysqlModel.IsProvider = data.isProvider;
-    if(data.hasOwnProperty("countryId"))
+    if(data.hasOwnProperty("countryId")&& data.countryId!= undefined)
     mysqlModel.CountryId = data.countryId;
-    if(data.hasOwnProperty("latitude"))
+    if(data.hasOwnProperty("latitude")&& data.latitude!= undefined)
     mysqlModel.Latitude = data.latitude;
-    if(data.hasOwnProperty("longitude"))
+    if(data.hasOwnProperty("longitude")&& data.longitude!= undefined)
     mysqlModel.Longitude = data.longitude;
-    if(data.hasOwnProperty("creationDate"))
+    if(data.hasOwnProperty("creationDate")&& data.creationDate!= undefined)
     mysqlModel.CreationDate = data.creationDate;
-    if(data.hasOwnProperty("modificationDate"))
+    if(data.hasOwnProperty("modificationDate")&& data.modificationDate!= undefined)
     mysqlModel.ModificationDate = data.modificationDate;
-    if(data.hasOwnProperty("isActive"))
+    if(data.hasOwnProperty("isActive")&& data.isActive!= undefined)
     mysqlModel.IsActive = data.isActive;
+     if(data.hasOwnProperty("gender")&& data.gender!= undefined)
+    mysqlModel.gender = data.gender;
+      if(data.hasOwnProperty("appointments")&& data.appointments!= undefined)
+    mysqlModel.Appointments = data.appointments;
+      if(data.hasOwnProperty("rating")&& data.rating!= undefined)
+    mysqlModel.Rating = data.rating;
+      if(data.hasOwnProperty("isOpenForFriendship")&& data.isOpenForFriendship!= undefined)
+    mysqlModel.IsOpenForFriendship = data.isOpenForFriendship;
      logger.log("debug","mapperModelToSql",mysqlModel);
       return mysqlModel;    
     }

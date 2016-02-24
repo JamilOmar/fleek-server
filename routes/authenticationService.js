@@ -1,6 +1,7 @@
 require('rootpath')();
 var express = require('express');
 var userLogic = require('logic/userLogic.js');
+var userModel = require('models/user.js');
 var config = require('config');
 var logger = require('utilities/logger');
 var router = express.Router();
@@ -23,7 +24,7 @@ router.post('/login', function(req, res,next) {
                 {
                 try
                 {
-                    var token = tokenHelper.generateToken(user);
+                    var token = tokenHelper.generateToken(user.id);
                     response.createResponse( {authenticated :true, token : token , user: user }, config.get('chameleon.responseWs.codeSuccess'));    
                     res.json(response);
                 }
@@ -42,7 +43,9 @@ router.post('/login', function(req, res,next) {
 router.post('/signup', function(req, res) {
     var userL = new userLogic();
     var response = new responseWs();
-    userL.createUser(req.body,function(err,result){
+    var usr = new userModel()
+    usr.initializer(req.body);
+    userL.createUser(usr,function(err,result){
         userL = null;
               if(err)
                 {

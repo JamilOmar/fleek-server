@@ -32,7 +32,12 @@ var userLogic = function()
 {
    userLogic.prototype.self = this;
 };
-userLogic.prototype.validate = function (user,callback) {
+//*******************************************************************************************
+//
+//Validation for User  
+//
+//*******************************************************************************************
+userLogic.prototype.validate = function (user, withPassword,callback) {
 var validatorM = new validatorManager();   
             
         
@@ -48,7 +53,7 @@ var validatorM = new validatorManager();
            {
                 validatorM.addException("Username is invalid.");
            }
-            if(  !validator.isLength( user.password,{min:6, max:64}) )
+            if(  !validator.isLength( user.password,{min:6, max:64}) && withPassword)
            {
                 validatorM.addException("Password is invalid.");
            }
@@ -58,33 +63,53 @@ var validatorM = new validatorManager();
                 validatorM.addException("Email is invalid.");
            }
   
-           if(  (validator.isNullOrUndefined( user.facebookId ) ||validator.isLength( user.facebookId,{min:0, max:255})) )
+           if(  (!validator.isNullOrUndefined( user.facebookId ) && !validator.isLength( user.facebookId,{min:0, max:255})) )
            {
                 validatorM.addException("Facebook Id is invalid.");
            }
-           if(  (validator.isNullOrUndefined( user.pictureUrl ) ||validator.isLength( user.pictureUrl,{min:0, max:255})) )
+           if(  (!validator.isNullOrUndefined( user.pictureUrl ) && !validator.isLength( user.pictureUrl,{min:0, max:255})) )
            {
                 validatorM.addException("Picture is invalid.");
            }
-            if(  (validator.isNullOrUndefined( user.countryId ) ||validator.isLength( user.countryId,{min:0, max:255})) )
+            if(  (!validator.isNullOrUndefined( user.countryId ) && !validator.isLength( user.countryId,{min:0, max:255})) )
            {
                 validatorM.addException("Country is invalid.");
            }
-            if(  (validator.isNullOrUndefined( user.latitude ) ||validator.isCoordinate( user.latitude)) )
+            if(  (!validator.isNullOrUndefined( user.latitude ) && !validator.isCoordinate( String(user.latitude)) ))
            {
                 validatorM.addException("Latitude is invalid.");
            }
-           if(  (validator.isNullOrUndefined( user.longitude ) ||validator.isCoordinate( user.longitude)) )
+           if(  (!validator.isNullOrUndefined( user.longitude ) && !validator.isCoordinate( String(user.longitude)) ))
            {
                 validatorM.addException("Longitude is invalid.");
            }
-           
-        
-            
+            if(  (!validator.isNullOrUndefined( user.gender ) && !validator.isNumberAndIntegerAndRange(user.gender,constants.USER_GENDER.NEUTRAL,constants.USER_GENDER.FEMALE)))
+           {
+                validatorM.addException("Gender is invalid.");
+           }
+            if(  (!validator.isNullOrUndefined( user.appointments ) && !validator.isNumberAndInteger(user.appointments)))
+           {
+                validatorM.addException("Appointments is invalid.");
+           }
+            if(  (!validator.isNullOrUndefined( user.rating ) && !validator.isNumberAndIntegerAndRange(user.rating, constants.RATING.MIN,constants.RATING.MAX)))
+           {
+                validatorM.addException("Appointments is invalid.");
+           }
+            if(  (!validator.isNullOrUndefined( user.IsOpenForFriendship ) && !validator.isBoolean(user.isOpenForFriendship) ))
+           {
+                validatorM.addException("IsOpenForFriendship is invalid.");
+           }
             if(validatorM.isValid())
-            return callback(null ,true);
+            {
+                validatorM = null;   
+                return callback(null ,true);
+            }
             else
-            return callback({name:"Error in User Validation", message : validatorM.GenerateErrorMessage()},false);
+            {
+                 var message =validatorM.GenerateErrorMessage();
+                 validatorM = null;   
+                return callback({name:"Error in User Validation", message : message},false);
+            }
 }
 
 //*******************************************************************************************
@@ -110,11 +135,13 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
+//validate
+//*******************************************************************************************
                 function validateEntity(callback)
                 {
-                    userLogic.prototype.self.validate(user,function(err,result)
+                    userLogic.prototype.self.validate(user,true,function(err,result)
                     {
-                        return callback(err,result);
+                        return callback(err);
                     })
                 },
                     
@@ -232,6 +259,7 @@ try
 //
 //*******************************************************************************************
 userLogic.prototype.updateUser = function(user, resultMethod) {
+var contextUser = context.getUser();
 var userData = new userDAL();
 try
 {
@@ -250,23 +278,35 @@ try
                 }
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
+//validate
+//*******************************************************************************************
+                function validateEntity(callback)
+                {
+                    userLogic.prototype.self.validate(user,false,function(err,result)
+                    {
+                       
+                        return callback(err);
+                    })
+                },
 //update the user
 //*******************************************************************************************    
 
                 function updateUser( callback)
                 {
-                
-                    if(user.id != context.getUser.id)
+              
+                    if(user.id != contextUser.id)
                     {
                     return callback({name: "Invalid Update", message:"User is not allowed."},null); 
                     }
                     else
                     {
                            user.modificationDate =new Date();
-                            //no update password
-                            delete user.password;
-                            delete user.creationDate;
-                            delete user.isActive;
+                            //no update 
+                            user.username= undefined;
+                            user.email =undefined;
+                            user.password=undefined;
+                            user.creationDate=undefined;
+                            user.isActive=undefined;
                             userData.updateUser(user,user.id,function (err,result)
                             {
                             if(err)
@@ -339,8 +379,9 @@ try
 //update users with password
 //
 //*******************************************************************************************
-userLogic.prototype.updatePassword = function(user, resultMethod) {
+userLogic.prototype.updatePassword = function(id,password, newPassword, resultMethod) {
 var userData = new userDAL();
+var contextUser = context.getUser();
 try
 {
     //create a connection for the transaction
@@ -359,26 +400,33 @@ try
 //*******************************************************************************************                    
                     //mod_vasync , waterfall for better order
                     mod_vasync.waterfall([
-                    
- 
+//*******************************************************************************************   
+                    function getById (callback)
+                    {
+                
+                        userLogic.prototype.self.checkUser(id,function (err,result)
+                        {
+                            return  callback(err,result);
+                        },connection);
+                    },
 //update the user
 //*******************************************************************************************    
 
-                     function updateUser(callback)
+                     function updateUser(data,callback)
                         {
                             try
                             {
-                                if(context.getUser.id != user.id)
+                                if( Object.keys(data).length<=0 && contextUser.id != id)
                                 {
                                 return callback({name: "Invalid Update", message:"User is not allowed."},null); 
                                 }
                                 else
                                 {
-                                        user.modificationDate =new Date();
-                                        delete user.creationDate;
-                                        delete user.isActive;
-                                        user.password =   cryptotHelper.encrypt(user.password);
-                                        userData.updatePassword({password:user.password, modificationDate:user.modificationDate ,id: user.id},function (err,result)
+                                        data.modificationDate =new Date();
+                                        if( data.password ==  cryptotHelper.encrypt(password))
+                                        {
+                                        data.password =   cryptotHelper.encrypt(newPassword);
+                                        userData.updatePassword({password:data.password, modificationDate:data.modificationDate ,id: data.id},function (err,result)
                                         {
                                             if(err)
                                             {
@@ -396,14 +444,19 @@ try
                                                 }
                                                 else
                                                 {
-                                                    logger.log("debug","commit" , user);
-                                                    return callback(null,user.id);
+                                                    logger.log("debug","commit" , data);
+                                                    return callback(null,data.id);
                                                 }
                                             });
                                      
                                            
                                             },connection);
                                             }
+                                            else
+                                            {
+                                                return callback({name: "Invalid Update", message:"Password Dont Match"},null); 
+                                            }
+                                }
                             }
                             catch (err)
                             {
@@ -426,7 +479,7 @@ try
                     function saveInCache(data,callback)
                     {
                         var cacheL =new cache();
-                        cacheL.saveCache(constants.REDIS_USER+user.id,data,function(err,result)
+                        cacheL.saveCache(constants.REDIS_USER+data.id,data,function(err,result)
                         {
                             cacheL = null;
                             return callback(err,result);
@@ -437,7 +490,7 @@ try
 //*******************************************************************************************                     
                     function sendEmail (data,callback)
                     {
-                        userLogic.prototype.self.sendEmail(user,"sd",function(err,result)
+                        userLogic.prototype.self.sendEmail(data,"sd",function(err,result)
                         {
                             return callback(err,data);
                         });
@@ -626,6 +679,7 @@ userLogic.prototype.loginUser = function(username, password, resultMethod) {
 //
 //*******************************************************************************************
 userLogic.prototype.blockUser = function(user, resultMethod) {
+    
 var userData = new userDAL();
 try
 {
@@ -649,12 +703,7 @@ try
                 function blockUser( callback)
                 {
         
-                    if(context.getUser.id != user.id)
-                    {
-                    return callback({name: "Invalid Update", message:"User is not allowed."},null); 
-                    }
-                    else
-                    {
+                   
                         user.modificationDate =new Date();
                         userData.blockUser(user,function (err,result)
                         {
@@ -680,7 +729,7 @@ try
                         });
                
                         },connection);
-                    } 
+                    
                 }, 
 
 //get information by id            
@@ -830,6 +879,7 @@ try
 //*******************************************************************************************
 userLogic.prototype.deactivateUser = function(user, resultMethod) {
     var userData = new userDAL();
+    var contextUser = context.getUser();
 try
 {
     //create a connection for the transaction
@@ -853,7 +903,7 @@ try
                 function deactivate(callback)
                 {
         
-                    if(context.getUser.id != user.id)
+                    if(contextUser.id != user.id)
                     {
                         return callback({name: "Invalid Update", message:"User is not allowed."},null); 
                     }
@@ -935,6 +985,7 @@ try
 //*******************************************************************************************
 userLogic.prototype.uploadProfilePicture = function(data,id, resultMethod) {
         var key =  uuid.v1();
+        var user = null;
         logger.log("debug","uploadProfilePicture",data);
         var instance = new awsS3();
         var base64data = new Buffer(data, 'binary');
@@ -947,20 +998,21 @@ userLogic.prototype.uploadProfilePicture = function(data,id, resultMethod) {
                 }); 
             },
 //*******************************************************************************************
-            function checkExistingItem(user , callback)
+            function checkExistingItem(data , callback)
             {
     
-                if(context.getUser.id != user.id)
+                if(context.getUser.id != data.id)
                 {
                 return callback({name: "Invalid Update", message:"User is not allowed."},null); 
                 }
                 else
                 {
-                        return callback(null,user); 
+                    user = data;
+                    return callback(null); 
                 } 
             },
 //*******************************************************************************************
-            function uploadPicture (user , callback)
+            function uploadPicture ( callback)
             {    
                 instance.put(
                 {
@@ -974,11 +1026,11 @@ userLogic.prototype.uploadProfilePicture = function(data,id, resultMethod) {
                     {
                         user.pictureUrl=key;
                     }
-                    return  callback(err,user);    
+                    return  callback(err);    
                 });
             },
 //*******************************************************************************************
-            function update(user,callback)
+            function update(callback)
             {
               userLogic.prototype.updateUser(user, function(err,result ){
                   
