@@ -44,7 +44,7 @@ providerScheduleDayDAL.prototype.updateProviderScheduleDay  = function(data,id, 
 //Method to Select providerScheduleDay By Schedule Id and Day of the week
 //*******************************************************************************************
 providerScheduleDayDAL.prototype.getProviderScheduleDayByProviderScheduleIdDayOfWeek = function(id,dayOfWeek, resultMethod,connection) {
-    var getProviderScheduleDayByProviderScheduleIdDayOfWeekQuery ="SELECT providerScheduleDay.`ProviderScheduleDayId` , providerScheduleDay.`ProviderScheduleId` , providerScheduleDay.`StartTime`, providerScheduleDay.`DayOfWeek` ,providerScheduleDay.`EndTime` , providerScheduleDay.`CreationDate` ,providerScheduleDay.`ModificationDate` ,providerScheduleDay.`IsActive` FROM `chameleon`.`ProviderScheduleDay` providerScheduleDay INNER JOIN `ProviderSchedule` providerSchedule on providerScheduleDay.`ProviderScheduleId` = providerSchedule.`ProviderScheduleId` WHERE providerScheduleDay.`ProviderScheduleDayId` =? AND providerScheduleDay.`IsActive` = 1 AND providerScheduleDay.`DayOfWeek` = ? AND providerSchedule.`IsActive` =1";
+    var getProviderScheduleDayByProviderScheduleIdDayOfWeekQuery ="SELECT providerScheduleDay.`ProviderScheduleDayId` , providerScheduleDay.`ProviderScheduleId` , providerScheduleDay.`StartTime`, providerScheduleDay.`DayOfWeek` ,providerScheduleDay.`EndTime` , providerScheduleDay.`CreationDate` ,providerScheduleDay.`ModificationDate` ,providerScheduleDay.`IsActive` FROM `chameleon`.`ProviderScheduleDay` providerScheduleDay INNER JOIN `ProviderSchedule` providerSchedule on providerScheduleDay.`ProviderScheduleId` = providerSchedule.`ProviderScheduleId` WHERE providerScheduleDay.`ProviderScheduleId` =? AND providerScheduleDay.`IsActive` = 1 AND providerScheduleDay.`DayOfWeek` = ? AND providerSchedule.`IsActive` =1";
                 providerScheduleDayDAL.prototype.getByArguments(getProviderScheduleDayByProviderScheduleIdDayOfWeekQuery,[id,dayOfWeek],function (err,result)
                 {
                     logger.log("debug","getProviderScheduleDayByProviderScheduleIdDayOfWeek" , result);
@@ -137,7 +137,8 @@ providerScheduleDayDAL.prototype.mapperSqlToModel = function(data)
            providerScheduleDay.dayOfWeek = data.DayOfWeek;
            providerScheduleDay.creationDate = data.CreationDate;
            providerScheduleDay.modificationDate = data.ModificationDate;
-           providerScheduleDay.isActive = data.IsActive
+           providerScheduleDay.isActive = data.IsActive;
+
            data = null;
             return providerScheduleDay;
         }
@@ -180,7 +181,8 @@ providerScheduleDayDAL.prototype.mapperSqlToModelCollection = function(dataReque
                 providerScheduleDay.dayOfWeek = data.DayOfWeek;
                 providerScheduleDay.creationDate = data.CreationDate;
                 providerScheduleDay.modificationDate = data.ModificationDate;
-                providerScheduleDay.isActive = data.IsActive
+                providerScheduleDay.isActive = data.IsActive;
+         
                 data = null;
                 providerScheduleDayCollection.push(providerScheduleDay);
               
@@ -226,6 +228,7 @@ providerScheduleDayDAL.prototype.mapperModelToSql = function(data)
     mysqlModel.ModificationDate = data.modificationDate;
     if(data.hasOwnProperty("isActive")&& data.isActive != undefined)
     mysqlModel.IsActive = data.isActive;
+
     
      logger.log("debug","mapperModelToSql",mysqlModel);
       return mysqlModel;    

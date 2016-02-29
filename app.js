@@ -2,10 +2,10 @@
 module.exports = function() {
    
     //creation of the express object
-    var express = require('express');
-    var config = require('config');
-    var passport = require('passport');
-    var logger = require('./utilities/logger');
+    const express = require('express');
+    const config = require('config');
+    const passport = require('passport');
+    const logger = require('./utilities/logger');
     var bodyParser = require('body-parser');
     var app = express();
     var hooks = require('./security/hooks/');
@@ -49,9 +49,7 @@ module.exports = function() {
         logger.error("global",err); 
         res.status(500).send(config.get('chameleon.responseWs.codeError'));
     });
-    process.on('uncaughtException', (err) => {
-    console.log(`Caught exception: ${err}`);
-    });
+   
 
     return app;
  

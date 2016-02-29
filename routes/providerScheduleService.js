@@ -5,15 +5,18 @@ var config = require('config');
 var logger = require('utilities/logger');
 var router = express.Router();
 var responseWs = require('models/response.js');
-
+var providerScheduleModel = require('models/providerSchedule');
 
 //Method to create the provider schedule
 //*******************************************************************************************
 router.post('/addProviderSchedule', function(req, res) {
     var providerScheduleL = new providerScheduleLogic();
     var response = new responseWs();
-    providerScheduleL.createProviderSchedule(req.body,function(err,result){
+    var providerSchedule = new providerScheduleModel();
+    providerSchedule.initializer(req.body);
+    providerScheduleL.createProviderSchedule(providerSchedule,function(err,result){
             providerScheduleL = null;
+            providerSchedule = null;
               if(err)
                 {
                 logger.log("error","addProviderSchedule",err); 
@@ -33,8 +36,11 @@ router.post('/addProviderSchedule', function(req, res) {
 router.put('/updateProviderSchedule', function(req, res) {
     var providerScheduleL = new providerScheduleLogic();
     var response = new responseWs();
-    providerScheduleL.updateProviderSchedule(req.body,function(err,result){
+    var providerSchedule = new providerScheduleModel();
+    providerSchedule.initializer(req.body);
+    providerScheduleL.updateProviderSchedule(providerSchedule,function(err,result){
          providerScheduleL = null;
+         providerSchedule = null;
               if(err)
                 {
                 logger.log("error","updateProviderSchedule",err); 
@@ -54,7 +60,9 @@ router.put('/updateProviderSchedule', function(req, res) {
 router.put('/deactivateProviderSchedule', function(req, res) {
     var providerScheduleL = new providerScheduleLogic();
     var response = new responseWs();
-    providerScheduleL.deactivateProviderSchedule(req.body,function(err,result){
+    var providerSchedule = new providerScheduleModel();
+    providerSchedule.initializer(req.body);
+    providerScheduleL.deactivateProviderSchedule(providerSchedule,function(err,result){
             providerScheduleL = null;
               if(err)
                 {

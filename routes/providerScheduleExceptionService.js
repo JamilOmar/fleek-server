@@ -5,15 +5,18 @@ var config = require('config');
 var logger = require('utilities/logger');
 var router = express.Router();
 var responseWs = require('models/response.js');
-
+var providerScheduleExceptionModel = require('models/providerScheduleException');
 
 //Method to create the provider schedule Exception
 //*******************************************************************************************
 router.post('/addProviderScheduleException', function(req, res) {
     var providerScheduleExceptionL = new providerScheduleExceptionLogic();
     var response = new responseWs();
-    providerScheduleExceptionL.createProviderScheduleException(req.body,function(err,result){
+    var providerScheduleException = new providerScheduleExceptionModel();
+    providerScheduleException.initializer(req.body);
+    providerScheduleExceptionL.createProviderScheduleException(providerScheduleException,function(err,result){
         providerScheduleExceptionL = null;
+        providerScheduleException = null;
               if(err)
                 {
                 logger.log("error","addProviderScheduleException",err); 
@@ -33,8 +36,11 @@ router.post('/addProviderScheduleException', function(req, res) {
 router.put('/updateProviderScheduleException', function(req, res) {
     var providerScheduleExceptionL = new providerScheduleExceptionLogic();
     var response = new responseWs();
+    var providerScheduleException = new providerScheduleExceptionModel();
+    providerScheduleException.initializer(req.body);
     providerScheduleExceptionL.updateProviderScheduleException(req.body,function(err,result){
         providerScheduleExceptionL = null;
+        providerScheduleException = null;
               if(err)
                 {
                 logger.log("error","updateProviderScheduleException",err); 
@@ -54,8 +60,11 @@ router.put('/updateProviderScheduleException', function(req, res) {
 router.put('/deactivateProviderScheduleException', function(req, res) {
     var providerScheduleExceptionL = new providerScheduleExceptionLogic();
     var response = new responseWs();
+    var providerScheduleException = new providerScheduleExceptionModel();
+    providerScheduleException.initializer(req.body);
     providerScheduleExceptionL.deactivateProviderScheduleException(req.body,function(err,result){
         providerScheduleExceptionL = null;
+        providerScheduleException = null;
               if(err)
                 {
                 logger.log("error","deactivateProviderScheduleException",err); 

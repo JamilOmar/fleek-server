@@ -5,15 +5,19 @@ var config = require('config');
 var logger = require('utilities/logger');
 var router = express.Router();
 var responseWs = require('models/response.js');
-
+var providerScheduleDayModel = require('models/providerScheduleDay');
 
 //Method to create the provider schedule Day
 //*******************************************************************************************
 router.post('/addProviderScheduleDay', function(req, res) {
     var providerScheduleDayL = new providerScheduleDayLogic();
     var response = new responseWs();
-    providerScheduleDayL.createProviderScheduleDay(req.body,function(err,result){
+    var providerScheduleDay = new providerScheduleDayModel();
+    providerScheduleDay.initializer(req.body);
+    providerScheduleDayL.createProviderScheduleDay(providerScheduleDay,function(err,result){
          providerScheduleDayL = null;
+         providerScheduleDay = null;
+         
               if(err)
                 {
                 logger.log("error","addProviderScheduleDay",err); 
@@ -33,8 +37,11 @@ router.post('/addProviderScheduleDay', function(req, res) {
 router.put('/updateProviderScheduleDay', function(req, res) {
     var providerScheduleDayL = new providerScheduleDayLogic();
     var response = new responseWs();
-    providerScheduleDayL.updateProviderScheduleDay(req.body,function(err,result){
+    var providerScheduleDay = new providerScheduleDayModel();
+    providerScheduleDay.initializer(req.body);
+    providerScheduleDayL.updateProviderScheduleDay(providerScheduleDay,function(err,result){
         providerScheduleDayL = null;
+        providerScheduleDay = null;
               if(err)
                 {
                 logger.log("error","updateProviderScheduleDay",err); 
@@ -54,8 +61,11 @@ router.put('/updateProviderScheduleDay', function(req, res) {
 router.put('/deactivateProviderScheduleDay', function(req, res) {
     var providerScheduleDayL = new providerScheduleDayLogic();
     var response = new responseWs();
-    providerScheduleDayL.deactivateProviderScheduleDay(req.body,function(err,result){
-          providerScheduleDayL = null;
+    var providerScheduleDay = new providerScheduleDayModel();
+    providerScheduleDay.initializer(req.body);
+    providerScheduleDayL.deactivateProviderScheduleDay(providerScheduleDay,function(err,result){
+            providerScheduleDayL = null;
+            providerScheduleDay = null;
               if(err)
                 {
                 logger.log("error","deactivateProviderScheduleDay",err); 
@@ -76,7 +86,7 @@ router.get('/getProviderScheduleDayById/:key', function(req, res) {
     var providerScheduleDayL = new providerScheduleDayLogic();
     var response = new responseWs();
     providerScheduleDayL.getProviderScheduleDayById(req.params.key,function(err,result){  
-              providerScheduleL = null;
+              providerScheduleDayL = null;
               if(err)
                 {
                 logger.log("error","getProviderScheduleDayById",err);
@@ -97,7 +107,7 @@ router.get('/getProviderScheduleDayByProviderScheduleId/:key', function(req, res
     var providerScheduleDayL = new providerScheduleDayLogic();
     var response = new responseWs();
     providerScheduleDayL.getProviderScheduleDayByProviderScheduleId(req.params.key,function(err,result){  
-              providerScheduleL = null;
+              providerScheduleDayL = null;
               if(err)
                 {
                 logger.log("error","getProviderScheduleDayByProviderScheduleId",err);

@@ -47,7 +47,7 @@ providerScheduleDAL.prototype.updateProviderSchedule  = function(data,id, result
 //Method to Select providerSchedule By Id
 //*******************************************************************************************
 providerScheduleDAL.prototype.getProviderScheduleById = function(id, resultMethod,connection) {
-    var getProviderScheduleByIdQuery ="SELECT providerSchedule.`ProviderScheduleId` ,providerSchedule.`ProviderId` , providerSchedule.`Name` ,providerSchedule.`IsDefault`, providerSchedule.`CreationDate`, providerSchedule.`ModificationDate` ,providerSchedule.`IsActive`, provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl' FROM `chameleon`.`ProviderSchedule` providerSchedule INNER JOIN `User` provider on provider.`UserId` = providerSchedule.`ProviderId`  WHERE providerSchedule.`IsActive` = 1  AND provider.`IsActive` = 1 AND provider.`IsProvider` =1 AND providerSchedule.`ProviderScheduleId` =?";
+    var getProviderScheduleByIdQuery ="SELECT providerSchedule.`ProviderScheduleId` ,providerSchedule.`ProviderId` , providerSchedule.`Name` ,providerSchedule.`IsDefault` ,providerSchedule.`IsMultiple` , providerSchedule.`CreationDate`, providerSchedule.`ModificationDate` ,providerSchedule.`IsActive`, provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl' FROM `chameleon`.`ProviderSchedule` providerSchedule INNER JOIN `User` provider on provider.`UserId` = providerSchedule.`ProviderId`  WHERE providerSchedule.`IsActive` = 1  AND provider.`IsActive` = 1 AND provider.`IsBlocked` = 0 AND provider.`IsProvider` =1 AND providerSchedule.`ProviderScheduleId` =?";
                 providerScheduleDAL.prototype.getByArguments(getProviderScheduleByIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getProviderScheduleById" , result);
@@ -74,7 +74,7 @@ providerScheduleDAL.prototype.deactivateProviderSchedule = function(data, result
 //Method to select the ProviderSchedule by Provider Id
 //*******************************************************************************************
 providerScheduleDAL.prototype.getProviderScheduleByProviderId = function(id, resultMethod,connection) {
-    var getProviderScheduleByProviderIdQuery ="SELECT providerSchedule.`ProviderScheduleId` ,providerSchedule.`ProviderId` , providerSchedule.`Name` ,providerSchedule.`IsDefault`, providerSchedule.`CreationDate`, providerSchedule.`ModificationDate` ,providerSchedule.`IsActive`, provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl' FROM `chameleon`.`ProviderSchedule` providerSchedule INNER JOIN `User` provider on provider.`UserId` = providerSchedule.`ProviderId`  WHERE providerSchedule.`IsActive` = 1  AND provider.`IsActive` = 1 AND provider.`IsProvider` =1 AND providerSchedule.`ProviderId` =?";
+    var getProviderScheduleByProviderIdQuery ="SELECT providerSchedule.`ProviderScheduleId` ,providerSchedule.`ProviderId` , providerSchedule.`Name` ,providerSchedule.`IsDefault`,providerSchedule.`IsMultiple` , providerSchedule.`CreationDate`, providerSchedule.`ModificationDate` ,providerSchedule.`IsActive`, provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl' FROM `chameleon`.`ProviderSchedule` providerSchedule INNER JOIN `User` provider on provider.`UserId` = providerSchedule.`ProviderId`  WHERE providerSchedule.`IsActive` = 1  AND provider.`IsActive` = 1 AND provider.`IsBlocked` = 0  AND provider.`IsProvider` =1 AND providerSchedule.`ProviderId` =?";
                 providerScheduleDAL.prototype.getByArguments(getProviderScheduleByProviderIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getProviderScheduleByProviderId",id , result);
@@ -84,7 +84,7 @@ providerScheduleDAL.prototype.getProviderScheduleByProviderId = function(id, res
 //Method to select the ProviderSchedule by ProviderSchedule Id and Provider Id
 //*******************************************************************************************
 providerScheduleDAL.prototype.getProviderScheduleByIdProviderId = function(id, providerId, resultMethod,connection) {
-    var getProviderScheduleByIdProviderIdQUery ="SELECT providerSchedule.`ProviderScheduleId` ,providerSchedule.`ProviderId` , providerSchedule.`Name` ,providerSchedule.`IsDefault`, providerSchedule.`CreationDate`, providerSchedule.`ModificationDate` ,providerSchedule.`IsActive`, provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl' FROM `chameleon`.`ProviderSchedule` providerSchedule INNER JOIN `User` provider on provider.`UserId` = providerSchedule.`ProviderId`  WHERE providerSchedule.`IsActive` = 1  AND provider.`IsActive` = 1 AND provider.`IsProvider` =1 AND providerSchedule.`ProviderScheduleId`=? AND providerSchedule.`ProviderId` =?";
+    var getProviderScheduleByIdProviderIdQUery ="SELECT providerSchedule.`ProviderScheduleId` ,providerSchedule.`ProviderId` , providerSchedule.`Name` ,providerSchedule.`IsDefault`,providerSchedule.`IsMultiple` , providerSchedule.`CreationDate`, providerSchedule.`ModificationDate` ,providerSchedule.`IsActive`, provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl' FROM `chameleon`.`ProviderSchedule` providerSchedule INNER JOIN `User` provider on provider.`UserId` = providerSchedule.`ProviderId`  WHERE providerSchedule.`IsActive` = 1  AND provider.`IsActive` = 1 AND provider.`IsBlocked` = 0  AND provider.`IsProvider` =1 AND providerSchedule.`ProviderScheduleId`=? AND providerSchedule.`ProviderId` =?";
                 providerScheduleDAL.prototype.getByArguments(getProviderScheduleByIdProviderIdQUery,[id,providerId],function (err,result)
                 {
                     logger.log("debug","getProviderScheduleByIdProviderId",id , result);
@@ -108,6 +108,7 @@ providerScheduleDAL.prototype.mapperSqlToModel = function(data)
            providerSchedule.isDefault = data.IsDefault;
            providerSchedule.creationDate = data.CreationDate;
            providerSchedule.modificationDate = data.ModificationDate;
+           providerSchedule.isMultiple = data.IsMultiple;
            providerSchedule.isActive = data.IsActive
            providerSchedule.provider = new userModel();
            providerSchedule.provider.basicInformation(data.provider_UserId ,data.provider_Name, data.provider_Lastname , data.provider_Username , data.provider_PictureUrl);
@@ -150,9 +151,10 @@ providerScheduleDAL.prototype.mapperSqlToModelCollection = function(dataRequeste
            providerSchedule.providerId = data.ProviderId;
            providerSchedule.name = data.Name; 
            providerSchedule.isDefault = data.IsDefault;
+           providerSchedule.isMultiple = data.IsMultiple;
            providerSchedule.creationDate = data.CreationDate;
            providerSchedule.modificationDate = data.ModificationDate;
-           providerSchedule.isActive = data.IsActive
+           providerSchedule.isActive = data.IsActive;
            providerSchedule.provider = new userModel();
            providerSchedule.provider.basicInformation(data.provider_UserId ,data.provider_Name, data.provider_Lastname , data.provider_Username , data.provider_PictureUrl);
            data = null;
@@ -192,6 +194,8 @@ providerScheduleDAL.prototype.mapperModelToSql = function(data)
         mysqlModel.Name = data.name;
         if(data.hasOwnProperty("isDefault")  && data.isDefault != undefined)
         mysqlModel.IsDefault = data.isDefault;
+         if(data.hasOwnProperty("isMultiple")  && data.isMultiple != undefined)
+        mysqlModel.IsMultiple = data.isMultiple;
         if(data.hasOwnProperty("creationDate")  && data.creationDate != undefined)
         mysqlModel.CreationDate = data.creationDate;
         if(data.hasOwnProperty("modificationDate")  && data.modificationDate != undefined)

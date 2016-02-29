@@ -6,6 +6,7 @@ var providerSchedule = function()
            this.providerId = null;
            this.name = null;
            this.isDefault = null;
+           this.isMultiple = null;
            this.provider  = null; 
            base.call(this);
         };
@@ -16,6 +17,7 @@ providerSchedule.prototype.initializer = function (data)
            this.providerId = data.providerId;
            this.name = data.name;
            this.isDefault = data.isDefault;
+           this.isMultiple = data.isMultiple;
       
 }
 //********************************************************************************************

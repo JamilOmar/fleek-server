@@ -3,9 +3,10 @@
 //Description: Reservation Detail  logic class
 //Target : Reservation Creation , Administration of Reservations Details
 //Author: Jamil Falconi
-//year: 2015
+//year: 2016
 //Version : 1.0
 //*******************************************************************************************
+"user strict";
 require('rootpath')();
 var mod_vasync  = require("vasync");
 var reservationDetailDAL = require('data/dal/reservationDetailDAL');

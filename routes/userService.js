@@ -1,7 +1,7 @@
 require('rootpath')();
 var express = require('express');
 var userLogic = require('logic/userLogic.js');
-var userModel = require('models/user')
+var userModel = require('models/user');
 var config = require('config');
 var logger = require('utilities/logger');
 var router = express.Router();
@@ -37,7 +37,7 @@ router.put('/updateUser', function(req, res) {
 router.put('/updatePassword', function(req, res) {
     var userL = new userLogic();
     var response = new responseWs();
-    userL.updatePassword(req.id, req.password, req.newPassword,function(err,result){
+    userL.updatePassword(req.body.id, req.body.password, req.body.newPassword,function(err,result){
          userL = null;
               if(err)
                 {
@@ -60,7 +60,7 @@ router.put('/updatePassword', function(req, res) {
         user.initializer( req.body)
         var userL = new userLogic();
         var response = new responseWs();
-    userL.blockUser(user,function(err,result){  
+        userL.blockUser(user,function(err,result){  
              userL = null;
               if(err)
                 {
@@ -76,6 +76,29 @@ router.put('/updatePassword', function(req, res) {
              response = null;
         });
     });
+//Method to unblock the user
+//*******************************************************************************************
+    router.put('/unblockUser', function(req, res) {
+        var user =new userModel();
+        user.initializer( req.body)
+        var userL = new userLogic();
+        var response = new responseWs();
+        userL.unblockUser(user,function(err,result){  
+             userL = null;
+              if(err)
+                {
+                logger.log("error","unblockUser",err); 
+                response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+             response = null;
+        });
+    });    
 //Method to deactivate the user
 //*******************************************************************************************
     router.put('/deactivateUser', function(req, res) {
@@ -83,7 +106,7 @@ router.put('/updatePassword', function(req, res) {
         user.initializer( req.body)
         var userL = new userLogic();
         var response = new responseWs();
-    userL.deactivateUser(user,function(err,result){  
+        userL.deactivateUser(user,function(err,result){  
               userL = null;
               if(err)
                 {

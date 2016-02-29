@@ -1,5 +1,5 @@
 require('rootpath')();
-var redis = require("redis");
+const redis = require("redis");
 var config = require('config');
 //********************************************************************************************
 function Cache()

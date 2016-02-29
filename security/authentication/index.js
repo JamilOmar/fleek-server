@@ -1,3 +1,4 @@
+"user strict";
 require('rootpath')();
 var userLogic = require('logic/userLogic');
 var tokenHelper = require('security/helper/tokenHelper');
