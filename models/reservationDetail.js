@@ -6,8 +6,7 @@ var reservationDetail = function()
            this.reservationId = null;
            this.serviceId = null;
            this.requestInfo = null; 
-           this.startTime = null;
-           this.endTime = null;
+           this.duration = null;
            base.call(this);
          
         };
@@ -18,8 +17,8 @@ reservationDetail.prototype.initializer = function (data)
     this.reservationId = data.reservation;
     this.serviceId = data.serviceId;
     this.requestInfo = data.serviceId;
-    this.startTime = data.startTime;
-    this.endTime = data.endTime;     
+    this.duration = data.duration;
+ 
 }
 //********************************************************************************************
 module.exports =reservationDetail;

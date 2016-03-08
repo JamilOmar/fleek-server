@@ -2,8 +2,10 @@ require('rootpath')();
 var base  = require('./base.js');   
 var providerService = function()
         {
-           this.id = null;
+           this.providerId = null;
            this.serviceId = null;
+           this.name = null;
+           this.currencyCode = null;
            this.customName = null;
            this.price = null;
            this.averageTimePerSession = null; 
@@ -14,8 +16,10 @@ var providerService = function()
 providerService.prototype = new base();
 providerService.prototype.initializer = function (data)
 {
-           this.id = data.id;
+           this.providerId = data.providerId;
            this.serviceId = data.serviceId;
+           this.name = data.name;
+           this.currencyCode = data.currencyCode;
            this.customName = data.customName;
            this.price = data.price;
            this.averageTimePerSession = data.averageTimePerSession; 
@@ -23,4 +27,4 @@ providerService.prototype.initializer = function (data)
       
 }
 //********************************************************************************************
-        module.exports =  providerService;
+ module.exports =  providerService;

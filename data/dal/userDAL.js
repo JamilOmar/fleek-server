@@ -247,47 +247,47 @@ userDAL.prototype.mapperModelToSql = function(data)
     {
      logger.log("debug","mapperModelToSql before",data);   
     var mysqlModel  ={};
-    if(data.hasOwnProperty("id")  && data.id!= undefined)
+    if(data.hasOwnProperty("id")  && data.id!== undefined)
     mysqlModel.UserId  = data.id;
-    if(data.hasOwnProperty("name") && data.name!= undefined)
+    if(data.hasOwnProperty("name") && data.name!== undefined)
     mysqlModel.Name = data.name;    
-    if(data.hasOwnProperty("lastname") && data.lastname!= undefined)
+    if(data.hasOwnProperty("lastname") && data.lastname!== undefined)
     mysqlModel.Lastname = data.lastname;
-    if(data.hasOwnProperty("age") && data.age!= undefined)
+    if(data.hasOwnProperty("age") && data.age!== undefined)
     mysqlModel.Age = data.age;
-    if(data.hasOwnProperty("username") && data.username!= undefined)
+    if(data.hasOwnProperty("username") && data.username!== undefined)
     mysqlModel.Username = data.username;
-    if(data.hasOwnProperty("password") && data.password!= undefined)
+    if(data.hasOwnProperty("password") && data.password!== undefined)
     mysqlModel.Password = data.password;
-    if(data.hasOwnProperty("email") && data.email!= undefined)
+    if(data.hasOwnProperty("email") && data.email!== undefined)
     mysqlModel.Email = data.email;
-    if(data.hasOwnProperty("facebookId") && data.facebookId!= undefined)
+    if(data.hasOwnProperty("facebookId") && data.facebookId!== undefined)
     mysqlModel.FacebookId = data.facebookId;
-    if(data.hasOwnProperty("pictureUrl") && data.pictureUrl!= undefined)
+    if(data.hasOwnProperty("pictureUrl") && data.pictureUrl!== undefined)
     mysqlModel.PictureUrl = data.pictureUrl;
-    if(data.hasOwnProperty("isBlocked") && data.isBlocked!= undefined)
+    if(data.hasOwnProperty("isBlocked") && data.isBlocked!== undefined)
     mysqlModel.IsBlocked = data.isBlocked;
-    if(data.hasOwnProperty("isProvider")&& data.isProvider!= undefined)
+    if(data.hasOwnProperty("isProvider")&& data.isProvider!== undefined)
     mysqlModel.IsProvider = data.isProvider;
-    if(data.hasOwnProperty("countryId")&& data.countryId!= undefined)
+    if(data.hasOwnProperty("countryId")&& data.countryId!== undefined)
     mysqlModel.CountryId = data.countryId;
-    if(data.hasOwnProperty("latitude")&& data.latitude!= undefined)
+    if(data.hasOwnProperty("latitude")&& data.latitude!== undefined)
     mysqlModel.Latitude = data.latitude;
-    if(data.hasOwnProperty("longitude")&& data.longitude!= undefined)
+    if(data.hasOwnProperty("longitude")&& data.longitude!== undefined)
     mysqlModel.Longitude = data.longitude;
-    if(data.hasOwnProperty("creationDate")&& data.creationDate!= undefined)
+    if(data.hasOwnProperty("creationDate")&& data.creationDate!== undefined)
     mysqlModel.CreationDate = data.creationDate;
-    if(data.hasOwnProperty("modificationDate")&& data.modificationDate!= undefined)
+    if(data.hasOwnProperty("modificationDate")&& data.modificationDate!== undefined)
     mysqlModel.ModificationDate = data.modificationDate;
-    if(data.hasOwnProperty("isActive")&& data.isActive!= undefined)
+    if(data.hasOwnProperty("isActive")&& data.isActive!== undefined)
     mysqlModel.IsActive = data.isActive;
-     if(data.hasOwnProperty("gender")&& data.gender!= undefined)
+     if(data.hasOwnProperty("gender")&& data.gender!== undefined)
     mysqlModel.gender = data.gender;
-      if(data.hasOwnProperty("appointments")&& data.appointments!= undefined)
+      if(data.hasOwnProperty("appointments")&& data.appointments!== undefined)
     mysqlModel.Appointments = data.appointments;
-      if(data.hasOwnProperty("rating")&& data.rating!= undefined)
+      if(data.hasOwnProperty("rating")&& data.rating!== undefined)
     mysqlModel.Rating = data.rating;
-      if(data.hasOwnProperty("isOpenForFriendship")&& data.isOpenForFriendship!= undefined)
+      if(data.hasOwnProperty("isOpenForFriendship")&& data.isOpenForFriendship!== undefined)
     mysqlModel.IsOpenForFriendship = data.isOpenForFriendship;
      logger.log("debug","mapperModelToSql",mysqlModel);
       return mysqlModel;    

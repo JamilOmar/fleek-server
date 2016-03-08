@@ -63,6 +63,10 @@
           
         
       },
+        "provider":
+      {
+          "maxtime":480
+      },
        "mandril":{
         
         "accessKeyId":"3_oNA5hR5LL5hBl7BcH9KA"

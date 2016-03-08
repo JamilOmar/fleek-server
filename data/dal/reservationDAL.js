@@ -10,6 +10,7 @@ var baseDAL  = require('./baseDAL');
 var reservationModel  = require('models/reservation');
 var util = require('util');
 var logger = require('utilities/logger');
+var userModel  = require('models/user');
 //*******************************************************************************************
 
 var reservationDAL = function()
@@ -46,7 +47,7 @@ reservationDAL.prototype.updateReservation  = function(data,id, resultMethod,con
 //Method to Select Reservation By Id
 //*******************************************************************************************
 reservationDAL.prototype.getReservationById = function(id, resultMethod,connection) {
-    var getReservationByIdQuery ="SELECT * FROM `chameleon`.`Reservation` WHERE `IsActive` = 1 AND `ReservationId` =?";
+    var getReservationByIdQuery ="SELECT  reservation.`ReservationId` ,reservation.`ProviderScheduleId`,  reservation.`Address` , reservation.`CancelationReason` , reservation.`Date` , reservation.`EndTime` , reservation.`StartTime`, reservation.`Latitude` , reservation.`Longitude`, reservation.`State` , reservation.`CreationDate` , reservation.`ModificationDate` , reservation.`IsActive` ,customer.`UserId` as 'customer_UserId', customer.`Name` as 'customer_Name', customer.`Lastname` as 'customer_Lastname', customer.`Username` as 'customer_Username' , customer.`PictureUrl` as 'customer_PictureUrl',provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl'  FROM `Reservation` reservation INNER JOIN `User` customer ON customer.`UserId` = reservation.`CustomerId` INNER JOIN `User` provider ON provider.`UserId` = reservation.`ProviderId` WHERE  reservation.`IsActive` = 1 AND customer.`IsActive` =1 AND provider.`IsActive` = 1 AND provider.`IsBlocked` = 0 and customer.`IsBlocked` = 0 and reservation.`ReservationId` =?";
                 reservationDAL.prototype.getByArguments(getReservationByIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getReservationById" , result);
@@ -89,7 +90,7 @@ reservationDAL.prototype.deactivateReservation = function(data, resultMethod,con
 //Method to select the Reservation by Customer Id
 //*******************************************************************************************
 reservationDAL.prototype.getReservationByCustomerId = function(id, resultMethod,connection) {
-    var getReservationByCustomerIdQuery ="SELECT * FROM `chameleon`.`Reservation` r INNER JOIN `User` u on u.`UserId` = r.`CustomerId` WHERE  u.`IsActive` = 1 and u.`UserId` =? and r.`IsActive` =1";
+    var getReservationByCustomerIdQuery ="SELECT  reservation.`ReservationId` ,reservation.`ProviderScheduleId`,  reservation.`Address` , reservation.`CancelationReason` , reservation.`Date` , reservation.`EndTime` , reservation.`StartTime`, reservation.`Latitude` , reservation.`Longitude`, reservation.`State` , reservation.`CreationDate` , reservation.`ModificationDate` , reservation.`IsActive` ,customer.`UserId` as 'customer_UserId', customer.`Name` as 'customer_Name', customer.`Lastname` as 'customer_Lastname', customer.`Username` as 'customer_Username' , customer.`PictureUrl` as 'customer_PictureUrl',provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl'  FROM `Reservation` reservation INNER JOIN `User` customer ON customer.`UserId` = reservation.`CustomerId` INNER JOIN `User` provider ON provider.`UserId` = reservation.`ProviderId` WHERE  reservation.`IsActive` = 1 AND customer.`IsActive` =1 AND provider.`IsActive` = 1 AND provider.`IsBlocked` = 0 and customer.`IsBlocked` = 0 and reservation.`CustomerId` =?";
                 reservationDAL.prototype.getByArguments(getReservationByCustomerIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getReservationByCustomerId",id , result);
@@ -100,7 +101,7 @@ reservationDAL.prototype.getReservationByCustomerId = function(id, resultMethod,
 //Method to select the Reservation by Provider Id
 //*******************************************************************************************
 reservationDAL.prototype.getReservationByProviderId = function(id, resultMethod,connection) {
-    var getReservationByProviderIdQuery ="SELECT r.* FROM `chameleon`.`Reservation` r INNER JOIN `User` u on u.`UserId` = r.`ProviderId` WHERE  u.`IsActive` = 1 and u.`UserId` =? and r.`IsActive` =1";
+    var getReservationByProviderIdQuery ="SELECT  reservation.`ReservationId` ,reservation.`ProviderScheduleId`,  reservation.`Address` , reservation.`CancelationReason` , reservation.`Date` , reservation.`EndTime` , reservation.`StartTime`, reservation.`Latitude` , reservation.`Longitude`, reservation.`State` , reservation.`CreationDate` , reservation.`ModificationDate` , reservation.`IsActive` ,customer.`UserId` as 'customer_UserId', customer.`Name` as 'customer_Name', customer.`Lastname` as 'customer_Lastname', customer.`Username` as 'customer_Username' , customer.`PictureUrl` as 'customer_PictureUrl',provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl'  FROM `Reservation` reservation INNER JOIN `User` customer ON customer.`UserId` = reservation.`CustomerId` INNER JOIN `User` provider ON provider.`UserId` = reservation.`ProviderId` WHERE  reservation.`IsActive` = 1 AND customer.`IsActive` =1 AND provider.`IsActive` = 1 AND provider.`IsBlocked` = 0 AND customer.`IsBlocked` = 0 AND reservation.`ProviderId` =?";
                 reservationDAL.prototype.getByArguments(getReservationByProviderIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getReservationByProviderId",id , result);
@@ -110,7 +111,7 @@ reservationDAL.prototype.getReservationByProviderId = function(id, resultMethod,
 //Method to Select providerScheduleException By Schedule Id, Provider , Year  And Month 
 //*******************************************************************************************
 reservationDAL.prototype.getReservationByProviderScheduleIdYearMonthDay= function(id,year,month,day, resultMethod,connection) {
-    var getReservationByProviderScheduleIdYearMonthDayQuery ="SELECT r.* FROM `chameleon`.`Reservation` r INNER JOIN `ProviderSchedule` ps ON ps.`ProviderScheduleId` = r.`ProviderScheduleId` INNER JOIN `User` u on u.`UserId` = r.`ProviderId`  WHERE r.`ProviderScheduleId` =?   AND YEAR(r.`Date`) = ? AND MONTH(r.`Date`) = ? AND DAY(r.`Date`) = ?  AND r.`IsActive` = 1  AND ps.`IsActive` =1 AND u.`IsActive` =1";
+    var getReservationByProviderScheduleIdYearMonthDayQuery ="SELECT  reservation.`ReservationId` ,reservation.`ProviderScheduleId`,  reservation.`Address` , reservation.`CancelationReason` , reservation.`Date` , reservation.`EndTime` , reservation.`StartTime`, reservation.`Latitude` , reservation.`Longitude`, reservation.`State` , reservation.`CreationDate` , reservation.`ModificationDate` , reservation.`IsActive` ,customer.`UserId` as 'customer_UserId', customer.`Name` as 'customer_Name', customer.`Lastname` as 'customer_Lastname', customer.`Username` as 'customer_Username' , customer.`PictureUrl` as 'customer_PictureUrl',provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl'  FROM `Reservation` reservation INNER JOIN `User` customer ON customer.`UserId` = reservation.`CustomerId` INNER JOIN `User` provider ON provider.`UserId` = reservation.`ProviderId` WHERE  reservation.`IsActive` = 1 AND customer.`IsActive` =1 AND provider.`IsActive` = 1 AND provider.`IsBlocked` = 0 and customer.`IsBlocked` = 0 AND reservation.`ProviderScheduleId` =? AND YEAR(reservation.`Date`) = ? AND MONTH(reservation.`Date`) = ? AND DAY(reservation.`Date`) = ?";
                 reservationDAL.prototype.getByArguments(getReservationByProviderScheduleIdYearMonthDayQuery,[id,year,month,day],function (err,result)
                 {
                     logger.log("debug","getReservationByProviderScheduleIdYearMonthDay" , result);
@@ -130,17 +131,22 @@ reservationDAL.prototype.mapperSqlToModel = function(data)
             data = data[0];
            var Reservation  = new reservationModel();
            Reservation.id = data.ReservationId;
-           Reservation.customerId = data.CustomerId;
-           Reservation.providerId = data.ProviderId;
+           Reservation.customerId = data.customer_UserId;
+           Reservation.providerId = data.provider_UserId;
+           Reservation.provider = new userModel();
+           Reservation.provider.basicInformation(data.provider_UserId ,data.provider_Name, data.provider_Lastname , data.provider_Username , data.provider_PictureUrl);
+           Reservation.customer = new userModel();
+           Reservation.customer.basicInformation(data.customer_UserId ,data.customer_Name, data.customer_Lastname , data.customer_Username , data.customer_PictureUrl);
+
            Reservation.providerScheduleId = data.ProviderScheduleId;
            Reservation.latitude = data.Latitude; 
-           Reservation.longitude = data.longitude;
+           Reservation.longitude = data.Longitude;
            Reservation.address = data.Address;
            Reservation.cancelationReason = data.CancelationReason; 
            Reservation.date = data.Date; 
            Reservation.startTime = data.StartTime;
            Reservation.endTime = data.EndTime;
-           Reservation.isCanceled = data.IsCanceled;
+           Reservation.state = data.State;
            Reservation.creationDate = data.CreationDate;
            Reservation.modificationDate = data.ModificationDate;
            Reservation.isActive = data.IsActive
@@ -180,17 +186,21 @@ reservationDAL.prototype.mapperSqlToModelCollection = function(dataRequested)
            var data = dataRequested[i];
            var Reservation  = new reservationModel();
            Reservation.id = data.ReservationId;
-           Reservation.customerId = data.CustomerId;
-           Reservation.providerId = data.ProviderId;
+           Reservation.customerId = data.customer_UserId;
+           Reservation.providerId = data.provider_UserId;
+           Reservation.provider = new userModel();
+           Reservation.provider.basicInformation(data.provider_UserId ,data.provider_Name, data.provider_Lastname , data.provider_Username , data.provider_PictureUrl);
+           Reservation.customer = new userModel();
+           Reservation.customer.basicInformation(data.customer_UserId ,data.customer_Name, data.customer_Lastname , data.customer_Username , data.customer_PictureUrl);
            Reservation.providerScheduleId = data.ProviderScheduleId;
            Reservation.latitude = data.Latitude; 
-           Reservation.longitude = data.longitude;
+           Reservation.longitude = data.Longitude;
            Reservation.address = data.Address;
            Reservation.cancelationReason = data.CancelationReason;
            Reservation.date = data.Date;  
            Reservation.startTime = data.StartTime;
            Reservation.endTime = data.EndTime;
-           Reservation.isCanceled = data.IsCanceled;
+           Reservation.state = data.State;
            Reservation.creationDate = data.CreationDate;
            Reservation.modificationDate = data.ModificationDate;
            Reservation.isActive = data.IsActive
@@ -246,8 +256,8 @@ reservationDAL.prototype.mapperModelToSql = function(data)
     mysqlModel.StartTime = data.startTime;
      if(data.hasOwnProperty("endTime") && data.endTime != undefined)
     mysqlModel.EndTime = data.endTime;
-     if(data.hasOwnProperty("isCanceled") && data.isCanceled != undefined)
-    mysqlModel.IsCanceled = data.isCanceled;
+     if(data.hasOwnProperty("state") && data.state != undefined)
+    mysqlModel.State = data.state;
      if(data.hasOwnProperty("creationDate")&& data.creationDate != undefined)
     mysqlModel.CreationDate = data.creationDate;
      if(data.hasOwnProperty("modificationDate") && data.modificationDate != undefined)

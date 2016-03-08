@@ -46,7 +46,7 @@ reservationDetailDAL.prototype.updateReservationDetail  = function(data,id, resu
 //Method to Select reservationDetail By Id
 //*******************************************************************************************
 reservationDetailDAL.prototype.getReservationDetailById = function(id, resultMethod,connection) {
-    var getReservationDetailByIdQuery ="SELECT * FROM `chameleon`.`ReservationDetail` WHERE `IsActive` = 1 AND `ReservationDetailId` =?";
+    var getReservationDetailByIdQuery ="SELECT reservationDetail.`ReservationDetailId` , reservationDetail.`ReservationId` , reservationDetail.`RequestInfo` , reservationDetail.`Duration` , reservationDetail.`ServiceId`, reservationDetail.`CreationDate` , reservationDetail.`ModificationDate` ,reservationDetail.`IsActive`  FROM `chameleon`.`ReservationDetail` reservationDetail  INNER JOIN `Reservation` reservation ON reservation.`ReservationId` = reservationDetail.`ReservationId` INNER JOIN `Service` service ON service.`ServiceId` = reservationDetail.`ServiceId` WHERE reservation.`IsActive` = 1 AND reservationDetail.`IsActive` = 1 AND service.`IsActive` =1 AND reservationDetail.`ReservationDetailId` =?";
                 reservationDetailDAL.prototype.getByArguments(getReservationDetailByIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getReservationDetailById" , result);
@@ -56,29 +56,14 @@ reservationDetailDAL.prototype.getReservationDetailById = function(id, resultMet
 //Method to Select reservationDetail By Reservation Id
 //*******************************************************************************************
 reservationDetailDAL.prototype.getReservationDetailByReservationId = function(id, resultMethod,connection) {
-    var getReservationDetailByReservationIdQuery ="SELECT * FROM `chameleon`.`ReservationDetail` WHERE `IsActive` = 1 AND `CustomerReservationId` =?";
+    var getReservationDetailByReservationIdQuery ="SELECT reservationDetail.`ReservationDetailId` , reservationDetail.`ReservationId` , reservationDetail.`RequestInfo` , reservationDetail.`Duration` , reservationDetail.`ServiceId`, reservationDetail.`CreationDate` , reservationDetail.`ModificationDate` ,reservationDetail.`IsActive`  FROM `chameleon`.`ReservationDetail` reservationDetail  INNER JOIN `Reservation` reservation ON reservation.`ReservationId` = reservationDetail.`ReservationId` INNER JOIN `Service` service ON service.`ServiceId` = reservationDetail.`ServiceId` WHERE reservation.`IsActive` = 1 AND reservationDetail.`IsActive` = 1 AND service.`IsActive` =1 AND reservationDetail.`ReservationId` =?";
                 reservationDetailDAL.prototype.getByArguments(getReservationDetailByReservationIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getReservationDetailByReservationId" , result);
                     return resultMethod(err,reservationDetailDAL.prototype.self.mapperSqlToModel(result));
                 },connection);  
 };
-//Method to cancel reservationDetail
-//*******************************************************************************************
-reservationDetailDAL.prototype.cancelReservationDetail = function(data, resultMethod,connection) {
-           var disableParameters = 
-               [
-                 data.modificationDate,
-                 data.id,
-                      
-               ];
-           var deactivatereservationDetailQuery = "UPDATE `chameleon`.`ReservationDetail` SET `IsCanceled`=1,`ModificationDate`=? WHERE `ReservationDetailId`=?;";
-             reservationDetailDAL.prototype.query(deactivatereservationDetailQuery,disableParameters,function (err,result)
-                {
-                    logger.log("debug","cancelReservationDetail",data);
-                    return resultMethod(err,reservationDetailDAL.prototype.nonQueryResult(result));
-                },connection);
-};
+
 //Method to cancel reservationDetail by Reservation Id
 //*******************************************************************************************
 reservationDetailDAL.prototype.cancelReservationDetailByReservationId = function(data, resultMethod,connection) {
@@ -111,17 +96,6 @@ reservationDetailDAL.prototype.deactivateReservationDetail = function(data, resu
                     return resultMethod(err,reservationDetailDAL.prototype.nonQueryResult(result));
                 },connection);
 };
-//Method to select the reservationDetail by Customer Id
-//*******************************************************************************************
-reservationDetailDAL.prototype.getreservationDetailByReservationId = function(id, resultMethod,connection) {
-    var getreservationDetailByReservationIdQuery ="SELECT rd.* FROM `ReservationDetail` rd INNER JOIN `Reservation` r on r.`CustomerReservationId` = rd.`CustomerReservationId` where r.`IsActive` =1 and rd.`IsActive` =1 and r.`IsActive` =1 and r.`CustomerReservationId` =?";
-                reservationDetailDAL.prototype.getByArguments(getreservationDetailByReservationIdQuery,id,function (err,result)
-                {
-                    logger.log("debug","getreservationDetailByReservationId",id , result);
-                    return resultMethod(err,reservationDetailDAL.prototype.self.mapperSqlToModelCollection(result));
-                },connection);  
-};
-
 
 //Method for transform the information from sql to model
 //********************************************************************************************
@@ -138,9 +112,7 @@ reservationDetailDAL.prototype.mapperSqlToModel = function(data)
            reservationDetail.reservationId = data.ReservationId;
            reservationDetail.serviceId = data.ServiceId;
            reservationDetail.requestInfo = data.RequestInfo; 
-           reservationDetail.startTime = data.StartTime;
-           reservationDetail.endTime = data.EndTime;
-           reservationDetail.isCanceled = data.IsCanceled;
+           reservationDetail.duration = data.Duration;
            reservationDetail.creationDate = data.CreationDate;
            reservationDetail.modificationDate = data.ModificationDate;
            reservationDetail.isActive = data.IsActive
@@ -183,9 +155,7 @@ reservationDetailDAL.prototype.mapperSqlToModelCollection = function(data)
            reservationDetail.reservationId = data.ReservationId;
            reservationDetail.serviceId = data.ServiceId;
            reservationDetail.requestInfo = data.RequestInfo; 
-           reservationDetail.startTime = data.StartTime;
-           reservationDetail.endTime = data.EndTime;
-           reservationDetail.isCanceled = data.IsCanceled;
+           reservationDetail.duration = data.Duration;
            reservationDetail.creationDate = data.CreationDate;
            reservationDetail.modificationDate = data.ModificationDate;
            reservationDetail.isActive = data.IsActive
@@ -227,10 +197,9 @@ reservationDetailDAL.prototype.mapperModelToSql = function(data)
     mysqlModel.ServiceId = data.serviceId;
     if(data.hasOwnProperty("requestInfo")&& data.requestInfo != undefined)
     mysqlModel.RequestInfo = data.requestInfo;
-    if(data.hasOwnProperty("startTime")&& data.startTime != undefined)
-    mysqlModel.StartTime = data.startTime;
-    if(data.hasOwnProperty("endTime")&& data.endTime != undefined)
-    mysqlModel.EndTime = data.endTime;
+    if(data.hasOwnProperty("duration")&& data.duration != undefined)
+    mysqlModel.Duration = data.duration;
+
     if(data.hasOwnProperty("creationDate")&& data.creationDate != undefined)
     mysqlModel.CreationDate = data.creationDate;
     if(data.hasOwnProperty("modificationDate")&& data.modificationDate != undefined)

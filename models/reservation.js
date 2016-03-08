@@ -1,10 +1,13 @@
 require('rootpath')();        
-var base  = require('./base.js');   
+var base  = require('./base.js');
+var reservationDetailModel = require('./reservationDetail.js');
 var reservation = function()
         {
            this.id = null;
            this.customerId = null;
            this.providerId = null;
+           this.customer = null;
+           this.provider = null;
            this.providerScheduleId =null;
            this.latitude = null; 
            this.longitude = null;
@@ -18,6 +21,7 @@ var reservation = function()
            this.reservationDetail = null;
            base.call(this);
         };
+reservation.prototype = new base();        
 reservation.prototype.initializer = function (data)
 {
         this.id = data.id;
@@ -32,9 +36,16 @@ reservation.prototype.initializer = function (data)
         this.startTime = data.startTime;
         this.endTime = data.endTime;
         this.state = data.state;
-  
-      
+        this.reservationDetail = [];
+        if( data.reservationDetail != undefined)
+        {
+            data.reservationDetail.forEach(function(element) {
+            var reservationD = new  reservationDetailModel();
+            reservationD.initializer(element);
+            this.reservationDetail.push(reservationD);
+            }, this);
+        }
 }        
-reservation.prototype = new base();
+
 //********************************************************************************************
-        module.exports = reservation;
+module.exports = reservation;

@@ -12,7 +12,7 @@ const constants=
     REDIS_PROVIDER_SCHEDULE : "REDIS_PROVIDER_SCHEDULE-",
     //Language for service and service type
 	LANGUAGE : "-LANGUAGE-",
-    //requests states for frienships
+    //requests states for friendships
     REQUEST_STATES :
     {
         REQUESTED : 0,
@@ -39,6 +39,13 @@ const constants=
         NEUTRAL :0,
         MALE : 1,
         FEMALE:2
+    },
+    //provider's workflow state
+    USER_PROVIDER_STATES:
+    {
+        REQUESTED : 0,
+        APPROVED :1,
+        CANCELED :-1
     },
        //RATING
     RATING:

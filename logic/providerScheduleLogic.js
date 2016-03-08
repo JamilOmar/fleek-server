@@ -46,7 +46,7 @@ providerScheduleLogic.prototype.validate = function(providerSchedule, callback) 
         
     }
     if ((!validator.isNullOrUndefined(providerSchedule.isMultiple) && !validator.isBoolean(providerSchedule.isMultiple))) {
-        validatorM.addException("isMultiple is invalid.");
+        validatorM.addException("IsMultiple is invalid.");
         
     }
     if (validator.isNullOrUndefined(providerSchedule.providerId)) {
@@ -118,7 +118,7 @@ providerScheduleLogic.prototype.createProviderSchedule = function(providerSchedu
 
                         //method to prepare the data    
                         //authorize
-                        //check if the user who is calling is the same user who is being send
+                        //check if the user who is calling is the same user who is being sent
                         //*******************************************************************************************
                         function authorize(data,callback) {
                             if (contextUser.id == data.id && data.isProvider) {

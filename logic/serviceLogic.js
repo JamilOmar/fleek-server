@@ -6,6 +6,7 @@
 //year: 2015
 //Version : 1.0
 //*******************************************************************************************
+"user strict";
 require('rootpath')();
 var mod_vasync  = require("vasync");
 var serviceDAL = require('data/dal/serviceDAL');

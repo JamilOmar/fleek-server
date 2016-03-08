@@ -393,10 +393,14 @@ try
                                 return connection.rollback(function() {
                                     callback(err,null);});
                             }
-                            logger.log("debug","commit" , providerScheduleDay);
+                            else
+                            {
+                                logger.log("debug","commit" , providerScheduleDay);
+                                 return callback(null,providerScheduleDay.id );
+                            }
                         });
                           
-                    return callback(null,providerScheduleDay.id );
+                  
                     },connection);
 
         },
@@ -554,10 +558,13 @@ try
                                     //Refresh the list cache
                                     callback(err,providerScheduleDay.providerScheduleId);});
                             }
-                            logger.log("debug","commit" , providerScheduleDay);
-                       
+                            else
+                            {
+                                logger.log("debug","commit" , providerScheduleDay);
+                                return callback(err,result );
+                            }
                         });
-                    return callback(err,result );
+                   
                     },connection);
 
         }

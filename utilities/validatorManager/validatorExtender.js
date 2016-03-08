@@ -1,7 +1,7 @@
 module.exports = function(validator) {
 validator.isNullOrUndefined = function(str)
 {
-    return  str == null || str == undefined ||str == "";
+    return  str === null || str === undefined ||str == "";
 };
 validator.isNumberAndIntegerAndRange= function(n,min,max)
 {
@@ -11,6 +11,7 @@ validator.isNumberAndInteger =function(number)
 {
     return Number.isInteger(number) ;
 };
+
 validator.isCoordinate =function(str)
 {
     var reg = new RegExp("^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}");
@@ -19,7 +20,7 @@ validator.isCoordinate =function(str)
 validator.isBoolean =function(val)
 {
     
-    return typeof val === 'boolean';
+    return typeof val === 'boolean' || (val == 0 || val ==1);
 };
 
 }

@@ -50,9 +50,27 @@
         baseDAL.prototype.queryWithArgument = function(createUserQuery,data,argument, resultMethod,connection) {
             if(connection !=null )
             {
-               
+                var parameters = [];
+                
+                var argumentsList = [];
+                
+                //check if it has more than one argument
+                if( Object.prototype.toString.call( argument ) === '[object Array]' ) {
+                    argument.forEach(function(element) {
+                        delete data[Object.keys(element)[0]];
+                        argumentsList.push(element); 
+                    }, this);
+                 }
+                 else
+                 {
+                        delete data[Object.keys(argument)[0]];
+                        argumentsList.push(argument); 
+                 }  
+                  parameters.push(data);
+                  parameters =parameters.concat(argumentsList);
+                 
                  // Use the connection
-                    connection.query(createUserQuery ,[data,argument], function(err, result) {
+                    connection.query(createUserQuery ,parameters, function(err, result) {
                    return resultMethod(err,result);
                 });
             }

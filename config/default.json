@@ -64,6 +64,10 @@
           
         
       },
+      "provider":
+      {
+          "maxtime":480
+      },
       
       "mandril":{
         

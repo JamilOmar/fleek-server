@@ -13,6 +13,9 @@ var reservationDetailDAL = require('data/dal/reservationDetailDAL');
 var logger = require('utilities/logger');
 var uuid = require('node-uuid');
 var moment = require('moment');
+var validator = require('validator');
+require('utilities/validatorManager/validatorExtender')(validator);
+var validatorManager = require('utilities/validatorManager/validatorManager');
 //*******************************************************************************************
 //constants
 var constants = require('global/constants');
@@ -23,51 +26,62 @@ var reservationDetailLogic = function()
   
    reservationDetailLogic.prototype.self = this;
 };
-//validation of the required fields for the reservation Detail creation
 //*******************************************************************************************
-reservationDetailLogic.prototype.validateFields = function(reservation) {
-
-
- 
-      return (
-    reservation.hasOwnProperty("startTime")
-    &&
-    reservation.hasOwnProperty("endTime")
-    &&
-    reservation.hasOwnProperty("serviceId") );
-                   
-
-}
+//
+//Validation for Provider Schedule
+//
+//*******************************************************************************************
+reservationDetailLogic.prototype.validate = function (reservation, callback) {
+var validatorM = new validatorManager();   
+            
+        
+         
+            if(  validator.isNullOrUndefined( reservation.serviceId )) {
+                validatorM.addException("ServiceId is invalid.");
+           }
+              if(  validator.isNullOrUndefined( reservation.duration )) {
+                validatorM.addException("Duration is invalid.");
+           }
+         
+                    if (validatorM.isValid()) {
+        validatorM = null;
+        return callback(null, true);
+    } else {
+        var message = validatorM.GenerateErrorMessage();
+        validatorM = null;
+        return callback({
+            name: "Error in Reservation Detail Validation",
+            message: message
+        }, false);
+    }}
 //validation of the required fields for the reservation detail and reservation creation
 //*******************************************************************************************
 reservationDetailLogic.prototype.validateTime = function(reservationDetailList) { 
-   var totalTime = 0;
+   var totalTime = 0    ;
    if( reservationDetailList.length >0)
    {
-      reservationDetailList = reservationDetailList.sort(function (s,e) { return s.startTime - e.startTime});
       for (var i = 0 ; i < reservationDetailList.length ; i++)
       {
-        var startTimeReservationDetail =  moment(reservationDetailList[i].startTime ,'HH:mm:ss');
-        var endTimeReservationDetail =  moment(reservationDetailList[i].endTime,'HH:mm:ss' );
+        var durationReservationDetail =  moment(reservationDetailList[i].duration ,'HH:mm:ss');
+    
     
         //check if they are valid dates and if the endtime is bigger than the start time , and at          
-        if( startTimeReservationDetail.isValid() && endTimeReservationDetail.isValid())
+        if( durationReservationDetail.isValid())
         {
-            totalTime +=   endTimeReservationDetail.diff(startTimeReservationDetail,"minutes"); 
-            startTimeReservationDetail = null;
-            endTimeReservationDetail = null;
+            totalTime +=   moment.duration( durationReservationDetail).asMinutes();
+            durationReservationDetail = null;
+    
         }
         else
         {
       
-            startTimeReservationDetail = null;
-            endTimeReservationDetail = null;
-            return {totalTime:0 , startTime:null ,   endTime:null ,reservationDetailList:null};
+            durationReservationDetail = null;
+            return {totalTime:0  ,reservationDetailList:null};
         }
     }
-    return {totalTime:totalTime , startTime:reservationDetailList[0].startTime  ,   endTime:reservationDetailList[reservationDetailList.length - 1].endTime ,reservationDetailList:reservationDetailList };
+    return {totalTime:totalTime , reservationDetailList:reservationDetailList };
    }
-    return {totalTime:0 , startTime:null ,   endTime:null, reservationDetailList: null};
+    return {totalTime:0 , reservationDetailList: null};
 }
 
 //Method to Create an entry to the reservation
@@ -80,21 +94,16 @@ try
 
                 //mod_vasync , waterfall for better order
                 mod_vasync.waterfall([
-                function validate(callback)
-                {
-                   //validate if the dates and required fields are submited 
-                   if(reservationDetailLogic.prototype.validateFields(reservationDetail))
-                    {
-                   //if the data is correct continue       
-                        return callback(null,reservationDetail);
-                    }
-                    else
-                    {
-                        return callback({name: "Error at create the reservation detail", message:"There are missing parameters."},null);
-                    }
-                },
+                 //validate
+                        //*******************************************************************************************
+                        function validateEntity(callback) {
+                            reservationDetailLogic.prototype.self.validate(reservationDetail, function(err, result) {
+                                return callback(err);
+                            })
+                        },    
+           
                  //method to prepare the data    
-                function prepare(reservationDetail,callback)
+                function prepare(callback)
                 {
                     var localDate = new Date();
                     reservationDetail.id =uuid.v4();
@@ -102,10 +111,10 @@ try
                     reservationDetail.modificationDate = localDate;
                     reservationDetail.creationDate = localDate;
                     reservationDetail.isActive = true;
-                    callback(null,reservationDetail);
+                    callback(null);
                 },    
                 //method to create the reservation    
-                function createReservation(reservationDetail,callback)
+                function createReservation(callback)
                 {
                     reservationDetailData.createReservationDetail(reservationDetail,function (err,result)
                     {
@@ -204,10 +213,10 @@ try
                 function prepare(callback)
                 {
                     reservationDetail.modificationDate =new Date();
-                    callback(null,reservationDetail);
+                    callback(null);
                 },
                 //Deactivate 
-                function deactivate(reservationDetail,callback)
+                function deactivate(callback)
                 {
                     reservationDetailData.deactivateReservation(reservationDetail,function (err,result)
                     {

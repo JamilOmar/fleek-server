@@ -80,7 +80,7 @@ userDeviceDAL.prototype.addUserDevice = function(data, resultMethod,connection) 
 };
 //Method to remove user devices
 //*******************************************************************************************
-userDeviceDAL.prototype.removeUserDevice = function(data, resultMethod,connection) {
+userDeviceDAL.prototype.deactivateUserDevice = function(data, resultMethod,connection) {
      var disableParameters = 
                {
                   
@@ -91,36 +91,6 @@ userDeviceDAL.prototype.removeUserDevice = function(data, resultMethod,connectio
              userDeviceDAL.prototype.query(removeUserDeviceQuery,disableParameters,function (err,result)
                 {
                     logger.log("debug","removeUserDevice",data);
-                    return resultMethod(err,result);
-                },connection);
-};
-//Method to block user devices
-//*******************************************************************************************
-userDeviceDAL.prototype.blockDevice = function(data, resultMethod,connection) {
-     var disableParameters = 
-               {
-                   modificationDate : data.modificationDate,
-                   UserDeviceId : data.id
-               };
-      var blockDeviceQuery = "UPDATE `chameleon`.`UserDevice` SET (`ModificationDate`=?,`IsBlocked`=0   ) WHERE `chameleon`.`UserDevice`.`UserDeviceId`=? ;";
-             userDeviceDAL.prototype.query(blockDeviceQuery,disableParameters,function (err,result)
-                {
-                    logger.log("debug","blockDevice",data);
-                    return resultMethod(err,result);
-                },connection);
-};
-//Method to unblock user devices
-//*******************************************************************************************
-userDeviceDAL.prototype.unblockDevice = function(data, resultMethod,connection) {
-     var enableParameters = 
-               {
-                   modificationDate : data.modificationDate,
-                   UserDeviceId : data.id
-               };
-      var unblockDeviceQuery = "UPDATE `chameleon`.`UserDevice` SET (`ModificationDate`=?,`IsBlocked`=1   ) WHERE `chameleon`.`UserDevice`.`UserDeviceId`=? ;";
-             userDeviceDAL.prototype.query(unblockDeviceQuery,enableParameters,function (err,result)
-                {
-                    logger.log("debug","unblockDevice",data);
                     return resultMethod(err,result);
                 },connection);
 };
@@ -135,7 +105,6 @@ userDeviceDAL.prototype.mapperSqlToModel = function(data)
     userDevice.userId = data.UserId;
     userDevice.deviceSerialNumber = data.DeviceSerialNumber;
     userDevice.deviceFriendlyName = data.DeviceFriendlyName;
-    userDevice.isBlocked = data.IsBlocked;
     userDevice.creationDate = data.CreationDate;
     userDevice.modificationDate = data.ModificationDate;
     userDevice.isActive = data.IsActive
@@ -150,6 +119,48 @@ userDeviceDAL.prototype.mapperSqlToModel = function(data)
         
 
 }
+//Method for transform the information from sql to  a model Collection
+//********************************************************************************************
+userDeviceDAL.prototype.mapperSqlToModelCollection = function(dataRequested)
+{
+    try
+    {
+        
+        if(dataRequested != null)
+        {
+            var userDeviceCollection = [];
+            for (var i = 0 ; i < dataRequested.length ; i++)
+            {
+            var data = dataRequested[i];
+            var userDevice  = new userDeviceModel();
+            userDevice.id = data.UserDeviceId;
+            userDevice.userId = data.UserId;
+            userDevice.deviceSerialNumber = data.DeviceSerialNumber;
+            userDevice.deviceFriendlyName = data.DeviceFriendlyName;
+            userDevice.creationDate = data.CreationDate;
+            userDevice.modificationDate = data.ModificationDate;
+            userDevice.isActive = data.IsActive
+            data = null;
+            userDeviceCollection.push(userDevice);
+            }
+            return userDeviceCollection;
+        }
+        else
+        {
+            return {};
+        }
+   
+    }
+    catch(err)
+    {
+         logger.log("error","mapperSqlToModel",err);
+        return null;
+    }
+    
+        
+
+}
+
 //Method for transform the information from model to sql
 //********************************************************************************************
 userDeviceDAL.prototype.mapperModelToSql = function(data)
@@ -158,21 +169,19 @@ userDeviceDAL.prototype.mapperModelToSql = function(data)
     {
     logger.log("debug","mapperModelToSql before",data);   
     var mysqlModel  ={};
-    if(data.hasOwnProperty("id") && data.id != undefined)
+    if(data.hasOwnProperty("id") && data.id !== undefined)
     mysqlModel.UserDeviceId = data.id;
-    if(data.hasOwnProperty("userId") && data.userId != undefined)    
+    if(data.hasOwnProperty("userId") && data.userId !== undefined)    
     mysqlModel.UserId  = data.userId;
-    if(data.hasOwnProperty("deviceSerialNumber") && data.deviceSerialNumber != undefined)
+    if(data.hasOwnProperty("deviceSerialNumber") && data.deviceSerialNumber !== undefined)
     mysqlModel.DeviceSerialNumber = data.deviceSerialNumber;
-    if(data.hasOwnProperty("deviceFriendlyName") && data.deviceFriendlyName != undefined)
+    if(data.hasOwnProperty("deviceFriendlyName") && data.deviceFriendlyName !== undefined)
     mysqlModel.DeviceFriendlyName  = data.deviceFriendlyName;
-    if(data.hasOwnProperty("isBlocked") && data.isBlocked != undefined)
-    mysqlModel.IsBlocked = data.isBlocked;
-    if(data.hasOwnProperty("creationDate") && data.creationDate != undefined)
+    if(data.hasOwnProperty("creationDate") && data.creationDate !== undefined)
     mysqlModel.CreationDate = data.creationDate;
-    if(data.hasOwnProperty("modificationDate") && data.modificationDate != undefined)
+    if(data.hasOwnProperty("modificationDate") && data.modificationDate !==undefined)
     mysqlModel.ModificationDate = data.modificationDate;
-    if(data.hasOwnProperty("isActive") && data.isActive != undefined)
+    if(data.hasOwnProperty("isActive") && data.isActive !== undefined)
     mysqlModel.IsActive = data.isActive;
     
      logger.log("debug","mapperModelToSql",mysqlModel);

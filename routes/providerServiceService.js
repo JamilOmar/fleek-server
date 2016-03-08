@@ -1,25 +1,25 @@
 require('rootpath')();
 var express = require('express');
-var reservationLogic = require('logic/reservationLogic');
+var providerServiceLogic = require('logic/providerServiceLogic');
 var config = require('config');
 var logger = require('utilities/logger');
 var router = express.Router();
 var responseWs = require('models/response.js');
-var reservationModel = require('models/reservation.js');
+var providerServiceModel = require('models/providerService');
 
-//Method to create the reservation
+//Method to create the provider service
 //*******************************************************************************************
-router.post('/addReservation', function(req, res) {
-    var reservationL = new reservationLogic();
+router.post('/addProviderService', function(req, res) {
+    var providerServiceL = new providerServiceLogic();
     var response = new responseWs();
-    var reservation =new reservationModel();
-    reservation.initializer(req.body);
-    reservationL.createReservation(reservation,function(err,result){
-            reservationL = null;
-            reservation =null;
+    var providerService = new providerServiceModel();
+    providerService.initializer(req.body);
+    providerServiceL.createProviderService(providerService,function(err,result){
+            providerServiceL = null;
+            providerService = null;
               if(err)
                 {
-                logger.log("error","createReservation",err); 
+                logger.log("error","addProviderService",err); 
                 response.createResponse(null, config.get('chameleon.responseWs.codeError'));
                 res.json(response);
                 }
@@ -31,19 +31,42 @@ router.post('/addReservation', function(req, res) {
             response = null;
         });
     });
-//Method to create the reservation
+//Method to update the provider service
 //*******************************************************************************************
-router.put('/approvalReservation', function(req, res) {
-    var reservationL = new reservationLogic();
+router.put('/updateProviderService', function(req, res) {
+    var providerServiceL = new providerServiceLogic();
     var response = new responseWs();
-    var reservation =new reservationModel();
-    reservation.initializer(req.body);
-    reservationL.approvalReservation(reservation,function(err,result){
-            reservationL = null;
-            reservation =null;
+    var providerService = new providerServiceModel();
+    providerService.initializer(req.body);
+    providerServiceL.updateProviderService(providerService,function(err,result){
+         providerServiceL = null;
+         providerService = null;
               if(err)
                 {
-                logger.log("error","createReservation",err); 
+                logger.log("error","updateProviderService",err); 
+                response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+           response = null;
+        });
+    });
+//Method to deactivate the provider service
+//*******************************************************************************************
+router.put('/deactivateProviderService', function(req, res) {
+    var providerServiceL = new providerServiceLogic();
+    var response = new responseWs();
+    var providerService = new providerServiceModel();
+    providerService.initializer(req.body);
+    providerServiceL.deactivateProviderService(providerService,function(err,result){
+            providerServiceL = null;
+              if(err)
+                {
+                logger.log("error","deactivateProviderService",err); 
                 response.createResponse(null, config.get('chameleon.responseWs.codeError'));
                 res.json(response);
                 }
@@ -54,18 +77,38 @@ router.put('/approvalReservation', function(req, res) {
                 }
             response = null;
         });
-    });
-
-//Method to get the Reservation by Id
+    });            
+//Method to get the provider Service by Id
 //*******************************************************************************************
-router.get('/getReservationById/:key', function(req, res) {
-    var reservationL = new reservationLogic();
+router.get('/getproviderServiceByProviderId/:key', function(req, res) {
+    var providerServiceL = new providerServiceLogic();
     var response = new responseWs();
-    reservationL.getReservationById(req.params.key,function(err,result){  
-              reservationL = null;
+    providerServiceL.getproviderServiceByProviderId(req.params.key,function(err,result){  
+             providerServiceL = null;
               if(err)
                 {
-                logger.log("error","getReservationById",err);
+                logger.log("error","getproviderServiceByProviderId",err);
+                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+             response = null;
+        });
+});
+//Method to get the provider Service by Provider Id
+//*******************************************************************************************
+router.get('/getProviderServiceByProviderIdServiceId/:key', function(req, res) {
+    var providerServiceL = new providerServiceLogic();
+    var response = new responseWs();
+    providerServiceL.getProviderServiceByProviderIdServiceId(req.params.key,function(err,result){  
+              providerServiceL = null;
+              if(err)
+                {
+                logger.log("error","getProviderServiceByProviderIdServiceId",err);
                     response.createResponse(null, config.get('chameleon.responseWs.codeError'));
                 res.json(response);
                 }
@@ -77,46 +120,5 @@ router.get('/getReservationById/:key', function(req, res) {
             response = null;
         });
 });
-//Method to get the reservation by customer Id
-//*******************************************************************************************
-router.get('/getReservationByCustomerId/', function(req, res) {
-    var reservationL = new reservationLogic();
-    var response = new responseWs();
-    reservationL.getReservationByCustomerId(req.params.key,function(err,result){  
-              reservationL = null;
-              if(err)
-                {
-                logger.log("error","getReservationByCustomerId",err);
-                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
-                res.json(response);
-                }
-            else
-                {
-                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
-                res.json(response);
-                }
-            response = null;
-        });
-});
-//Method to get the reservation by provider Id
-//*******************************************************************************************
-router.get('/getReservationByProviderId/', function(req, res) {
-    var reservationL = new reservationLogic();
-    var response = new responseWs();
-    reservationL.getReservationByProviderId(req.params.key,function(err,result){  
-              reservationL = null;
-              if(err)
-                {
-                logger.log("error","getReservationByProviderId",err);
-                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
-                res.json(response);
-                }
-            else
-                {
-                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
-                res.json(response);
-                }
-            response = null;
-        });
-});
+//********************************************************************************************
 module.exports = router;

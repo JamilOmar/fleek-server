@@ -106,8 +106,11 @@ userLogic.prototype.validate = function(user, withPassword, callback) {
     if ((!validator.isNullOrUndefined(user.rating) && !validator.isNumberAndIntegerAndRange(user.rating, constants.RATING.MIN, constants.RATING.MAX))) {
         validatorM.addException("Appointments is invalid.");
     }
-    if ((!validator.isNullOrUndefined(user.IsOpenForFriendship) && !validator.isBoolean(user.isOpenForFriendship))) {
+    if ((!validator.isNullOrUndefined(user.isOpenForFriendship) && !validator.isBoolean(user.isOpenForFriendship))) {
         validatorM.addException("IsOpenForFriendship is invalid.");
+    }
+     if ((!validator.isNullOrUndefined(user.isProvider) && !validator.isBoolean(user.isProvider))) {
+        validatorM.addException("IsProvider is invalid.");
     }
     if (validatorM.isValid()) {
         validatorM = null;
