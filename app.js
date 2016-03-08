@@ -20,29 +20,29 @@ module.exports = function() {
     var routes = require('./routes/index');
     app.use('/', routes);
     var userService = require('./routes/userService');
-    app.use('/userService', userService);
+    app.use('/v1/userService', userService);
     var serviceTypeService = require('./routes/serviceTypeService');
-    app.use('/serviceTypeService', serviceTypeService);
+    app.use('/v1/serviceTypeService', serviceTypeService);
      var serviceService = require('./routes/serviceService');
-    app.use('/serviceService', serviceService);
+    app.use('/v1/serviceService', serviceService);
     var userFriendService = require('./routes/userFriendService');
-    app.use('/userFriendService', userFriendService);
+    app.use('/v1/userFriendService', userFriendService);
     var providerScheduleService = require('./routes/providerScheduleService');
-    app.use('/providerScheduleService', providerScheduleService);
+    app.use('/v1/providerScheduleService', providerScheduleService);
     var providerServiceService = require('./routes/providerServiceService');
-    app.use('/providerServiceService', providerServiceService);
+    app.use('/v1/providerServiceService', providerServiceService);
     var providerService = require('./routes/providerService');
-    app.use('/providerService', providerService);
+    app.use('/v1/providerService', providerService);
      var providerScheduleDayService = require('./routes/providerScheduleDayService');
-    app.use('/providerScheduleDayService', providerScheduleDayService);
+    app.use('/v1/providerScheduleDayService', providerScheduleDayService);
     var providerScheduleExceptionService = require('./routes/providerScheduleExceptionService');
-    app.use('/providerScheduleExceptionService', providerScheduleExceptionService);
+    app.use('/v1/providerScheduleExceptionService', providerScheduleExceptionService);
     var userRatingService = require('./routes/userRatingService');
-    app.use('/userRatingService', userRatingService);
+    app.use('/v1/userRatingService', userRatingService);
     var reservationService = require('./routes/reservationService');
-    app.use('/reservationService', reservationService);
+    app.use('/v1/reservationService', reservationService);
     var authenticationService = require('./routes/authenticationService');
-    app.use('/authenticationService', authenticationService);
+    app.use('/v1/authenticationService', authenticationService);
     
     
     
