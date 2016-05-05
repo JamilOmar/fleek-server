@@ -52,8 +52,16 @@ const constants=
     {
         MIN :0,
         MAX:5
-    }
-    
+    },
+    //Facebook app ids 
+    FACEBOOK_ID:
+    {
+        FACEBOOK_APP_ID : "1667420520161039",
+        FACEBOOK_APP_SECRET: "bb797891d7fdc9702963821570a4900d"
+    },
+    //Facebook information for inteligent analysis
+    FACEBOOK_INFORMATION :
+    ['posts.limit(100){description}','quotes']  
 	
 };
 module.exports =constants;

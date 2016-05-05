@@ -20,7 +20,7 @@ router.post('/addProviderSchedule', function(req, res) {
               if(err)
                 {
                 logger.log("error","addProviderSchedule",err); 
-                response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                response.createResponse(err.eCode,  config.get('chameleon.responseWs.codeError'));
                 res.json(response);
                 }
             else
@@ -44,7 +44,7 @@ router.put('/updateProviderSchedule', function(req, res) {
               if(err)
                 {
                 logger.log("error","updateProviderSchedule",err); 
-                response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                response.createResponse(err.eCode, config.get('chameleon.responseWs.codeError'));
                 res.json(response);
                 }
             else
@@ -67,7 +67,7 @@ router.put('/deactivateProviderSchedule', function(req, res) {
               if(err)
                 {
                 logger.log("error","deactivateProviderSchedule",err); 
-                response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                response.createResponse(err.eCode, config.get('chameleon.responseWs.codeError'));
                 res.json(response);
                 }
             else
@@ -88,7 +88,7 @@ router.get('/getProviderScheduleById/:key', function(req, res) {
               if(err)
                 {
                 logger.log("error","getProviderScheduleById",err);
-                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                response.createResponse(null, config.get('chameleon.responseWs.codeError'));
                 res.json(response);
                 }
             else
@@ -120,5 +120,27 @@ router.get('/getProviderScheduleByProviderId/:key', function(req, res) {
             response = null;
         });
 });
+//Method to get the provider Schedule by Provider Id and that is Default
+//*******************************************************************************************
+router.get('/getProviderScheduleByProviderIdAndDefault/:key', function(req, res) {
+    var providerScheduleL = new providerScheduleLogic();
+    var response = new responseWs();
+    providerScheduleL.getProviderScheduleByProviderIdAndDefault(req.params.key,function(err,result){  
+              providerScheduleL = null;
+              if(err)
+                {
+                logger.log("error","getProviderScheduleByProviderIdAndDefault",err);
+                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+            response = null;
+        });
+});
+
 //********************************************************************************************
 module.exports = router;

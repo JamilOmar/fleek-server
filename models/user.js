@@ -40,7 +40,6 @@ user.prototype.initializer = function (data)
            this.isBlocked = data.isBlocked;
            this.isProvider = data.isProvider;
            this.countryId = data.countryId;
-           this.cultureId = data.CultureId;
            this.cultureCode = data.CultureCode;
            this.latitude = data.latitude;
            this.longitude = data.longitude;

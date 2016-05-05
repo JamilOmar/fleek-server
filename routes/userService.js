@@ -260,7 +260,8 @@ router.get('/getProfilePicture/:key', function(req, res) {
         if(result)
         {
             res.set('Content-Type', result.ContentType);
-            res.send(result.Body);
+            //res.send(result.Body);
+            result.Body .pipe(res);
         }
         else
         {

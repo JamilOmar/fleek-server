@@ -8,6 +8,7 @@
 require('rootpath')();        
 var baseDAL  = require('./baseDAL');
 var providerServiceModel  = require('models/providerService');
+var providerServiceServiceQueryModel  = require('models/providerServiceServiceQuery');
 var util = require('util');
 var logger = require('utilities/logger');
 //*******************************************************************************************
@@ -64,38 +65,48 @@ providerServiceDAL.prototype.deactivateProviderService = function(data, resultMe
 
 //Method to select the  Active/NonActive providerService by Provider Id Service Id 
 //*******************************************************************************************
-providerServiceDAL.prototype.getproviderServiceByProviderIdServiceIdActiveNonActive = function(providerId, serviceId, resultMethod,connection) {
-    var getproviderServiceByProviderIdServiceIdActiveNonActiveQuery ="SELECT providerService.`ProviderId` ,providerService.`ServiceId`,serviceLocal.`Name`  , providerService.`CurrencyCode`, providerService.`Price` , providerService.`IsCustom` , providerService.`CustomName` , providerService.`AverageTimePerSession` , providerService.`ModificationDate` , providerService.`CreationDate` , providerService.`IsActive`  FROM `chameleon`.`ProviderService` providerService  INNER JOIN `chameleon`.`Service` service ON providerService.`ServiceId` = service.`ServiceId` INNER JOIN `Service_Local` serviceLocal ON service.`ServiceId` = serviceLocal.`ServiceId` INNER JOIN `User` provider ON provider.`UserId` = providerService.`ProviderId` WHERE service.`IsActive` =1  AND serviceLocal.`CultureId` =  provider.`CultureId` AND providerService.`ProviderId` =? AND  providerService.`ServiceId` =? ";
-                providerServiceDAL.prototype.getByArguments(getproviderServiceByProviderIdServiceIdActiveNonActiveQuery,[providerId,serviceId],function (err,result)
+providerServiceDAL.prototype.getProviderServiceByProviderIdServiceIdActiveNonActive = function(providerId, serviceId, resultMethod,connection) {
+    var getProviderServiceByProviderIdServiceIdActiveNonActiveQuery ="SELECT providerService.`ProviderId` ,providerService.`ServiceId`,serviceLocal.`Name`  , providerService.`CurrencyCode`, providerService.`Price` , providerService.`IsCustom` , providerService.`CustomName` , providerService.`AverageTimePerSession` , providerService.`ModificationDate` , providerService.`CreationDate` , providerService.`IsActive`  FROM `chameleon`.`ProviderService` providerService  INNER JOIN `chameleon`.`Service` service ON providerService.`ServiceId` = service.`ServiceId` INNER JOIN `Service_Local` serviceLocal ON service.`ServiceId` = serviceLocal.`ServiceId` INNER JOIN `User` provider ON provider.`UserId` = providerService.`ProviderId` WHERE service.`IsActive` =1  AND serviceLocal.`CultureId` =  provider.`CultureId` AND providerService.`ProviderId` =? AND  providerService.`ServiceId` =? ";
+                providerServiceDAL.prototype.getByArguments(getProviderServiceByProviderIdServiceIdActiveNonActiveQuery,[providerId,serviceId],function (err,result)
                 {
                     
-                    logger.log("debug","getproviderServiceByProviderIdServiceIdActiveNonActive",[providerId,serviceId] , result);
+                    logger.log("debug","getProviderServiceByProviderIdServiceIdActiveNonActive",[providerId,serviceId] , result);
                     return resultMethod(err,providerServiceDAL.prototype.self.mapperSqlToModel(result));
                 },connection);  
 };
 //Method to select the ProviderService by Provider Id Service Id 
 //*******************************************************************************************
-providerServiceDAL.prototype.getproviderServiceByProviderIdServiceId = function(providerId, serviceId, resultMethod,connection) {
-    var getproviderServiceByProviderIdServiceIdQuery ="SELECT providerService.`ProviderId` ,providerService.`ServiceId`,serviceLocal.`Name`  , providerService.`CurrencyCode`, providerService.`Price` , providerService.`IsCustom` , providerService.`CustomName` , providerService.`AverageTimePerSession` , providerService.`ModificationDate` , providerService.`CreationDate` , providerService.`IsActive`  FROM `chameleon`.`ProviderService` providerService  INNER JOIN `chameleon`.`Service` service ON providerService.`ServiceId` = service.`ServiceId` INNER JOIN `Service_Local` serviceLocal ON service.`ServiceId` = serviceLocal.`ServiceId` INNER JOIN `User` provider ON provider.`UserId` = providerService.`ProviderId` WHERE service.`IsActive` =1 AND providerService.`IsActive` =1 AND serviceLocal.`CultureId` =  provider.`CultureId` AND providerService.`ProviderId` =? AND  providerService.`ServiceId` =? ";
-                providerServiceDAL.prototype.getByArguments(getproviderServiceByProviderIdServiceIdQuery,[providerId,serviceId],function (err,result)
+providerServiceDAL.prototype.getProviderServiceByProviderIdServiceId = function(providerId, serviceId, resultMethod,connection) {
+    var getProviderServiceByProviderIdServiceIdQuery ="SELECT providerService.`ProviderId` ,providerService.`ServiceId`,serviceLocal.`Name`  , providerService.`CurrencyCode`, providerService.`Price` , providerService.`IsCustom` , providerService.`CustomName` , providerService.`AverageTimePerSession` , providerService.`ModificationDate` , providerService.`CreationDate` , providerService.`IsActive`  FROM `chameleon`.`ProviderService` providerService  INNER JOIN `chameleon`.`Service` service ON providerService.`ServiceId` = service.`ServiceId` INNER JOIN `Service_Local` serviceLocal ON service.`ServiceId` = serviceLocal.`ServiceId` INNER JOIN `User` provider ON provider.`UserId` = providerService.`ProviderId` WHERE service.`IsActive` =1 AND providerService.`IsActive` =1 AND serviceLocal.`CultureId` =  provider.`CultureId` AND providerService.`ProviderId` =? AND  providerService.`ServiceId` =? ";
+                providerServiceDAL.prototype.getByArguments(getProviderServiceByProviderIdServiceIdQuery,[providerId,serviceId],function (err,result)
                 {
                     
-                    logger.log("debug","getproviderServiceByProviderIdServiceId",[providerId,serviceId] , result);
+                    logger.log("debug","getProviderServiceByProviderIdServiceId",[providerId,serviceId] , result);
                     return resultMethod(err,providerServiceDAL.prototype.self.mapperSqlToModel(result));
                 },connection);  
 };
 //Method to select the ProviderService by Provider Id
 //*******************************************************************************************
-providerServiceDAL.prototype.getproviderServiceByProviderId = function(providerId, resultMethod,connection) {
-    var getproviderServiceByProviderIdQuery ="SELECT providerService.`ProviderId` ,providerService.`ServiceId`,serviceLocal.`Name`  , providerService.`CurrencyCode`, providerService.`Price` , providerService.`IsCustom` , providerService.`CustomName` , providerService.`AverageTimePerSession` , providerService.`ModificationDate` , providerService.`CreationDate` , providerService.`IsActive`  FROM `chameleon`.`ProviderService` providerService  INNER JOIN `chameleon`.`Service` service ON providerService.`ServiceId` = service.`ServiceId` INNER JOIN `Service_Local` serviceLocal ON service.`ServiceId` = serviceLocal.`ServiceId` INNER JOIN `User` provider ON provider.`UserId` = providerService.`ProviderId` WHERE service.`IsActive` =1 AND providerService.`IsActive` =1  AND serviceLocal.`CultureId` =  provider.`CultureId` AND providerService.`ProviderId` =? ORDER BY serviceLocal.`Name`";
-                providerServiceDAL.prototype.getByArguments(getproviderServiceByProviderIdQuery,providerId,function (err,result)
+providerServiceDAL.prototype.getProviderServiceByProviderId = function(providerId, resultMethod,connection) {
+        var getProviderServiceByProviderIdQuery ="SELECT providerService.`ProviderId` ,providerService.`ServiceId`,serviceLocal.`Name`  , providerService.`CurrencyCode`, providerService.`Price` , providerService.`IsCustom` , providerService.`CustomName` , providerService.`AverageTimePerSession` , providerService.`ModificationDate` , providerService.`CreationDate` , providerService.`IsActive`  FROM `chameleon`.`ProviderService` providerService  INNER JOIN `chameleon`.`Service` service ON providerService.`ServiceId` = service.`ServiceId` INNER JOIN `Service_Local` serviceLocal ON service.`ServiceId` = serviceLocal.`ServiceId` INNER JOIN `User` provider ON provider.`UserId` = providerService.`ProviderId` WHERE service.`IsActive` =1 AND providerService.`IsActive` =1  AND serviceLocal.`CultureId` =  provider.`CultureId` AND providerService.`ProviderId` =? ORDER BY serviceLocal.`Name`";
+                providerServiceDAL.prototype.getByArguments(getProviderServiceByProviderIdQuery,providerId,function (err,result)
                 {
                     
-                    logger.log("debug","getproviderServiceByProviderId",providerId , result);
+                    logger.log("debug","getProviderServiceByProviderId",providerId , result);
                     return resultMethod(err,providerServiceDAL.prototype.self.mapperSqlToModelCollection(result));
                 },connection);  
 };
-
+//Method to select the ProviderServiceQuery by Provider Id , Service Type and Culture
+//*******************************************************************************************
+providerServiceDAL.prototype.getProviderServiceByProviderIdTypeId = function(providerId,serviceTypeId,cultureCode, resultMethod,connection) {
+        var getProviderServiceByProviderIdTypeIdQuery ="SELECT service.`ServiceId` , serviceLocal.`Name` , service.Type  , IFNULL( providerService.`ProviderId`,0) >0 Exist FROM `Service` service  LEFT JOIN (SELECT  providerService.ProviderId , providerService.`ServiceId` FROM `ProviderService` providerService   WHERE providerService.`ProviderId` =? AND providerService.`IsActive`=1) providerService ON providerService.`ServiceId` = service.`ServiceId` INNER JOIN `ServiceType` serviceType ON serviceType.`ServiceTypeId` = service.`Type` INNER JOIN `Service_Local` serviceLocal on serviceLocal.`ServiceId` = service.`ServiceId`  INNER JOIN `Culture` culture on culture.`CultureId` = serviceLocal.`CultureId`  WHERE service.`IsActive` =1  AND serviceType.`IsActive` =1 AND culture.`IsActive`=1  AND serviceType.`ServiceTypeId`=? AND culture.`CultureCode` =?  ORDER BY serviceLocal.Name";
+                providerServiceDAL.prototype.getByArguments(getProviderServiceByProviderIdTypeIdQuery,[providerId,serviceTypeId,cultureCode],function (err,result)
+                {
+                    
+                    logger.log("debug","getProviderServiceByProviderIdTypeIdQuery",providerId , result);
+                    return resultMethod(err,providerServiceDAL.prototype.self.mapperSqlToModelCollectionServiceQuery(result));
+                },connection);  
+};
 //Method for transform the information from sql to model
 //********************************************************************************************
 providerServiceDAL.prototype.mapperSqlToModel = function(data)
@@ -116,7 +127,7 @@ providerServiceDAL.prototype.mapperSqlToModel = function(data)
            providerService.currencyCode = data.CurrencyCode;
            providerService.customName =  data.CustomName;
            providerService.price = data.Price;
-           providerService.averageTimePerSession = data.averageTimePerSession;
+           providerService.averageTimePerSession = data.AverageTimePerSession;
            providerService.isCustom = data.isCustom;
            providerService.creationDate = data.CreationDate;
            providerService.modificationDate = data.ModificationDate;
@@ -161,7 +172,7 @@ providerServiceDAL.prototype.mapperSqlToModelCollection = function(dataRequested
                 providerService.currencyCode = data.CurrencyCode;
                 providerService.customName =  data.CustomName;
                 providerService.price = data.Price;
-                providerService.averageTimePerSession = data.averageTimePerSession;
+                providerService.averageTimePerSession = data.AverageTimePerSession;
                 providerService.isCustom = data.isCustom;
                 providerService.creationDate = data.CreationDate;
                 providerService.modificationDate = data.ModificationDate;
@@ -187,6 +198,46 @@ providerServiceDAL.prototype.mapperSqlToModelCollection = function(dataRequested
         
 
 }
+//Method for transform the information from sql to  a model Collection for ProviderService and Service
+//********************************************************************************************
+providerServiceDAL.prototype.mapperSqlToModelCollectionServiceQuery = function(dataRequested)
+{
+    try
+    {
+        
+        if(dataRequested != null)
+        {
+            var providerServiceServiceQueryCollection = [];
+            for (var i = 0 ; i < dataRequested.length ; i++)
+            {
+                var data = dataRequested[i];
+                var providerServiceServiceQuery  = new providerServiceServiceQueryModel();
+                providerServiceServiceQuery.serviceId = data.ServiceId;
+                providerServiceServiceQuery.name = data.Name;
+                providerServiceServiceQuery.type = data.Type;
+                providerServiceServiceQuery.exist =  data.Exist;
+                data = null;
+                providerServiceServiceQueryCollection.push(providerServiceServiceQuery);
+              
+            }
+            return providerServiceServiceQueryCollection;
+        }
+        else
+        {
+            return {};
+        }
+   
+    }
+    catch(err)
+    {
+         logger.log("error","mapperSqlToModel",err);
+        return null;
+    }
+    
+        
+
+}
+
 //Method for transform the information from model to sql
 //********************************************************************************************
 providerServiceDAL.prototype.mapperModelToSql = function(data)

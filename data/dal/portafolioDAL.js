@@ -34,7 +34,6 @@ portafolioDAL.prototype.createPortafolio = function(data, resultMethod,connectio
 portafolioDAL.prototype.updatePortafolio  = function(data,id, resultMethod,connection) {
      data = portafolioDAL.prototype.self.mapperModelToSql(data); 
             var updatePortafolioQuery = "UPDATE `chameleon`.`Portafolio` SET ? WHERE ?;";
-    console.log(portafolioDAL);
              portafolioDAL.prototype.queryWithArgument(updatePortafolioQuery,data,{UserId:id},function (err,result)
                 {
                     logger.log("debug","updatePortafolio",data);
@@ -134,7 +133,7 @@ portafolioDAL.prototype.mapperSqlToModelCollection = function(data)
             var portafolioCollection = [];
             for (var i = 0 ; i < data.length ; i++)
             {
-                data = data[i];
+            data = data[i];
            var portafolio  = new portafolioModel();
            portafolio.id = data.PortafolioId;
            portafolio.reservationId = data.ReservationId;
@@ -146,8 +145,7 @@ portafolioDAL.prototype.mapperSqlToModelCollection = function(data)
            portafolio.modificationDate = data.ModificationDate;
            portafolio.isActive = data.IsActive
            data = null;
-            return portafolio;
-                portafolioCollection.push(portafolio);
+           portafolioCollection.push(portafolio);
             }
             return portafolioCollection;
         }

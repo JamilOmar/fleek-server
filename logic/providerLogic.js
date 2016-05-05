@@ -1,11 +1,12 @@
 //*******************************************************************************************
-//Name: Provider Schedule Exception Logic
-//Description: Provider Schedule Day Exception class
-//Target : Provider Schedule Day  Creation , Administration of Provider Schedule Day 
+//Name: Provider  Logic
+//Description: Provider  class
+//Target : Provider Creation , Administration of Providers
 //Author: Jamil Falconi
-//year: 2015
+//year: 2016
 //Version : 1.0
 //*******************************************************************************************
+"user strict";
 require('rootpath')();
 var mod_vasync = require("vasync");
 var providerDAL = require('data/dal/providerDAL');

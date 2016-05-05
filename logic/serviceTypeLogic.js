@@ -3,11 +3,12 @@
 //Description: ServiceType Type logic class
 //Target : ServiceType Type  Creation , Administration of ServiceTypes 
 //Author: Jamil Falconi
-//year: 2015
+//year: 2016
 //Version : 1.0
 //*******************************************************************************************
 "user strict";
 require('rootpath')();
+var awsS3 = require('utilities/amazonS3');
 var mod_vasync  = require("vasync");
 var serviceTypeDAL = require('data/dal/serviceTypeDAL');
 var cache = require('data/cache/cache.js');
@@ -71,5 +72,22 @@ serviceTypeLogic.prototype.getServiceType = function(cultureCode, resultMethod) 
         return  resultMethod(err,JSON.parse(result));});
 
 }
+//*******************************************************************************************   
+//
+//get service type picture
+//
+//*******************************************************************************************
+serviceTypeLogic.prototype.getImageAWS = function(data, resultMethod) {
+    var instance = new awsS3();
+    instance.get({
+        Bucket: 'chameleon-dev',
+        Key:"app-images/"+ data,
+        ResponseContentType: "image/png"
+    }, function(err, dataReceived) {
+        instance = null;
+        return resultMethod(err, dataReceived);
+    });
+
+};
 //********************************************************************************************
 module.exports =serviceTypeLogic;

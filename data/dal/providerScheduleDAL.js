@@ -35,7 +35,6 @@ providerScheduleDAL.prototype.createProviderSchedule = function(data, resultMeth
 providerScheduleDAL.prototype.updateProviderSchedule  = function(data,id, resultMethod,connection) {
      data = providerScheduleDAL.prototype.self.mapperModelToSql(data); 
             var updateProviderScheduleQuery = "UPDATE `chameleon`.`ProviderSchedule` SET ? WHERE ?;";
-    console.log(providerScheduleDAL);
              providerScheduleDAL.prototype.queryWithArgument(updateProviderScheduleQuery,data,{ProviderScheduleId:id},function (err,result)
                 {
                     logger.log("debug","updateProviderSchedule",data);
@@ -81,6 +80,16 @@ providerScheduleDAL.prototype.getProviderScheduleByProviderId = function(id, res
                     return resultMethod(err,providerScheduleDAL.prototype.self.mapperSqlToModelCollection(result));
                 },connection);  
 };
+//Method to select the ProviderSchedule by Provider Id and that is Default
+//*******************************************************************************************
+providerScheduleDAL.prototype.getProviderScheduleByProviderIdAndDefault = function(id, resultMethod,connection) {
+    var getProviderScheduleByProviderIdAndDefaultQuery ="SELECT providerSchedule.`ProviderScheduleId` ,providerSchedule.`ProviderId` , providerSchedule.`Name` ,providerSchedule.`IsDefault`,providerSchedule.`IsMultiple` , providerSchedule.`CreationDate`, providerSchedule.`ModificationDate` ,providerSchedule.`IsActive`, provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl' FROM `chameleon`.`ProviderSchedule` providerSchedule INNER JOIN `User` provider on provider.`UserId` = providerSchedule.`ProviderId`  WHERE providerSchedule.`IsActive` = 1  AND provider.`IsActive` = 1 AND provider.`IsBlocked` = 0  AND provider.`IsProvider` =1 AND providerSchedule.`IsDefault` =1 AND providerSchedule.`ProviderId` =?";
+                providerScheduleDAL.prototype.getByArguments(getProviderScheduleByProviderIdAndDefaultQuery,id,function (err,result)
+                {
+                    logger.log("debug","getProviderScheduleByProviderIdAndDefault",id , result);
+                    return resultMethod(err,providerScheduleDAL.prototype.self.mapperSqlToModelCollection(result));
+                },connection);  
+};
 //Method to select the ProviderSchedule by ProviderSchedule Id and Provider Id
 //*******************************************************************************************
 providerScheduleDAL.prototype.getProviderScheduleByIdProviderId = function(id, providerId, resultMethod,connection) {
@@ -88,9 +97,10 @@ providerScheduleDAL.prototype.getProviderScheduleByIdProviderId = function(id, p
                 providerScheduleDAL.prototype.getByArguments(getProviderScheduleByIdProviderIdQUery,[id,providerId],function (err,result)
                 {
                     logger.log("debug","getProviderScheduleByIdProviderId",id , result);
-                    return resultMethod(err,providerScheduleDAL.prototype.self.mapperSqlToModelCollection(result));
+                    return resultMethod(err,providerScheduleDAL.prototype.self.mapperSqlToModel(result));
                 },connection);  
 };
+
 //Method for transform the information from sql to model
 //********************************************************************************************
 providerScheduleDAL.prototype.mapperSqlToModel = function(data)
@@ -158,8 +168,7 @@ providerScheduleDAL.prototype.mapperSqlToModelCollection = function(dataRequeste
            providerSchedule.provider = new userModel();
            providerSchedule.provider.basicInformation(data.provider_UserId ,data.provider_Name, data.provider_Lastname , data.provider_Username , data.provider_PictureUrl);
            data = null;
-            return providerSchedule;
-                providerScheduleCollection.push(providerSchedule);
+           providerScheduleCollection.push(providerSchedule);
             }
             return providerScheduleCollection;
         }

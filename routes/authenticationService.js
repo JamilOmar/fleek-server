@@ -32,7 +32,7 @@ router.post('/login', function(req, res,next) {
                 {
                      logger.log("error","login",err);
                     response.createResponse({authenticated :false, token : null , user: null }, config.get('chameleon.responseWs.codeError'));
-                    res.json(response);
+                    res.status(500).json(response);
                 }
                 }
              response = null;

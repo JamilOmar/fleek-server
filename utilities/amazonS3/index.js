@@ -23,7 +23,6 @@ AwsS3.prototype.put = function(params,callback )
     
     AwsS3.prototype.self.s3.putObject(params, function(err,data)   
     {
-        console.log(data);
         callback(err,data);
     });
 };
@@ -50,5 +49,5 @@ AwsS3.prototype.get = function(params,callback )
     });
 };
 //********************************************************************************************
-    module.exports =  AwsS3();
+    module.exports =  AwsS3;
 

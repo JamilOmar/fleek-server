@@ -80,10 +80,10 @@ router.put('/deactivateProviderService', function(req, res) {
     });            
 //Method to get the provider Service by Id
 //*******************************************************************************************
-router.get('/getproviderServiceByProviderId/:key', function(req, res) {
+router.get('/getProviderServiceByProviderId/:key', function(req, res) {
     var providerServiceL = new providerServiceLogic();
     var response = new responseWs();
-    providerServiceL.getproviderServiceByProviderId(req.params.key,function(err,result){  
+    providerServiceL.getProviderServiceByProviderId(req.params.key,function(err,result){  
              providerServiceL = null;
               if(err)
                 {
@@ -101,14 +101,36 @@ router.get('/getproviderServiceByProviderId/:key', function(req, res) {
 });
 //Method to get the provider Service by Provider Id
 //*******************************************************************************************
-router.get('/getProviderServiceByProviderIdServiceId/:key', function(req, res) {
+router.get('/getProviderServiceByProviderIdServiceId/:key/:service', function(req, res) {
     var providerServiceL = new providerServiceLogic();
     var response = new responseWs();
-    providerServiceL.getProviderServiceByProviderIdServiceId(req.params.key,function(err,result){  
+    providerServiceL.getProviderServiceByProviderIdServiceId(req.params.key,req.params.service,function(err,result){  
               providerServiceL = null;
               if(err)
                 {
                 logger.log("error","getProviderServiceByProviderIdServiceId",err);
+                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+            response = null;
+        });
+});
+
+//Method to get the providerServiceService by provider Id, Service Type and Culture
+//*******************************************************************************************
+router.get('/getProviderServiceByProviderIdTypeId/:key/:service/:cultureCode', function(req, res) {
+    var providerServiceL = new providerServiceLogic();
+    var response = new responseWs();
+    providerServiceL.getProviderServiceByProviderIdTypeId(req.params.key,req.params.service,req.params.cultureCode,function(err,result){  
+              providerServiceL = null;
+              if(err)
+                {
+                logger.log("error","getProviderServiceByProviderIdTypeId",err);
                     response.createResponse(null, config.get('chameleon.responseWs.codeError'));
                 res.json(response);
                 }

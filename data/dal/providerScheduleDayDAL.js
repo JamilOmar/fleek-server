@@ -34,7 +34,6 @@ providerScheduleDayDAL.prototype.createProviderScheduleDay = function(data, resu
 providerScheduleDayDAL.prototype.updateProviderScheduleDay  = function(data,id, resultMethod,connection) {
      data = providerScheduleDayDAL.prototype.self.mapperModelToSql(data); 
             var updateProviderScheduleDayQuery = "UPDATE `chameleon`.`ProviderScheduleDay` SET ? WHERE ?;";
-    console.log(providerScheduleDayDAL);
              providerScheduleDayDAL.prototype.queryWithArgument(updateProviderScheduleDayQuery,data,{ProviderScheduleDayId:id},function (err,result)
                 {
                     logger.log("debug","updateProviderScheduleDay",data);

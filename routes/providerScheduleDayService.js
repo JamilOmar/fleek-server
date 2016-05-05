@@ -122,6 +122,28 @@ router.get('/getProviderScheduleDayByProviderScheduleId/:key', function(req, res
             response = null;
         });
 });
+//Method to get the provider Schedule Day by Schedule Id
+//*******************************************************************************************
+router.get('/getProviderScheduleDayByProviderScheduleIdDayOfWeek/:key/:day', function(req, res) {
+    var providerScheduleDayL = new providerScheduleDayLogic();
+    var response = new responseWs();
+    providerScheduleDayL.getProviderScheduleDayByProviderScheduleIdDayOfWeek(req.params.key,req.params.day,function(err,result){  
+              providerScheduleDayL = null;
+              if(err)
+                {
+                logger.log("error","getProviderScheduleDayByProviderScheduleIdDayOfWeek",err);
+                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+            response = null;
+        },null);
+});
+
 
 //********************************************************************************************
 module.exports = router;

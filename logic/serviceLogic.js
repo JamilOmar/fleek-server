@@ -3,7 +3,7 @@
 //Description: Service logic class
 //Target : Service  Creation , Administration of Services 
 //Author: Jamil Falconi
-//year: 2015
+//year: 2016
 //Version : 1.0
 //*******************************************************************************************
 "user strict";

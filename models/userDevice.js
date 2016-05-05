@@ -4,9 +4,12 @@ var userDevice = function()
         {
             this.id =null;
             this.userId = null;
-            this.deviceSerialNumber =null;
+            this.appName =null;
+            this.appVersion = null;
+            this.deviceToken =null;
             this.deviceFriendlyName = null;
-            this.isBlocked =null;
+            this.deviceModel =null;
+            this.deviceVersion = null;
             base.call(this);
             
         };
@@ -15,9 +18,12 @@ userDevice.prototype.initializer = function (data)
 {
             this.id =data.id;
             this.userId = data.userId;
-            this.deviceSerialNumber =data.deviceSerialNumber;
+            this.appName =data.appName;
+            this.appVersion = data.appVersion;
+            this.deviceToken =data.deviceToken;
             this.deviceFriendlyName = data.deviceFriendlyName;
-            this.isBlocked =data.isBlocked;
+            this.deviceModel =data.deviceModel;
+            this.deviceVersion = data.deviceVersion;
 }
 //********************************************************************************************
         module.exports = userDevice;

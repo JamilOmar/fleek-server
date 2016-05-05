@@ -17,14 +17,33 @@ router.get('/getServiceType/:cultureCode', function(req, res) {
                 {
                 logger.log("error","getServiceType",err);
                     response.createResponse(null, config.get('chameleon.responseWs.codeError'));
-                res.json(response);
+                    res.json(response);
                 }
             else
                 {
                  response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
-                res.json(response);
+                    res.json(response);
                 }
             response = null;
+        });
+});
+//get service type picture
+//********************************************************************************************
+router.get('/getServiceTypePicture/:key', function(req, res) {
+    var serviceTypeL = new serviceTypeLogic();
+    serviceTypeL.getImageAWS(req.params.key,function(err,result){  
+        serviceTypeL = null;
+        if(result)
+        {
+            res.set('Content-Type', result.ContentType);
+            res.send(result.Body);
+            //result.Body.pipe(res);
+        }
+        else
+        {
+            logger.log("error","getServiceTypePicture",err); 
+            res.json(config.get('chameleon.responseWs.codeError'));
+        }
         });
 });
 //********************************************************************************************

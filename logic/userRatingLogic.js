@@ -6,6 +6,7 @@
 //year: 2016
 //Version : 1.0
 //*******************************************************************************************
+"user strict";
 require('rootpath')();
 var mod_vasync = require("vasync");
 var userRatingDAL = require('data/dal/userRatingDAL');

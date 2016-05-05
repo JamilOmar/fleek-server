@@ -34,7 +34,6 @@ reservationDetailDAL.prototype.createReservationDetail = function(data, resultMe
 reservationDetailDAL.prototype.updateReservationDetail  = function(data,id, resultMethod,connection) {
      data = reservationDetailDAL.prototype.self.mapperModelToSql(data); 
             var updateReservationDetailQuery = "UPDATE `chameleon`.`ReservationDetail` SET ? WHERE ?;";
-    console.log(reservationDetailDAL);
              reservationDetailDAL.prototype.queryWithArgument(updateReservationDetailQuery,data,{ReservationDetailId:id},function (err,result)
                 {
                     logger.log("debug","updateReservationDetail",data);
@@ -160,8 +159,7 @@ reservationDetailDAL.prototype.mapperSqlToModelCollection = function(data)
            reservationDetail.modificationDate = data.ModificationDate;
            reservationDetail.isActive = data.IsActive
            data = null;
-            return reservationDetail;
-                reservationDetailCollection.push(reservationDetail);
+           reservationDetailCollection.push(reservationDetail);
             }
             return reservationDetailCollection;
         }

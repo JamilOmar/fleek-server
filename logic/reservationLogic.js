@@ -3,7 +3,7 @@
 //Description: Reservation logic class
 //Target : Reservation Creation , Administration of Reservations
 //Author: Jamil Falconi
-//year: 2015
+//year: 2016
 //Version : 1.0
 //*******************************************************************************************
 "user strict";

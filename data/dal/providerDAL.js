@@ -34,7 +34,6 @@ ProviderDAL.prototype.createProvider = function(data, resultMethod,connection) {
 ProviderDAL.prototype.updateProvider  = function(data,id, resultMethod,connection) {
      data = ProviderDAL.prototype.self.mapperModelToSql(data); 
             var updateProviderQuery = "UPDATE `chameleon`.`Provider` SET ? WHERE ?;";
-    console.log(ProviderDAL);
              ProviderDAL.prototype.queryWithArgument(updateProviderQuery,data,{ProviderId: id },function (err,result)
                 {
                     logger.log("debug","updateProviderQuery",data);

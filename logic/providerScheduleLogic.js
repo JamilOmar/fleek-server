@@ -22,6 +22,8 @@ var context = require('security/context');
 //*******************************************************************************************
 //constants
 var constants = require('global/constants');
+//error constants
+var errorConstants = require('global/errorConstants');
 //*******************************************************************************************
 var providerScheduleLogic = function() {
 
@@ -60,7 +62,8 @@ providerScheduleLogic.prototype.validate = function(providerSchedule, callback) 
         validatorM = null;
         return callback({
             name: "Error in Provider Schedule Validation",
-            message: message
+            message: message,
+            eCode : errorConstants.PROVIDER_SCHEDULE_INVALID
         }, false);
     }
 }
@@ -105,7 +108,8 @@ providerScheduleLogic.prototype.createProviderSchedule = function(providerSchedu
                                 .length == 0) {
                                 return callback({
                                     name: "Error at create the provider schedule",
-                                    message: "Invalid operation."
+                                    message: "Invalid operation.",
+                                    eCode : errorConstants.PROVIDER_SCHEDULE_INVALID_USER
                                 }, null);
                             } else {
                                
@@ -126,7 +130,8 @@ providerScheduleLogic.prototype.createProviderSchedule = function(providerSchedu
                             } else {
                                 return callback({
                                     name: "Error at create provider Schedule",
-                                    message: "Invalid operation."
+                                    message: "Invalid operation.",
+                                    eCode : errorConstants.USER_NOT_AUTHORIZE
                                 }, null);
                             }
 
@@ -148,7 +153,8 @@ providerScheduleLogic.prototype.createProviderSchedule = function(providerSchedu
                                 .length > 0) {
                                 return callback({
                                     name: "Error at create schedule",
-                                    message: "There is already an schedule"
+                                    message: "There is already an schedule",
+                                    eCode : errorConstants.PROVIDER_SCHEDULE_EXISTING_ITEM
                                 }, null);
                             } else {
                                 var localDate = new Date();
@@ -248,7 +254,8 @@ providerScheduleLogic.prototype.updateProviderSchedule = function(providerSchedu
                                 .length == 0) {
                                 return callback({
                                     name: "Error at update the provider schedule",
-                                    message: "Invalid operation."
+                                    message: "Invalid operation.",
+                                     eCode : errorConstants.PROVIDER_SCHEDULE_INVALID_USER
                                 }, null);
                             } else {
                                
@@ -276,7 +283,8 @@ providerScheduleLogic.prototype.updateProviderSchedule = function(providerSchedu
                                 contextUser.id != providerSchedule.providerId ) {
                                 return callback({
                                     name: "Error at update the provider Schedule",
-                                    message: "Invalid operation."
+                                    message: "Invalid operation.",
+                                    eCode : errorConstants.PROVIDER_SCHEDULE_ITEM_NOT_FOUND
                                 }, null);
                             } else {
 
@@ -381,7 +389,23 @@ providerScheduleLogic.prototype.getProviderScheduleByProviderId = function(id, r
         return resultMethod(err, result);
     });
 };
+//*******************************************************************************************
+//
+//get providerSchedule by provider Id and that is Default
+//
+//*******************************************************************************************
+providerScheduleLogic.prototype.getProviderScheduleByProviderIdAndDefault = function(id, resultMethod) {
+    var providerScheduleData = new providerScheduleDAL();
+    mod_vasync.waterfall([function Get(callback) {
+        providerScheduleData.getProviderScheduleByProviderIdAndDefault(id, function(err, result) {
+            return callback(err, result);
+        }, null);
 
+    }], function(err, result) {
+        providerScheduleData = null;
+        return resultMethod(err, result);
+    });
+};
 //*******************************************************************************************
 //
 // Method for remove the provider Schedule
@@ -412,7 +436,8 @@ providerScheduleLogic.prototype.deactivateProviderSchedule = function(providerSc
                                 .length == 0) {
                                 return callback({
                                     name: "Error at update the provider schedule",
-                                    message: "Invalid operation."
+                                    message: "Invalid operation.",
+                                      eCode : errorConstants.PROVIDER_SCHEDULE_INVALID_USER
                                 }, null);
                             } else {
                                
@@ -438,7 +463,8 @@ providerScheduleLogic.prototype.deactivateProviderSchedule = function(providerSc
                                 .length == 0 || data.providerId != providerSchedule.providerId || contextUser.id != providerSchedule.providerId) {
                                 return callback({
                                     name: "Error at create provider Schedule",
-                                    message: "Invalid operation."
+                                    message: "Invalid operation.",
+                                      eCode : errorConstants.PROVIDER_SCHEDULE_ITEM_NOT_FOUND
                                 }, null);
                             } else {
 

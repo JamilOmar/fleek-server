@@ -34,7 +34,6 @@ providerScheduleExceptionDAL.prototype.createProviderScheduleException = functio
 providerScheduleExceptionDAL.prototype.updateProviderScheduleException  = function(data,id, resultMethod,connection) {
      data = providerScheduleExceptionDAL.prototype.self.mapperModelToSql(data); 
             var updateProviderScheduleExceptionQuery = "UPDATE `chameleon`.`ProviderScheduleException` SET ? WHERE ?;";
-    console.log(providerScheduleExceptionDAL);
              providerScheduleExceptionDAL.prototype.queryWithArgument(updateProviderScheduleExceptionQuery,data,{ProviderScheduleExceptionId:id},function (err,result)
                 {
                     logger.log("debug","updateProviderScheduleException",data);

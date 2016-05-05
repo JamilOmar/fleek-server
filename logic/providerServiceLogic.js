@@ -142,7 +142,7 @@ providerServiceLogic.prototype.createProviderService = function(providerService,
                         function getPreviousData(callback) {
                             //Gets the previous day per calendar
 
-                            providerServiceData.getproviderServiceByProviderIdServiceIdActiveNonActive(providerService.providerId, providerService.serviceId, function(err, result) {
+                            providerServiceData.getProviderServiceByProviderIdServiceIdActiveNonActive(providerService.providerId, providerService.serviceId, function(err, result) {
                                 if (Object.keys(result)
                                     .length > 0 && result.isActive) {
                                     return callback({
@@ -227,7 +227,7 @@ providerServiceLogic.prototype.createProviderService = function(providerService,
                         //get information by provider id and service id
                         //*******************************************************************************************       
                         function getById( callback) {
-                            providerServiceData.getproviderServiceByProviderIdServiceId(providerService.providerId, providerService.serviceId, function(err, result) {
+                            providerServiceData.getProviderServiceByProviderIdServiceId(providerService.providerId, providerService.serviceId, function(err, result) {
                                 return callback(err, result);
                             }, connection);
                         }
@@ -316,7 +316,7 @@ providerServiceLogic.prototype.updateProviderService = function(providerService,
                         function getPreviousData(callback) {
                             //Gets the previous day per calendar
 
-                            providerServiceData.getproviderServiceByProviderIdServiceId(providerService.providerId, providerService.serviceId, function(err, result) {
+                            providerServiceData.getProviderServiceByProviderIdServiceId(providerService.providerId, providerService.serviceId, function(err, result) {
                                 if (Object.keys(result)
                                     .length <= 0) {
                                     return callback({
@@ -368,7 +368,7 @@ providerServiceLogic.prototype.updateProviderService = function(providerService,
                          //get information by provider id and service id
                         //*******************************************************************************************       
                         function getById(providerService, callback) {
-                            providerServiceData.getproviderServiceByProviderIdServiceId(providerService.providerId, providerService.serviceId, function(err, result) {
+                            providerServiceData.getProviderServiceByProviderIdServiceId(providerService.providerId, providerService.serviceId, function(err, result) {
                                 return callback(err, result);
                             }, connection);
                         }
@@ -393,10 +393,10 @@ providerServiceLogic.prototype.updateProviderService = function(providerService,
 //Get providerService by Provider Id and Service Id
 //
 //*******************************************************************************************
-providerServiceLogic.prototype.getproviderServiceByProviderId = function(providerId, resultMethod) {
+providerServiceLogic.prototype.getProviderServiceByProviderId = function(providerId, resultMethod) {
     var providerServiceData = new providerServiceDAL();
     mod_vasync.waterfall([function Get(callback) {
-        providerServiceData.getproviderServiceByProviderId(providerId, function(err, result) {
+        providerServiceData.getProviderServiceByProviderId(providerId, function(err, result) {
             return callback(err, result);
         }, null);
 
@@ -407,13 +407,13 @@ providerServiceLogic.prototype.getproviderServiceByProviderId = function(provide
 };
 //*******************************************************************************************
 //
-//Get providerService by provider Id
+//Get providerService by provider Id and Service Id
 //
 //*******************************************************************************************
-providerServiceLogic.prototype.getproviderServiceByProviderIdServiceId = function(providerId, serviceId, resultMethod) {
+providerServiceLogic.prototype.getProviderServiceByProviderIdServiceId = function(providerId, serviceId, resultMethod) {
     var providerServiceData = new providerServiceDAL();
     mod_vasync.waterfall([function Get(callback) {
-        providerServiceData.getProviderServiceByProviderScheduleId(providerId, serviceId, function(err, result) {
+        providerServiceData.getProviderServiceByProviderIdServiceId(providerId, serviceId, function(err, result) {
             return callback(err, result);
         }, null);
 
@@ -423,7 +423,23 @@ providerServiceLogic.prototype.getproviderServiceByProviderIdServiceId = functio
     });
 }
 
+//*******************************************************************************************
+// 
+//Get providerServiceService by provider Id, Service Type and Culture
+//
+//*******************************************************************************************
+providerServiceLogic.prototype.getProviderServiceByProviderIdTypeId = function(providerId, serviceId,cultureCode, resultMethod) {
+    var providerServiceData = new providerServiceDAL();
+    mod_vasync.waterfall([function Get(callback) {
+        providerServiceData.getProviderServiceByProviderIdTypeId(providerId, serviceId,cultureCode, function(err, result) {
+            return callback(err, result);
+        }, null);
 
+    }], function(err, result) {
+        providerServiceData = null;
+        return resultMethod(err, result);
+    });
+}
 
 //*******************************************************************************************
 //
@@ -486,7 +502,7 @@ providerServiceLogic.prototype.deactivateProviderService = function(providerServ
                         function getPreviousData(callback) {
                             //Gets the previous day per calendar
 
-                            providerServiceData.getproviderServiceByProviderIdServiceId(providerService.providerId, providerService.serviceId, function(err, result) {
+                            providerServiceData.getProviderServiceByProviderIdServiceId(providerService.providerId, providerService.serviceId, function(err, result) {
                                 if (Object.keys(result)
                                     .length <= 0) {
                                     return callback({

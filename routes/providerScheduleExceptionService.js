@@ -85,7 +85,7 @@ router.get('/getProviderScheduleExceptionyById/:key', function(req, res) {
     var providerScheduleExceptionL = new providerScheduleExceptionLogic();
     var response = new responseWs();
     providerScheduleExceptionL.getProviderScheduleExceptionById(req.params.key,function(err,result){  
-              providerScheduleExceptionLogic = null;
+              providerScheduleExceptionL = null;
               if(err)
                 {
                 logger.log("error","getProviderScheduleExceptionyById",err);
@@ -106,7 +106,7 @@ router.get('/getProviderScheduleExceptionByProviderScheduleId/:key', function(re
     var providerScheduleExceptionL = new providerScheduleExceptionLogic();
     var response = new responseWs();
     providerScheduleExceptionL.getProviderScheduleExceptionByProviderScheduleId(req.params.key,function(err,result){  
-              providerScheduleExceptionLogic = null;
+              providerScheduleExceptionL = null;
               if(err)
                 {
                 logger.log("error","getProviderScheduleExceptionByProviderScheduleId",err);

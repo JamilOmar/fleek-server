@@ -13,11 +13,15 @@ var authenticationController = require('security/authentication');
 var hooks ={
     
    tokenValidation : function(req, res, next) {
-    authenticationController.authenticate('bearer', { session : false }, function(err, user, info){
+       
+       
+       
+       
+    authenticationController.authenticate('facebook-token', { session : false }, function(err, user, info){
     if(err || user==false)
     {
         var response = new responseWs();
-        logger.log("error","login",err);
+        logger.log("error","authentication",err);
         response.createResponse("not authorize", config.get('chameleon.responseWs.codeError'));
         res.json(response);
         response = null;

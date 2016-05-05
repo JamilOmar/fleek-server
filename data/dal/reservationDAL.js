@@ -35,7 +35,6 @@ reservationDAL.prototype.createReservation = function(data, resultMethod,connect
 reservationDAL.prototype.updateReservation  = function(data,id, resultMethod,connection) {
      data = reservationDAL.prototype.self.mapperModelToSql(data); 
             var updateReservationQuery = "UPDATE `chameleon`.`Reservation` SET ? WHERE ?;";
-    console.log(reservationDAL);
              reservationDAL.prototype.queryWithArgument(updateReservationQuery,data,{ReservationId:id},function (err,result)
                 {
                     logger.log("debug","updateReservation",data);

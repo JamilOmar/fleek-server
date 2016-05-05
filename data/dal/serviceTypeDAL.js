@@ -32,7 +32,7 @@ serviceTypeDAL.prototype.getServiceTypeById = function(id,cultureCode, resultMet
 //Method to Select a Service Type
 //*******************************************************************************************
 serviceTypeDAL.prototype.getServiceType = function(cultureCode, resultMethod,connection) {
-    var getServiceTypeQuery ="SELECT st.`ServiceTypeId` , stl.`Name` , st.`CreationDate` , st.`ModificationDate`,st.`IsActive` FROM `chameleon`.`ServiceType` st INNER JOIN `chameleon`.`ServiceType_Local` stl on st.`ServiceTypeId` = stl.`ServiveTypeId` INNER JOIN `chameleon`.`Culture` cu on cu.`CultureId` = stl.`CultureId`  WHERE st.`IsActive` = 1 AND cu.`CultureCode` =? AND cu.`IsActive` = 1  ORDER BY stl.`Name`";
+    var getServiceTypeQuery ="SELECT st.`ServiceTypeId` , stl.`Name` , st.`PictureUrl`, st.`CreationDate` , st.`ModificationDate`,st.`IsActive` FROM `chameleon`.`ServiceType` st INNER JOIN `chameleon`.`ServiceType_Local` stl on st.`ServiceTypeId` = stl.`ServiveTypeId` INNER JOIN `chameleon`.`Culture` cu on cu.`CultureId` = stl.`CultureId`  WHERE st.`IsActive` = 1 AND cu.`CultureCode` =? AND cu.`IsActive` = 1  ORDER BY stl.`Name`";
                 serviceTypeDAL.prototype.getByArguments(getServiceTypeQuery,cultureCode,function (err,result)
                 {
                     logger.log("debug","getServiceType" , result);
@@ -54,6 +54,7 @@ serviceTypeDAL.prototype.mapperSqlToModel = function(data)
             var serviceType  = new serviceTypeModel();
             serviceType.id = data.ServiceTypeId;
             serviceType.name = data.Name;
+            serviceType.pictureUrl = data.PictureUrl;
             serviceType.creationDate = data.CreationDate;
             serviceType.modificationDate = data.ModificationDate;
             serviceType.isActive = data.IsActive
@@ -94,6 +95,7 @@ serviceTypeDAL.prototype.mapperSqlToModelCollection = function(dataRequested)
                 var serviceType  = new serviceTypeModel();
             	serviceType.id = data.ServiceTypeId;
             	serviceType.name = data.Name;
+                serviceType.pictureUrl = data.PictureUrl; 
             	serviceType.creationDate = data.CreationDate;
             	serviceType.modificationDate = data.ModificationDate;
             	serviceType.isActive = data.IsActive
@@ -129,6 +131,8 @@ serviceTypeDAL.prototype.mapperModelToSql = function(data)
     mysqlModel.ServiceTypeId  = data.id;
     if(data.hasOwnProperty("name")  && data.name!= undefined)
     mysqlModel.Name = data.name;
+      if(data.hasOwnProperty("pictureUrl")  && data.pictureUrl!= undefined)
+    mysqlModel.PictureUrl = data.pictureUrl;           
     if(data.hasOwnProperty("creationDate")  && data.creationDate!= undefined)
     mysqlModel.CreationDate = data.creationDate;
     if(data.hasOwnProperty("modificationDate")  && data.modificationDate!= undefined)
