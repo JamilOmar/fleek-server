@@ -147,7 +147,7 @@ userLogic.prototype.createUser = function(user, resultMethod) {
                         //validate
                         //*******************************************************************************************
                         function validateEntity(callback) {
-                            userLogic.prototype.self.validate(user, true, function(err, result) {
+                            userLogic.prototype.self.validate(user, false, function(err, result) {
                                 return callback(err);
                             })
                         },
@@ -171,7 +171,7 @@ userLogic.prototype.createUser = function(user, resultMethod) {
                                     user.creationDate = localDate;
                                     user.isActive = true;
                                     user.isBlocked = false;
-                                    user.password = cryptotHelper.encrypt(user.password);
+                                    //user.password = cryptotHelper.encrypt(user.password);
                                     userData.createUser(user, function(err, result) {
                                         if (err) {
                                             return connection.rollback(function() {
@@ -508,7 +508,10 @@ userLogic.prototype.updatePassword = function(userId, password, newPassword, res
     }
 
 };
+//*******************************************************************************************
+//
 //select User By Facebook Id
+//
 //*******************************************************************************************
 userLogic.prototype.getUserByFacebookId = function(facebookId, resultMethod) {
     var userData = new userDAL();
@@ -521,6 +524,15 @@ userLogic.prototype.getUserByFacebookId = function(facebookId, resultMethod) {
         userData = null;
         return resultMethod(err, result);
     });
+};
+//*******************************************************************************************
+//
+//get the current user
+//
+//*******************************************************************************************
+userLogic.prototype.getCurrentUser = function( resultMethod) {
+    var contextUser = context.getUser();
+   return resultMethod(null,contextUser);
 };
 //*******************************************************************************************
 //
@@ -1008,6 +1020,7 @@ userLogic.prototype.sendEmail = function(user, type, resultMethod) {
         name: "body",
         content: "Esta es una prueba desde fleekapp"
     });
+
 
 
     email.sendEmail(t, m, function(result) {

@@ -375,5 +375,39 @@ providerLogic.prototype.getProviderById = function (id, resultMethod) {
         return resultMethod(err, result);
     });
 };
+//*******************************************************************************************
+//
+//get provider by coordinates and service id
+//
+//*******************************************************************************************
+providerLogic.prototype.getProviderByLocationForSearch = function (latitude,longitude,serviceId, resultMethod) {
+    var providerData = new providerDAL();
+    mod_vasync.waterfall([function Get(callback) {
+        providerData.getProviderByLocationForSearch(latitude,longitude,serviceId, function (err, result) {
+            return callback(err, result);
+        }, null);
+
+        }], function (err, result) {
+        providerData = null;
+        return resultMethod(err, result);
+    });
+};
+//*******************************************************************************************
+//
+//get provider information
+//
+//*******************************************************************************************
+providerLogic.prototype.getProviderInformationWithServices = function (id, resultMethod) {
+    var providerData = new providerDAL();
+    mod_vasync.waterfall([function Get(callback) {
+        providerData.getProviderInformationWithServices(id, function (err, result) {
+            return callback(err, result);
+        }, null);
+
+        }], function (err, result) {
+        providerData = null;
+        return resultMethod(err, result);
+    });
+};
 //********************************************************************************************
 module.exports = providerLogic;

@@ -35,7 +35,7 @@ user.prototype.initializer = function (data)
            this.username =  String(data.username).toLowerCase();
            this.password = data.password;
            this.email = data.email;
-           this.facebookId = data.facebook;
+           this.facebookId = data.facebookId;
            this.pictureUrl = data.pictureUrl; 
            this.isBlocked = data.isBlocked;
            this.isProvider = data.isProvider;
@@ -51,13 +51,14 @@ user.prototype.initializer = function (data)
 
 
 //method to fill basic information
-user.prototype.basicInformation = function(id, name ,lastname, username, pictureUrl)
+user.prototype.basicInformation = function(id, name ,lastname, username, pictureUrl,facebookId)
 {
            this.id = id;
            this.name = name;
            this.lastname = lastname;
            this.username = username;
            this.pictureUrl = pictureUrl;
+           this.facebookId = facebookId; 
            this.isActive = undefined;
            this.creationDate = undefined;
            this.modificationDate = undefined; 

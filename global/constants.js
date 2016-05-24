@@ -61,7 +61,13 @@ const constants=
     },
     //Facebook information for inteligent analysis
     FACEBOOK_INFORMATION :
-    ['posts.limit(100){description}','quotes']  
+    ['posts.limit(100){description}','quotes'],
+    //search by location , KM: 6371 , MILES 3959
+    LOCATION_SEARCH:
+    {
+        TYPE : "KM",
+        VALUE : 6371
+    }  
 	
 };
 module.exports =constants;

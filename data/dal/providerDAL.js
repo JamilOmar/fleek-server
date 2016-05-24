@@ -8,8 +8,12 @@
 require('rootpath')();        
 var baseDAL  = require('./baseDAL');
 var ProviderModel  = require('models/Provider');
+var userModel  = require('models/user');
 var util = require('util');
 var logger = require('utilities/logger');
+//*******************************************************************************************
+//constants
+var constants = require('global/constants.js');
 //*******************************************************************************************
 
 var ProviderDAL = function()
@@ -72,7 +76,28 @@ ProviderDAL.prototype.getProviderById = function(providerId, resultMethod,connec
                     return resultMethod(err,ProviderDAL.prototype.self.mapperSqlToModel(result));
                 },connection);  
 };
-
+//Method to select the Provider by location and for Search
+//*******************************************************************************************
+ProviderDAL.prototype.getProviderByLocationForSearch = function(latitude,longitude,serviceId, resultMethod,connection) {
+    var getProviderByLocationForSearchQuery ="SELECT  pr.`ProviderId`, pr.`Telephone` , pr.`Rating` , pr.`AllowsKids` , pr.`Appointments` , pr.`IsForMale` , pr.`IsForFemale` , pr.`State` , pr.`Latitude` , pr.`Longitude` , pr.`CreationDate` , pr.`ModificationDate` , pr.`IsActive`,usr.`UserId` , usr.`Name` as user_Name , usr.`Lastname` as user_Lastname, usr.`PictureUrl` as  user_PictureUrl, usr.`FacebookId` as  user_FacebookId,usr.`Username` as  user_Username,ps.`Price` ,ps.`ServiceId`,ps.`AverageTimePerSession` as AverageTimePerSession,ps.`CurrencyCode` as CurrencyCode ,  ( "+constants.LOCATION_SEARCH.VALUE +" * acos( cos( radians("+ ProviderDAL.prototype.escape(latitude)+") ) * cos( radians( pr.`Latitude` ) ) * cos( radians( pr.`Longitude` ) - radians("+ ProviderDAL.prototype.escape(longitude)+") ) + sin( radians("+ ProviderDAL.prototype.escape(latitude)+") ) * sin( radians( pr.`Latitude` ) ) ) ) AS Distance FROM `User` usr INNER JOIN `Provider` pr on usr.`UserId` = pr.`ProviderId` INNER JOIN `ProviderService` ps on ps.`ProviderId` = usr.`UserId` where usr.`IsActive` =1 AND usr.`IsBlocked` =0 AND usr.`IsProvider` =1 AND pr.`IsActive` =1 AND ps.`IsActive` =1  AND ps.`ServiceId` = "+ ProviderDAL.prototype.escape(serviceId)+" HAVING Distance < 25 ORDER BY Distance LIMIT 0 , 20;";
+                ProviderDAL.prototype.getByArguments(getProviderByLocationForSearchQuery,function (err,result)
+                {
+                    
+                    logger.log("debug","getProviderByLocationForSearch" , result);
+                    return resultMethod(err,ProviderDAL.prototype.self.mapperSqlToModelCollectionForSearch(result));
+                },connection);  
+};
+//Method to select the Provider services and information
+//*******************************************************************************************
+ProviderDAL.prototype.getProviderInformationWithServices = function(id,resultMethod,connection) {
+    var getProviderInformationWithServicesQuery ="SELECT  pr.`ProviderId`, pr.`Telephone` , pr.`Rating` , pr.`AllowsKids` , pr.`Appointments` , pr.`IsForMale` , pr.`IsForFemale` , pr.`State` , pr.`Latitude` , pr.`Longitude` , pr.`CreationDate` , pr.`ModificationDate` , pr.`IsActive`,usr.`UserId` , usr.`Name` as user_Name , usr.`Lastname` as user_Lastname, usr.`PictureUrl` as  user_PictureUrl, usr.`FacebookId` as  user_FacebookId,usr.`Username` as  user_Username,ps.`Price` ,ps.`ServiceId`,ps.`AverageTimePerSession` as AverageTimePerSession,ps.`CurrencyCode` as CurrencyCode , FROM `User` usr INNER JOIN `Provider` pr on usr.`UserId` = pr.`ProviderId` INNER JOIN `ProviderService` ps on ps.`ProviderId` = usr.`UserId` where usr.`IsActive` =1 AND usr.`IsBlocked` =0 AND usr.`IsProvider` =1 AND pr.`IsActive` =1 AND ps.`IsActive` =1  AND usr.`UserId` =" +ProviderDAL.prototype.escape(id);
+                ProviderDAL.prototype.getByArguments(getProviderInformationWithServicesQuery,function (err,result)
+                {
+                    
+                    logger.log("debug","getProviderInformationWithServices" , result);
+                    return resultMethod(err,ProviderDAL.prototype.self.mapperSqlToModelCollectionForSearch(result));
+                },connection);  
+};
 //Method for transform the information from sql to model
 //********************************************************************************************
 ProviderDAL.prototype.mapperSqlToModel = function(data)
@@ -161,6 +186,64 @@ ProviderDAL.prototype.mapperSqlToModelCollection = function(dataRequested)
     catch(err)
     {
          logger.log("error","mapperSqlToModel",err);
+        return null;
+    }
+    
+        
+
+}
+
+//Method for transform the information from sql to  a model Collection for Search
+//********************************************************************************************
+ProviderDAL.prototype.mapperSqlToModelCollectionForSearch = function(dataRequested)
+{
+    try
+    {
+        
+        if(dataRequested != null)
+        {
+            var providerCollection = [];
+            for (var i = 0 ; i < dataRequested.length ; i++)
+            {
+                var data = dataRequested[i];
+                var provider  = new ProviderModel();
+                provider.id = data.Id;
+                provider.latitude = data.Latitude;
+                provider.longitude = data.Longitude;
+                provider.telephone = data.Telephone;
+                provider.rating = data.Rating;
+                provider.allowsKids = data.AllowsKids;
+                provider.appointments = data.Appointments; 
+                provider.isForMale = data.IsForMale;
+                provider.isForFemale = data.IsForFemale;
+                provider.state = data.State;
+                provider.creationDate = data.CreationDate;
+                provider.modificationDate = data.ModificationDate;
+                provider.isActive = data.IsActive
+                provider.user = new userModel();
+                provider.user.basicInformation(data.friend_UserId ,data.user_Name, data.user_Lastname , data.user_Username , data.user_PictureUrl,data.user_FacebookId);
+                provider.Metadata = {};
+                provider.Metadata.distance = data.Distance;
+                provider.Metadata.price = data.Price;
+                provider.Metadata.currencyCode = data.CurrencyCode;
+                provider.Metadata.averageTimePerSession = data.AverageTimePerSession;
+                provider.Metadata.distanceType =constants.LOCATION_SEARCH.TYPE;
+                
+                data = null;
+                providerCollection.push(provider);
+              
+            }
+            return providerCollection;
+        }
+        else
+        {
+            return {};
+        }
+   
+    }
+    catch(err)
+    {
+         logger.log("error","mapperSqlToModelCollectionForSearch",err);
         return null;
     }
     

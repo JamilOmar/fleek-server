@@ -12,6 +12,8 @@ var providerService = function()
            this.isForMale = null;
            this.isForFemale = null;
            this.state = null;
+           this.user = null;
+           this.service = null;
            base.call(this);
           
         };

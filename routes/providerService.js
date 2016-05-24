@@ -77,6 +77,47 @@ router.get('/getProviderById/:key', function(req, res) {
              response = null;
         });
 });
-
+//Method for get providers by coordinates and service id
+//*******************************************************************************************
+router.get('/getProviderByLocationForSearch/:latitude/:longitude/:serviceId', function(req, res) {
+    var providerL = new providerLogic();
+    var response = new responseWs();
+    providerL.getProviderByLocationForSearch(req.params.latitude,req.params.longitude,req.params.serviceId,function(err,result){  
+             providerL = null;
+              if(err)
+                {
+                logger.log("error","getProviderByLocationForSearch",err);
+                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+             response = null;
+        });
+});
+//Method for get providers by coordinates and service id
+//*******************************************************************************************
+router.get('/getProviderInformationWithServices/:id/', function(req, res) {
+    var providerL = new providerLogic();
+    var response = new responseWs();
+    providerL.getProviderInformationWithServices(req.params.id,function(err,result){  
+             providerL = null;
+              if(err)
+                {
+                logger.log("error","getProviderInformationWithServices",err);
+                response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+             response = null;
+        });
+});
 //********************************************************************************************
 module.exports = router;

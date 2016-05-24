@@ -17,6 +17,11 @@
            this.pool = pool;
            baseDAL.prototype.self = this;
         };
+//Generic escape method
+//*******************************************************************************************
+        baseDAL.prototype.escape = function(value) {
+            return mysql.escape(value);
+        }
 
 //Generic query method
 //*******************************************************************************************

@@ -165,6 +165,26 @@ router.put('/updatePassword', function(req, res) {
               response = null;
         });
     });
+ //Method to get the actual user
+//*******************************************************************************************
+    router.get('/me', function(req, res) {
+        var userL = new userLogic();
+        var response = new responseWs(); userL.getCurrentUser(function(err,result){  
+              userL = null;
+              if(err)
+                {
+                logger.log("error","me",err); 
+                response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+              response = null;
+        });
+    });   
 //Method to get the user by username
 //*******************************************************************************************
     router.get('/getUserByUsername/:username', function(req, res) {

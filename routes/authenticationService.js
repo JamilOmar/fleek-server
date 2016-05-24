@@ -92,5 +92,26 @@ router.post('/signup', function(req, res) {
             response = null;
         });
     });
+//get user by facebook id
+//*******************************************************************************************
+    router.get('/getUserByFacebookId/:key', function(req, res) {
+    var userL = new userLogic();
+    var response = new responseWs();
+    userL.getUserByFacebookId(req.params.key,function(err,result){  
+              userL = null;
+              if(err)
+                {
+                logger.log("error","getUserByFacebookId",err);
+                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+            response = null;
+        });
+    });
 
 module.exports = router;
