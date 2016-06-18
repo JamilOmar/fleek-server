@@ -68,7 +68,7 @@ ProviderDAL.prototype.deactivateProvider = function(data, resultMethod,connectio
 //Method to select the Provider by Provider Id
 //*******************************************************************************************
 ProviderDAL.prototype.getProviderById = function(providerId, resultMethod,connection) {
-    var getProviderByProviderIdQuery ="SELECT provider.`ProviderId`, provider.`Telephone` , provider.`Rating` , provider.`AllowsKids` , provider.`Appointments` , provider.`IsForMale` , provider.`IsForFemale` , provider.`State` , provider.`Latitude` , provider.`Longitude` , provider.`CreationDate` , provider.`ModificationDate` , provider.`IsActive` FROM `Provider` provider INNER JOIN User user on user.`UserId` = provider.`ProviderId` where provider.`IsActive` = 1 AND user.`IsActive` =1 AND provider.`State` <> -1 AND  provider.`ProviderId` =?";
+    var getProviderByProviderIdQuery ="SELECT provider.`ProviderId` Id, provider.`Telephone`,provider.`Address` , provider.`Rating` , provider.`AllowsKids` , provider.`Appointments` , provider.`IsForMale` , provider.`IsForFemale` , provider.`State` , provider.`Latitude` , provider.`Longitude` , provider.`CreationDate` , provider.`ModificationDate` , provider.`IsActive` FROM `Provider` provider INNER JOIN User user on user.`UserId` = provider.`ProviderId` where provider.`IsActive` = 1 AND user.`IsActive` =1 AND provider.`State` <> -1 AND  provider.`ProviderId` =?";
                 ProviderDAL.prototype.getByArguments(getProviderByProviderIdQuery,providerId,function (err,result)
                 {
                     
@@ -79,7 +79,7 @@ ProviderDAL.prototype.getProviderById = function(providerId, resultMethod,connec
 //Method to select the Provider by location and for Search
 //*******************************************************************************************
 ProviderDAL.prototype.getProviderByLocationForSearch = function(latitude,longitude,serviceId, resultMethod,connection) {
-    var getProviderByLocationForSearchQuery ="SELECT  pr.`ProviderId`, pr.`Telephone` , pr.`Rating` , pr.`AllowsKids` , pr.`Appointments` , pr.`IsForMale` , pr.`IsForFemale` , pr.`State` , pr.`Latitude` , pr.`Longitude` , pr.`CreationDate` , pr.`ModificationDate` , pr.`IsActive`,usr.`UserId` , usr.`Name` as user_Name , usr.`Lastname` as user_Lastname, usr.`PictureUrl` as  user_PictureUrl, usr.`FacebookId` as  user_FacebookId,usr.`Username` as  user_Username,ps.`Price` ,ps.`ServiceId`,ps.`AverageTimePerSession` as AverageTimePerSession,ps.`CurrencyCode` as CurrencyCode ,  ( "+constants.LOCATION_SEARCH.VALUE +" * acos( cos( radians("+ ProviderDAL.prototype.escape(latitude)+") ) * cos( radians( pr.`Latitude` ) ) * cos( radians( pr.`Longitude` ) - radians("+ ProviderDAL.prototype.escape(longitude)+") ) + sin( radians("+ ProviderDAL.prototype.escape(latitude)+") ) * sin( radians( pr.`Latitude` ) ) ) ) AS Distance FROM `User` usr INNER JOIN `Provider` pr on usr.`UserId` = pr.`ProviderId` INNER JOIN `ProviderService` ps on ps.`ProviderId` = usr.`UserId` where usr.`IsActive` =1 AND usr.`IsBlocked` =0 AND usr.`IsProvider` =1 AND pr.`IsActive` =1 AND ps.`IsActive` =1  AND ps.`ServiceId` = "+ ProviderDAL.prototype.escape(serviceId)+" HAVING Distance < 25 ORDER BY Distance LIMIT 0 , 20;";
+    var getProviderByLocationForSearchQuery ="SELECT  pr.`ProviderId` Id, pr.`Telephone` , pr.`Rating` , pr.`AllowsKids` , pr.`Appointments` , pr.`IsForMale` , pr.`IsForFemale` ,pr.`Address`, pr.`State` , pr.`Latitude` , pr.`Longitude` , pr.`CreationDate` , pr.`ModificationDate` , pr.`IsActive`,usr.`UserId` , usr.`Name` as user_Name , usr.`Lastname` as user_Lastname, usr.`PictureUrl` as  user_PictureUrl, usr.`FacebookId` as  user_FacebookId,usr.`Username` as  user_Username,ps.`Price` ,ps.`ServiceId`,ps.`AverageTimePerSession` as AverageTimePerSession,ps.`CurrencyCode` as CurrencyCode ,prs.`ProviderScheduleId` as ProviderScheduleId,  ( "+constants.LOCATION_SEARCH.VALUE +" * acos( cos( radians("+ ProviderDAL.prototype.escape(latitude)+") ) * cos( radians( pr.`Latitude` ) ) * cos( radians( pr.`Longitude` ) - radians("+ ProviderDAL.prototype.escape(longitude)+") ) + sin( radians("+ ProviderDAL.prototype.escape(latitude)+") ) * sin( radians( pr.`Latitude` ) ) ) ) AS Distance FROM `User` usr INNER JOIN `Provider` pr on usr.`UserId` = pr.`ProviderId` INNER JOIN `ProviderSchedule` prs on prs.`ProviderId` = pr.`ProviderId` INNER JOIN `ProviderService` ps on ps.`ProviderId` = usr.`UserId` where usr.`IsActive` =1 AND usr.`IsBlocked` =0 AND usr.`IsProvider` =1 AND prs.`IsDefault` = 1 AND pr.`IsActive` =1 AND ps.`IsActive` =1  AND ps.`ServiceId` = "+ ProviderDAL.prototype.escape(serviceId)+" HAVING Distance < 25 ORDER BY Distance LIMIT 0 , 20;";
                 ProviderDAL.prototype.getByArguments(getProviderByLocationForSearchQuery,function (err,result)
                 {
                     
@@ -90,7 +90,7 @@ ProviderDAL.prototype.getProviderByLocationForSearch = function(latitude,longitu
 //Method to select the Provider services and information
 //*******************************************************************************************
 ProviderDAL.prototype.getProviderInformationWithServices = function(id,resultMethod,connection) {
-    var getProviderInformationWithServicesQuery ="SELECT  pr.`ProviderId`, pr.`Telephone` , pr.`Rating` , pr.`AllowsKids` , pr.`Appointments` , pr.`IsForMale` , pr.`IsForFemale` , pr.`State` , pr.`Latitude` , pr.`Longitude` , pr.`CreationDate` , pr.`ModificationDate` , pr.`IsActive`,usr.`UserId` , usr.`Name` as user_Name , usr.`Lastname` as user_Lastname, usr.`PictureUrl` as  user_PictureUrl, usr.`FacebookId` as  user_FacebookId,usr.`Username` as  user_Username,ps.`Price` ,ps.`ServiceId`,ps.`AverageTimePerSession` as AverageTimePerSession,ps.`CurrencyCode` as CurrencyCode , FROM `User` usr INNER JOIN `Provider` pr on usr.`UserId` = pr.`ProviderId` INNER JOIN `ProviderService` ps on ps.`ProviderId` = usr.`UserId` where usr.`IsActive` =1 AND usr.`IsBlocked` =0 AND usr.`IsProvider` =1 AND pr.`IsActive` =1 AND ps.`IsActive` =1  AND usr.`UserId` =" +ProviderDAL.prototype.escape(id);
+    var getProviderInformationWithServicesQuery ="SELECT  pr.`ProviderId` Id, pr.`Telephone` ,pr.`Address`, pr.`Rating` , pr.`AllowsKids` , pr.`Appointments` , pr.`IsForMale` , pr.`IsForFemale` , pr.`State` , pr.`Latitude` , pr.`Longitude` , pr.`CreationDate` , pr.`ModificationDate` , pr.`IsActive`,usr.`UserId` , usr.`Name` as user_Name , usr.`Lastname` as user_Lastname, usr.`PictureUrl` as  user_PictureUrl, usr.`FacebookId` as  user_FacebookId,usr.`Username` as  user_Username,ps.`Price` ,ps.`ServiceId`,ps.`AverageTimePerSession` as AverageTimePerSession,ps.`CurrencyCode` as CurrencyCode , FROM `User` usr INNER JOIN `Provider` pr on usr.`UserId` = pr.`ProviderId` INNER JOIN `ProviderService` ps on ps.`ProviderId` = usr.`UserId` where usr.`IsActive` =1 AND usr.`IsBlocked` =0 AND usr.`IsProvider` =1 AND pr.`IsActive` =1 AND ps.`IsActive` =1  AND usr.`UserId` =" +ProviderDAL.prototype.escape(id);
                 ProviderDAL.prototype.getByArguments(getProviderInformationWithServicesQuery,function (err,result)
                 {
                     
@@ -116,6 +116,7 @@ ProviderDAL.prototype.mapperSqlToModel = function(data)
            provider.latitude = data.Latitude;
            provider.longitude = data.Longitude;
            provider.telephone = data.Telephone;
+           provider.address = data.Address;
            provider.rating = data.Rating;
            provider.allowsKids = data.AllowsKids;
            provider.appointments = data.Appointments; 
@@ -162,6 +163,7 @@ ProviderDAL.prototype.mapperSqlToModelCollection = function(dataRequested)
                 provider.latitude = data.Latitude;
                 provider.longitude = data.Longitude;
                 provider.telephone = data.Telephone;
+                provider.address = data.Address;
                 provider.rating = data.Rating;
                 provider.allowsKids = data.AllowsKids;
                 provider.appointments = data.Appointments; 
@@ -211,6 +213,7 @@ ProviderDAL.prototype.mapperSqlToModelCollectionForSearch = function(dataRequest
                 provider.latitude = data.Latitude;
                 provider.longitude = data.Longitude;
                 provider.telephone = data.Telephone;
+                provider.address = data.Address;
                 provider.rating = data.Rating;
                 provider.allowsKids = data.AllowsKids;
                 provider.appointments = data.Appointments; 
@@ -223,7 +226,7 @@ ProviderDAL.prototype.mapperSqlToModelCollectionForSearch = function(dataRequest
                 provider.user = new userModel();
                 provider.user.basicInformation(data.friend_UserId ,data.user_Name, data.user_Lastname , data.user_Username , data.user_PictureUrl,data.user_FacebookId);
                 provider.Metadata = {};
-                provider.Metadata.distance = data.Distance;
+                provider.Metadata.providerScheduleId  =  data.ProviderScheduleId;                provider.Metadata.distance = data.Distance;
                 provider.Metadata.price = data.Price;
                 provider.Metadata.currencyCode = data.CurrencyCode;
                 provider.Metadata.averageTimePerSession = data.AverageTimePerSession;
@@ -266,6 +269,8 @@ ProviderDAL.prototype.mapperModelToSql = function(data)
     mysqlModel.Longitude = data.longitude;
     if(data.hasOwnProperty("telephone") && data.telephone != undefined)
     mysqlModel.Telephone = data.telephone;
+    if(data.hasOwnProperty("address") && data.address != undefined)
+    mysqlModel.Address = data.address;
     if(data.hasOwnProperty("rating") && data.rating != undefined)
     mysqlModel.Rating = data.rating;
     if(data.hasOwnProperty("allowsKids") && data.allowsKids != undefined)

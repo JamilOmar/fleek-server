@@ -141,6 +141,27 @@ router.get('/getProviderScheduleByProviderIdAndDefault/:key', function(req, res)
             response = null;
         });
 });
+//Method to get the provider Schedule Complete by Provider Id and that is Default
+//*******************************************************************************************
+router.get('/getProviderScheduleCompleteByProviderIdAndDefault/:key', function(req, res) {
+    var providerScheduleL = new providerScheduleLogic();
+    var response = new responseWs();
+    providerScheduleL.getProviderScheduleCompleteByProviderIdAndDefault(req.params.key,function(err,result){  
+              providerScheduleL = null;
+              if(err)
+                {
+                logger.log("error","getProviderScheduleCompleteByProviderIdAndDefault",err);
+                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+            response = null;
+        });
+});
 
 //********************************************************************************************
 module.exports = router;

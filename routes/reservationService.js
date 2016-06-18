@@ -6,6 +6,7 @@ var logger = require('utilities/logger');
 var router = express.Router();
 var responseWs = require('models/response.js');
 var reservationModel = require('models/reservation.js');
+var reservationRequestModel = require('models/reservationRequest.js');
 
 //Method to create the reservation
 //*******************************************************************************************
@@ -88,6 +89,30 @@ router.get('/getReservationByCustomerId/', function(req, res) {
                 {
                 logger.log("error","getReservationByCustomerId",err);
                     response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+            response = null;
+        });
+});
+//Method to retreive the available times
+//*******************************************************************************************
+router.post('/generateAvailableTimes/', function(req, res) {
+    var reservationL = new reservationLogic();
+    var response = new responseWs();
+    var reservationRequest =new reservationRequestModel();
+    reservationRequest.initializer(req.body);
+    reservationL.generateAvailableTimes(reservationRequest,function(err,result){
+            reservationL = null;
+            reservation =null;
+              if(err)
+                {
+                logger.log("error","generateAvailableTimes",err); 
+                response.createResponse(null, config.get('chameleon.responseWs.codeError'));
                 res.json(response);
                 }
             else

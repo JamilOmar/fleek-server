@@ -12,10 +12,19 @@ validator.isNumberAndInteger =function(number)
     return Number.isInteger(number) ;
 };
 
+validator.validateCoordinate= function (min,number,max){
+    if ( !isNaN(number) && (number >= min) && (number <= max) ){
+        return true;
+    } else {
+        return false;
+    };
+}
+
 validator.isCoordinate =function(str)
 {
     var reg = new RegExp("^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}");
-    return reg.exec(str);
+    var result =  reg.exec(str);
+    return result;
 };
 validator.isBoolean =function(val)
 {

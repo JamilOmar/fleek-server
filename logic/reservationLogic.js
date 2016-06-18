@@ -10,6 +10,7 @@
 require('rootpath')();
 var mod_vasync = require("vasync");
 var reservationDAL = require('data/dal/reservationDAL');
+var providerScheduleDAL = require('data/dal/providerScheduleDAL');
 var providerScheduleDayDAL = require('data/dal/providerScheduleDayDAL');
 var providerScheduleExceptionDAL = require('data/dal/providerScheduleExceptionDAL');
 var reservationDetailLogic = require('./reservationDetailLogic')
@@ -164,6 +165,210 @@ reservationLogic.prototype.validateTime = function(reservation, providerSchedule
         endTimeReservation = null;
         return false;
     }
+//*******************************************************************************************
+//
+//generate available times
+//
+//*******************************************************************************************
+reservationLogic.prototype.getTime = function(reservationList, providerScheduleDayList, providerScheduleDayException, reservationRequest) {
+        //convert the string into dates
+        var providerScheduleDay = null;
+        var isValid = true;
+        var availableTimes = [];
+        if (Object.keys(providerScheduleDayException)
+            .length <= 0 )  {
+
+            for (var sd = 0; sd < providerScheduleDayList.length; sd++) {
+                providerScheduleDay = providerScheduleDayList[sd];
+                var startTimeCalendar = moment(providerScheduleDay.startTime, 'HH:mm:ss');
+                var endTimeCalendar = moment(providerScheduleDay.endTime, 'HH:mm:ss');
+                var lengthTimeCalendar = endTimeCalendar.diff(startTimeCalendar, "minutes");
+                if( lengthTimeCalendar - reservationRequest.averageTimePerSession >=0 ) //at least one turn
+                {
+                    var newStartTimeCalendar = startTimeCalendar;
+                    var newEndTimeCalendar =startTimeCalendar.clone();
+                     newEndTimeCalendar.add(reservationRequest.averageTimePerSession , "minutes");
+                    //divide into minutes for check the time diference
+                    while (endTimeCalendar.diff(newEndTimeCalendar,"minutes")>=0)
+                    {
+                        availableTimes.push({from:newStartTimeCalendar, to:newEndTimeCalendar.clone()});
+                        newStartTimeCalendar = newEndTimeCalendar.clone();
+                        newEndTimeCalendar.add(reservationRequest.averageTimePerSession , "minutes");
+                    }
+                }
+
+                startTimeCalendar = null;
+                endTimeCalendar = null;
+     
+            }
+            for (var rsrv = 0 ; rsrv < reservationList.length; rsrv++)
+            {
+                var rStartTime = moment(reservationList[rsrv].startTime, 'HH:mm:ss');
+                var rEndTime = moment(reservationList[rsrv].endTime, 'HH:mm:ss');
+                for (var times = 0 ; times< availableTimes.length ; times++)
+                {
+                    var tFrom =  moment(availableTimes[times].from.format('HH:mm:ss'),'HH:mm:ss');
+                    var tTo =  moment(availableTimes[times].to.format('HH:mm:ss'),'HH:mm:ss');
+                      if ((( tFrom>= rStartTime && tTo <= rEndTime)))
+                      {
+                          availableTimes.splice(times , 1);
+                      } 
+                    tFrom =null;
+                    tTo = null;
+                }
+                rStartTime = null;
+                rEndTime = null;
+            }
+            
+            
+        }
+        
+        for(var i = 0 ; i< availableTimes.length; i++)
+        {
+            availableTimes[i].from =  availableTimes[i].from.format('HH:mm:ss');
+            availableTimes[i].to =  availableTimes[i].to.format('HH:mm:ss');
+        }
+        providerScheduleDay = null;
+        startTimeCalendar = null;
+        endTimeCalendar = null;
+        return availableTimes;
+    }    
+     //*******************************************************************************************
+    //
+    //Method to Generate available times for reservations
+    //
+    //*******************************************************************************************
+reservationLogic.prototype.generateAvailableTimes = function(reservationRequest, resultMethod) {
+    var contextUser = context.getUser();
+    var reservationData = new reservationDAL();
+    var infoVerification = {};
+    var providerScheduleDayData = new providerScheduleDayDAL();
+    var providerScheduleData = new providerScheduleDAL();
+    var reservationDetailL = new reservationDetailLogic();
+    var providerScheduleExceptionData = new providerScheduleExceptionDAL();
+    try {
+                //mod_vasync , waterfall for better order
+                mod_vasync.waterfall([
+                    //If the time is correct proceed to create the reservation time
+//*******************************************************************************************
+                        function checkVerificationDate(callback) {
+                            try {
+                          
+                                   
+                                    var tmp = moment(reservationRequest.date);
+                                    tmp.format(config.get('chameleon.date.format'));
+                                    if (tmp !== null && tmp.isValid()) {
+                                        reservationRequest.date = tmp;
+                                         return callback(null);
+                                    } else {
+                                        return callback({
+                                            name: "Error at get available Times.",
+                                            message: "There are invalid parameters."
+                                        }, null);
+                                    
+                                }
+                            } catch (err) {
+                                return callback({
+                                    name: "Error at get available Times.",
+                                    message: "Unable to cast."
+                                }, null);
+                            }
+                        },
+//get schedule information
+//*******************************************************************************************                
+                        function getSchedule(callback) {
+                            var reservationDay = reservationRequest.date.day();
+                            providerScheduleData.getProviderScheduleByProviderIdAndDefault(reservationRequest.providerId,  function(err, result) {
+                                if (Object.keys(result)
+                                .length > 0) {
+                                     infoVerification.providerSchedule = result;
+                                    return callback(err);
+                                } else {
+                                    return callback({
+                                        name: "Error at create the reservation",
+                                        message: "There are no schedules defined."
+                                    }, null);
+
+                                }
+                            }, null);
+                        },                        
+//get schedule day  information
+//*******************************************************************************************                
+                        function getScheduleDay(callback) {
+                            var reservationDay = reservationRequest.date.day();
+                            providerScheduleDayData.getProviderScheduleDayByProviderScheduleIdDayOfWeek( infoVerification.providerSchedule.id, reservationDay,function(err, result) {
+                                if (result.length > 0) {
+                                     infoVerification.providerScheduleDay = result;
+                                    return callback(err);
+                                } else {
+                                    return callback({
+                                        name: "Error at create the reservation",
+                                        message: "There are no  schedule days defined."
+                                    }, null);
+
+                                }
+                            }, null);
+                        },
+//get if there are any schedule exception for this date
+//*******************************************************************************************                
+                        function getScheduleException(callback) {
+                            providerScheduleExceptionData.getProviderScheduleExceptionByProviderScheduleIdYearMonthDay(infoVerification.providerSchedule.id, reservationRequest.date.year(), reservationRequest.date.month() + 1, reservationRequest.date.date(), function(err, result) {
+                                infoVerification.providerScheduleException = result;
+                                return callback(err);
+
+                            }, null);
+                        },
+//get if there are any previous reservations for this date
+//*******************************************************************************************                     
+                        function getPreviousReservationsData(callback) {
+                            reservationData.getReservationByProviderScheduleIdYearMonthDay(infoVerification.providerSchedule.id, reservationRequest.date.year(), reservationRequest.date.month() + 1, reservationRequest.date.date(), function(err, result) {
+
+                                infoVerification.previousReservations = result;
+                                return callback(err);
+
+                            }, null);
+
+                        },
+//Validate data for create reservation
+//*******************************************************************************************                   
+                        function generateAvailableTimes(callback) {
+                            //async 
+                            process.nextTick(function(){
+                            try
+                            {
+                            var availableTimes = reservationLogic.prototype.getTime(infoVerification.previousReservations, infoVerification.providerScheduleDay,
+                                    infoVerification.providerScheduleException ,reservationRequest);
+                                    return callback(null,availableTimes);
+                            }catch(err)
+                            {
+                                return callback({
+                                       name: "Error at get available Times.",
+                                        message: "There was an issue on generate the available times"
+                                    }, null);
+                            }
+
+                        });
+                        },
+                    ],
+                    function(err, result) {
+                        reservationData = null;
+                        infoVerification = null;
+                        providerScheduleDayData = null;
+                        providerScheduleExceptionData = null;
+                        return resultMethod(err, result);
+                    });
+
+  
+    } catch (err) {
+        reservationData = null;
+        infoVerification = null;
+        providerScheduleDayData = null;
+        providerScheduleExceptionData = null;
+        return resultMethod(err, null);
+    }
+
+};   
+    
     //*******************************************************************************************
     //
     //Method to Create an entry to the reservation

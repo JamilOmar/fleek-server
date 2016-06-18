@@ -45,10 +45,10 @@ providerLogic.prototype.validate = function (provider, callback) {
         validatorM.addException("Picture is invalid.");
     }
 
-    if ((!validator.isNullOrUndefined(provider.latitude) && !validator.isCoordinate(String(provider.latitude)))) {
+    if ((!validator.isNullOrUndefined(provider.latitude) && !validator.validateCoordinate(constants.COORDINATES_MAX.LATITUDE_MIN,provider.latitude,constants.COORDINATES_MAX.LATITUDE_MAX))) {
         validatorM.addException("Latitude is invalid.");
     }
-    if ((!validator.isNullOrUndefined(provider.longitude) && !validator.isCoordinate(String(provider.longitude)))) {
+    if ((!validator.isNullOrUndefined(provider.longitude) && !validator.validateCoordinate(constants.COORDINATES_MAX.LONGITUDE_MIN,provider.longitude,constants.COORDINATES_MAX.LONGITUDE_MAX))) {
         validatorM.addException("Longitude is invalid.");
     }
 

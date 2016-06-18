@@ -408,6 +408,43 @@ providerScheduleLogic.prototype.getProviderScheduleByProviderIdAndDefault = func
 };
 //*******************************************************************************************
 //
+//get providerSchedule complete information by provider Id and that is Default
+//
+//*******************************************************************************************
+providerScheduleLogic.prototype.getProviderScheduleCompleteByProviderIdAndDefault = function(id, resultMethod) {
+    var providerScheduleData = new providerScheduleDAL();
+    var providerScheduleExceptionData = new providerScheduleExceptionDAL();
+    var providerScheduleDayData = new providerScheduleDayDAL();
+    var providerScheduleCompleteInformation ={};
+    mod_vasync.waterfall([function Get(callback) {
+        providerScheduleData.getProviderScheduleByProviderIdAndDefault(id, function(err, result) {
+            providerScheduleCompleteInformation.providerSchedule = result;
+            return callback(err);
+        }, null);
+
+    }, function GetProviderScheduleDay(callback)
+    {
+        
+        providerScheduleDayData.getProviderScheduleDayByProviderScheduleId(providerScheduleCompleteInformation.providerSchedule.id, function(err, result) {
+            providerScheduleCompleteInformation.providerScheduleDay = result;
+            return callback(err);
+        }, null);
+    }, function GetProviderScheduleException(callback)
+    {
+        providerScheduleExceptionData.getProviderScheduleExceptionByProviderScheduleId(providerScheduleCompleteInformation.providerSchedule.id, function(err, result) {
+            providerScheduleCompleteInformation.providerScheduleException = result;
+            return callback(err);
+        }, null);
+        
+    }], function(err, result) {
+        providerScheduleData = null;
+        providerScheduleExceptionData = null;
+        providerScheduleDayData = null;
+        return resultMethod(err, providerScheduleCompleteInformation);
+    });
+};
+//*******************************************************************************************
+//
 // Method for remove the provider Schedule
 //
 //*******************************************************************************************

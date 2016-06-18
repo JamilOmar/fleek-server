@@ -1,6 +1,6 @@
 require('rootpath')();        
 var base  = require('./base.js');   
-var providerService = function()
+var provider = function()
         {
            this.id = null;
            this.latitude = null;
@@ -13,12 +13,12 @@ var providerService = function()
            this.isForFemale = null;
            this.state = null;
            this.user = null;
-           this.service = null;
+           this.address = null;
            base.call(this);
           
         };
-providerService.prototype = new base();
-providerService.prototype.initializer = function (data)
+provider.prototype = new base();
+provider.prototype.initializer = function (data)
 {
            this.id = data.id;
            this.latitude = data.latitude;
@@ -30,8 +30,9 @@ providerService.prototype.initializer = function (data)
            this.isForMale = data.isForMale;
            this.isForFemale = data.isForFemale;
            this.state = data.state;
+           this.address = data.address;
       
 }
 //********************************************************************************************
- module.exports =  providerService;
+ module.exports =  provider;
  

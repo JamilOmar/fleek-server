@@ -67,6 +67,14 @@ const constants=
     {
         TYPE : "KM",
         VALUE : 6371
+    },
+    //MAX value for coordinates
+    COORDINATES_MAX:
+    {
+       LATITUDE_MAX:90,
+       LATITUDE_MIN:-90,
+       LONGITUDE_MAX:180,
+       LONGITUDE_MIN:-180
     }  
 	
 };

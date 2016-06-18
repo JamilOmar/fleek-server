@@ -87,7 +87,7 @@ providerScheduleDAL.prototype.getProviderScheduleByProviderIdAndDefault = functi
                 providerScheduleDAL.prototype.getByArguments(getProviderScheduleByProviderIdAndDefaultQuery,id,function (err,result)
                 {
                     logger.log("debug","getProviderScheduleByProviderIdAndDefault",id , result);
-                    return resultMethod(err,providerScheduleDAL.prototype.self.mapperSqlToModelCollection(result));
+                    return resultMethod(err,providerScheduleDAL.prototype.self.mapperSqlToModel(result));
                 },connection);  
 };
 //Method to select the ProviderSchedule by ProviderSchedule Id and Provider Id
