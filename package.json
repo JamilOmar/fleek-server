@@ -19,6 +19,7 @@
     "busboy": "^0.2.11",
     "config": "^1.14.0",
     "continuation-local-storage": "^3.1.6",
+    "deepstream.io": "^0.9.0",
     "express": "^4.13.1",
     "fb": "^1.0.2",
     "heapdump": "^0.3.6",

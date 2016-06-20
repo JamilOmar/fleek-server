@@ -144,4 +144,47 @@ router.get('/getReservationByProviderId/', function(req, res) {
             response = null;
         });
 });
+//Method to get the reservation by provider Id, State and Paged
+//*******************************************************************************************
+router.get('/getReservationByProviderIdStatePaged/', function(req, res) {
+    var reservationL = new reservationLogic();
+    var response = new responseWs();
+    reservationL.getReservationByProviderId(req.params.key,req.params.state,req.params.offset,req.params.limit,function(err,result){  
+              reservationL = null;
+              if(err)
+                {
+                logger.log("error","getReservationByProviderIdStatePaged",err);
+                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+            response = null;
+        });
+});
+
+//Method to get the reservation by customer Id , State and Paged
+//*******************************************************************************************
+router.get('/getReservationByCustomerIdStatePaged/', function(req, res) {
+    var reservationL = new reservationLogic();
+    var response = new responseWs();
+    reservationL.getReservationByCustomerId(req.params.key,req.params.state,req.params.offset,req.params.limit,function(err,result){  
+              reservationL = null;
+              if(err)
+                {
+                logger.log("error","getReservationByCustomerIdStatePaged",err);
+                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+            response = null;
+        });
+});
 module.exports = router;

@@ -380,10 +380,10 @@ providerLogic.prototype.getProviderById = function (id, resultMethod) {
 //get provider by coordinates and service id
 //
 //*******************************************************************************************
-providerLogic.prototype.getProviderByLocationForSearch = function (latitude,longitude,serviceId, resultMethod) {
+providerLogic.prototype.getProviderByLocationForSearch = function (query,latitude,longitude,serviceId,offset,limit, resultMethod) {
     var providerData = new providerDAL();
     mod_vasync.waterfall([function Get(callback) {
-        providerData.getProviderByLocationForSearch(latitude,longitude,serviceId, function (err, result) {
+        providerData.getProviderByLocationForSearch(query,latitude,longitude,serviceId,offset,limit, function (err, result) {
             return callback(err, result);
         }, null);
 

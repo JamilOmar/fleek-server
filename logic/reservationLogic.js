@@ -865,5 +865,73 @@ reservationLogic.prototype.getReservationByProviderId = function(id, resultMetho
         return resultMethod(err, result);
     });
 };
+//*******************************************************************************************
+//
+//Method to Select reservation By Customer Id and State
+//
+//*******************************************************************************************
+reservationLogic.prototype.getReservationByCustomerIdStatePaged = function(id,state,offset,limit, resultMethod) {
+    var contextUser = context.getUser();
+    var reservationData = new reservationDAL();
+    mod_vasync.waterfall([
+        //*******************************************************************************************            
+        function authorize(callback) {
+            if (contextUser.id == id) {
+                return callback(null);
+            } else {
+                return callback({
+                    name: "Not Authorized",
+                    message: "Invalid operation."
+                }, null);
+            }
+
+        },
+        //*******************************************************************************************                        
+        function Get(callback) {
+            reservationData.getReservationByCustomerIdState(id,state,offset,limit, function(err, result) {
+                return callback(err, result);
+            }, null);
+
+        }
+    ], function(err, result) {
+        reservationData = null;
+        return resultMethod(err, result);
+    });
+};
+//*******************************************************************************************
+//
+//Method to Select reservation By Provider Id and State
+//
+//*******************************************************************************************
+reservationLogic.prototype.getReservationByProviderIdStatePaged = function(id,state,offset,limit, resultMethod) {
+    var contextUser = context.getUser();
+    var reservationData = new reservationDAL();
+    mod_vasync.waterfall([
+        //*******************************************************************************************            
+        function authorize(callback) {
+            if (contextUser.id == id) {
+                return callback(null);
+            } else {
+                return callback({
+                    name: "Not Authorized",
+                    message: "Invalid operation."
+                }, null);
+            }
+
+        },
+        //******************************************************************************************* 
+
+
+        function Get(callback) {
+            reservationData.getReservationByProviderIdState(id,state,offset,limit, function(err, result) {
+                return callback(err, result);
+            }, null);
+
+        }
+    ], function(err, result) {
+        reservationData = null;
+        return resultMethod(err, result);
+    });
+};
 //********************************************************************************************
 module.exports = reservationLogic;
