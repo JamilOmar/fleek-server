@@ -79,10 +79,10 @@ router.get('/getProviderById/:key', function(req, res) {
 });
 //Method for get providers by coordinates and service id
 //*******************************************************************************************
-router.get('/getProviderByLocationForSearch/:query/:latitude/:longitude/:serviceId/:offset/:limit', function(req, res) {
+router.get('/getProviderByLocationForSearch', function(req, res) {
     var providerL = new providerLogic();
     var response = new responseWs();
-    providerL.getProviderByLocationForSearch(req.params.query,req.params.latitude,req.params.longitude,req.params.serviceId,req.params.offset,req.params.limit,function(err,result){  
+    providerL.getProviderByLocationForSearch(req.query.query,req.query.latitude,req.query.longitude,req.query.serviceId,req.query.offset,req.query.limit,function(err,result){  
              providerL = null;
               if(err)
                 {

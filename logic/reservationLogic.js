@@ -888,7 +888,7 @@ reservationLogic.prototype.getReservationByCustomerIdStatePaged = function(id,st
         },
         //*******************************************************************************************                        
         function Get(callback) {
-            reservationData.getReservationByCustomerIdState(id,state,offset,limit, function(err, result) {
+            reservationData.getReservationByCustomerIdStatePaged(parseInt(id),parseInt(state),parseInt(offset),parseInt(limit), function(err, result) {
                 return callback(err, result);
             }, null);
 
@@ -923,7 +923,7 @@ reservationLogic.prototype.getReservationByProviderIdStatePaged = function(id,st
 
 
         function Get(callback) {
-            reservationData.getReservationByProviderIdState(id,state,offset,limit, function(err, result) {
+            reservationData.getReservationByProviderIdStatePaged(id,state,offset,limit, function(err, result) {
                 return callback(err, result);
             }, null);
 

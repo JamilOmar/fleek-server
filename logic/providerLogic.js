@@ -382,7 +382,34 @@ providerLogic.prototype.getProviderById = function (id, resultMethod) {
 //*******************************************************************************************
 providerLogic.prototype.getProviderByLocationForSearch = function (query,latitude,longitude,serviceId,offset,limit, resultMethod) {
     var providerData = new providerDAL();
-    mod_vasync.waterfall([function Get(callback) {
+    mod_vasync.waterfall([
+        
+//validate
+//*******************************************************************************************
+        function validateEntity(callback)
+        {
+            var validatorM = new validatorManager();
+    if ((!validator.isNullOrUndefined(query) && !validator.isLength(query, {
+            min: 0,
+            max: 120
+        }))) {
+        validatorM.addException("Query is invalid.");
+        }
+        if (validatorM.isValid()) {
+        validatorM = null;
+        return callback(null, true);
+    } else {
+        var message = validatorM.GenerateErrorMessage();
+        validatorM = null;
+        return callback({
+            name: "Error in User Validation",
+            message: message
+        }, false);
+    }
+    },
+//Query
+//*******************************************************************************************        
+        function Get(validation,callback) {
         providerData.getProviderByLocationForSearch(query,latitude,longitude,serviceId,offset,limit, function (err, result) {
             return callback(err, result);
         }, null);

@@ -44,7 +44,7 @@ router.put('/approvalReservation', function(req, res) {
             reservation =null;
               if(err)
                 {
-                logger.log("error","createReservation",err); 
+                logger.log("error","approvalReservation",err); 
                 response.createResponse(null, config.get('chameleon.responseWs.codeError'));
                 res.json(response);
                 }
@@ -149,7 +149,7 @@ router.get('/getReservationByProviderId/', function(req, res) {
 router.get('/getReservationByProviderIdStatePaged/', function(req, res) {
     var reservationL = new reservationLogic();
     var response = new responseWs();
-    reservationL.getReservationByProviderId(req.params.key,req.params.state,req.params.offset,req.params.limit,function(err,result){  
+    reservationL.getReservationByProviderIdStatePaged(req.query.id,req.query.state,req.query.offset,req.query.limit,function(err,result){  
               reservationL = null;
               if(err)
                 {
@@ -171,7 +171,7 @@ router.get('/getReservationByProviderIdStatePaged/', function(req, res) {
 router.get('/getReservationByCustomerIdStatePaged/', function(req, res) {
     var reservationL = new reservationLogic();
     var response = new responseWs();
-    reservationL.getReservationByCustomerId(req.params.key,req.params.state,req.params.offset,req.params.limit,function(err,result){  
+    reservationL.getReservationByCustomerIdStatePaged(req.query.id,req.query.state,req.query.offset,req.query.limit,function(err,result){  
               reservationL = null;
               if(err)
                 {
