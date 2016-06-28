@@ -20,6 +20,7 @@
     "config": "^1.14.0",
     "continuation-local-storage": "^3.1.6",
     "deepstream.io": "^0.9.0",
+    "deepstream.io-client-js": "^0.5.0",
     "express": "^4.13.1",
     "fb": "^1.0.2",
     "heapdump": "^0.3.6",
@@ -45,6 +46,7 @@
     "underscore": "^1.8.3",
     "validator": "^4.5.2",
     "vasync": "^1.6.3",
+    "watson-developer-cloud": "^1.9.4",
     "winston": "^1.1.1"
   },
   "devDependencies": {},

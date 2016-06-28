@@ -41,7 +41,7 @@ userDAL.prototype.updateUser  = function(data,id, resultMethod,connection) {
 //Method to Select User By Facebook Id
 //*******************************************************************************************
 userDAL.prototype.getUserByFacebookId = function(facebookId, resultMethod,connection) {
-    var getUserByFacebookIdQuery ="SELECT usr.`UserId` , usr.`Name` , usr.`Lastname` , usr.`Age` , usr.`Username` , usr.`FacebookId` , usr.`PictureUrl` , usr.`IsBlocked` , usr.`IsProvider` , usr.`CountryId`, usr.`Latitude` , usr.`Longitude` , usr.`CreationDate` , usr.`ModificationDate` , usr.`Email` , usr.`Password` , usr.`Gender` , usr.`Gender`, usr.`Rating` , usr.`Appointments`, usr.`IsOpenForFriendship` ,usr.`CultureCode`    FROM `chameleon`.`User` usr WHERE usr.`IsActive` = 1 AND  usr.`FacebookId` =? ";
+    var getUserByFacebookIdQuery ="SELECT usr.`UserId` , usr.`Name` , usr.`Lastname` , usr.`Age` , usr.`Username` , usr.`FacebookId` , usr.`PictureUrl` , usr.`IsBlocked` , usr.`IsProvider` , usr.`CountryCode`, usr.`Latitude` , usr.`Longitude` , usr.`CreationDate` , usr.`ModificationDate` , usr.`Email` , usr.`Password` , usr.`Gender` , usr.`Gender`, usr.`Rating` , usr.`Appointments`, usr.`IsOpenForFriendship` ,usr.`CultureCode`    FROM `chameleon`.`User` usr WHERE usr.`IsActive` = 1 AND  usr.`FacebookId` =? ";
                 userDAL.prototype.getByArguments(getUserByFacebookIdQuery,facebookId,function (err,result)
                 {
                     logger.log("debug","getUserByFacebookId" , result);
@@ -51,7 +51,7 @@ userDAL.prototype.getUserByFacebookId = function(facebookId, resultMethod,connec
 //Method to Select User By Username 
 //*******************************************************************************************
 userDAL.prototype.getUserByUsername = function(username, resultMethod,connection) {
-    var getUserByUsernameQuery ="SELECT usr.`UserId` , usr.`Name` , usr.`Lastname` , usr.`Age` , usr.`Username` , usr.`FacebookId` , usr.`PictureUrl` , usr.`IsBlocked` , usr.`IsProvider` , usr.`CountryId`, usr.`Latitude` , usr.`Longitude` , usr.`CreationDate` , usr.`ModificationDate` , usr.`Email` , usr.`Password` , usr.`Gender` , usr.`Gender`, usr.`Rating` , usr.`Appointments`, usr.`IsOpenForFriendship` ,usr.`CultureCode`  FROM `chameleon`.`User` usr WHERE usr.`IsActive` = 1  AND usr.`Username` =?" ;
+    var getUserByUsernameQuery ="SELECT usr.`UserId` , usr.`Name` , usr.`Lastname` , usr.`Age` , usr.`Username` , usr.`FacebookId` , usr.`PictureUrl` , usr.`IsBlocked` , usr.`IsProvider` , usr.`CountryCode`, usr.`Latitude` , usr.`Longitude` , usr.`CreationDate` , usr.`ModificationDate` , usr.`Email` , usr.`Password` , usr.`Gender` , usr.`Gender`, usr.`Rating` , usr.`Appointments`, usr.`IsOpenForFriendship` ,usr.`CultureCode`  FROM `chameleon`.`User` usr WHERE usr.`IsActive` = 1  AND usr.`Username` =?" ;
                 userDAL.prototype.getByArguments(getUserByUsernameQuery,username,function (err,result)
                 {
                     logger.log("debug","getUserByUsername" , result);
@@ -63,7 +63,7 @@ userDAL.prototype.getUserByUsername = function(username, resultMethod,connection
 //Method to Select User By Id
 //*******************************************************************************************
 userDAL.prototype.getUserById = function(id, resultMethod,connection) {
-    var getUserByIdQuery ="SELECT usr.`UserId` , usr.`Name` , usr.`Lastname` , usr.`Age` , usr.`Username` , usr.`FacebookId` , usr.`PictureUrl` , usr.`IsBlocked` , usr.`IsProvider` , usr.`CountryId`, usr.`Latitude` , usr.`Longitude` , usr.`CreationDate` , usr.`ModificationDate` , usr.`Email` , usr.`Password` , usr.`Gender`, usr.`Rating` , usr.`Appointments`, usr.`IsOpenForFriendship` ,usr.`CultureCode`  FROM `chameleon`.`User` usr WHERE usr.`IsActive` = 1  AND usr.`UserId` =? ";
+    var getUserByIdQuery ="SELECT usr.`UserId` , usr.`Name` , usr.`Lastname` , usr.`Age` , usr.`Username` , usr.`FacebookId` , usr.`PictureUrl` , usr.`IsBlocked` , usr.`IsProvider` , usr.`CountryCode`, usr.`Latitude` , usr.`Longitude` , usr.`CreationDate` , usr.`ModificationDate` , usr.`Email` , usr.`Password` , usr.`Gender`, usr.`Rating` , usr.`Appointments`, usr.`IsOpenForFriendship` ,usr.`CultureCode`  FROM `chameleon`.`User` usr WHERE usr.`IsActive` = 1  AND usr.`UserId` =? ";
                 userDAL.prototype.getByArguments(getUserByIdQuery,id,function (err,result)
                 {
                     logger.log("debug","getUserById" , result);
@@ -156,7 +156,7 @@ userDAL.prototype.mapperSqlToModel = function(data)
             user.pictureUrl = data.PictureUrl;
             user.isBlocked = data.IsBlocked;
             user.isProvider = data.IsProvider;
-            user.countryId = data.CountryId;
+            user.countryCode = data.CountryCode;
             user.latitude = data.Latitude;
             user.longitude = data.Longitude;
             user.gender = data.Gender;
@@ -210,7 +210,7 @@ userDAL.prototype.mapperSqlToModelCollection = function(dataRequested)
                 user.pictureUrl = data.PictureUrl;
                 user.isBlocked = data.IsBlocked;
                 user.isProvider = data.IsProvider;
-                user.countryId = data.CountryId;
+                user.countryCode = data.CountryCode;
                 user.latitude = data.Latitude;
                 user.longitude = data.Longitude;
                 user.gender = data.Gender;
@@ -271,8 +271,8 @@ userDAL.prototype.mapperModelToSql = function(data)
     mysqlModel.IsBlocked = data.isBlocked;
     if(data.hasOwnProperty("isProvider")&& data.isProvider!== undefined)
     mysqlModel.IsProvider = data.isProvider;
-    if(data.hasOwnProperty("countryId")&& data.countryId!== undefined)
-    mysqlModel.CountryId = data.countryId;
+    if(data.hasOwnProperty("countryCode")&& data.countryCode!== undefined)
+    mysqlModel.CountryCode = data.countryCode;
     if(data.hasOwnProperty("latitude")&& data.latitude!== undefined)
     mysqlModel.Latitude = data.latitude;
     if(data.hasOwnProperty("longitude")&& data.longitude!== undefined)

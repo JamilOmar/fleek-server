@@ -33,6 +33,16 @@ userRatingDAL.prototype.getUserRatingByReservationIdToUserIdFromUserId = functio
         return resultMethod(err, userRatingDAL.prototype.self.mapperSqlToModel(result));
     }, connection);
 };
+//get total rating from User
+//*******************************************************************************************
+userRatingDAL.prototype.getTotalRatingOfUser = function ( toUserId, resultMethod, connection) {
+   
+    var getTotalRatingOfUserQuery = "SELECT  IFNULL(SUM(userRating.`Rating`),0) AS TotalRating  ,  IFNULL(COUNT(userRating.`Rating`),0) TotalCount FROM `UserRating` userRating WHERE userRating.`IsActive` = 1 AND userRating.`ToUserId` = ?";
+    userRatingDAL.prototype.getByArguments(getTotalRatingOfUserQuery, toUserId, function (err, result) {
+        logger.log("debug", "getTotalRatingOfUser", result);
+        return resultMethod(err, userRatingDAL.prototype.self.mapperSqlToModel(result));
+    }, connection);
+};
 //Method to add User Rating
 //*******************************************************************************************
 userRatingDAL.prototype.addUserRating = function (data, resultMethod, connection) {
@@ -75,6 +85,29 @@ userRatingDAL.prototype.mapperSqlToModel = function (data) {
 
 
     }
+   //Method for transform the information from sql to model for Total Rating
+//********************************************************************************************
+userRatingDAL.prototype.mapperSqlToModelTotalRating = function (data) {
+        try {
+            if (data != null && data.length > 0) {
+                data = data[0];
+                var totalRating = {};
+                userRating.totalRating = data.TotalRating;
+                userRating.totalCount = data.TotalCount;
+              
+                return totalRating;
+            } else {
+                return {};
+            }
+
+        } catch (err) {
+            logger.log("error", "mapperSqlToModelTotalRating", err);
+            return null;
+        }
+
+
+
+    } 
     //Method for transform the information from sql to  a model Collection
     //********************************************************************************************
 

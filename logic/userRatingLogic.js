@@ -17,6 +17,8 @@ require('utilities/validatorManager/validatorExtender')(validator);
 var validatorManager = require('utilities/validatorManager/validatorManager');
 var context = require('security/context');
 var userLogic = require('./userLogic');
+var reservationLogic = require('./reservationLogic');
+var providerLogic = require('./providerLogic');
 var uuid = require('node-uuid');
 var emailT = require("utilities/email/");
 var messageHelper = require("utilities/email/models/message");
@@ -78,6 +80,9 @@ userRatingLogic.prototype.validate = function(userRating, callback) {
     //
     //*******************************************************************************************
 userRatingLogic.prototype.createUserRating = function(userRating, resultMethod) {
+    var userL = new userLogic();
+    var providerL = new providerLogic();
+    var reservationL = new reservationLogic();
     var userRatingData = new userRatingDAL();
     var contextUser = context.getUser();
     var userL = new userLogic();
@@ -141,12 +146,61 @@ userRatingLogic.prototype.createUserRating = function(userRating, resultMethod) 
 
                         },
                         //*******************************************************************************************            
+                        //method to validate the reservation
+                        function checkReservation(callback) {
+                            reservationL.getReservationById(userRating.reservationId, function(err, result) {
+                                if(Object.keys(data)
+                                    .length > 0 && result.state == constants.REQUEST_STATES_RESERVATION.COMPLETED)
+                                {
+                                     if(userRating.isForProvider)
+                                     {
+                                         if((userRating.fromUserId == result.customerId) && (originalReservation.toUserId == result.providerId))
+                                         {
+                                             return callback(null);
+                                         }
+                                         else
+                                         {
+                                        return callback({
+                                            name: "Error at create user rating",
+                                            message: "Invalid operation."
+                                            }, null);
+                                         }
+                                     }
+                                     else
+                                     {
+                                        if((userRating.fromUserId == result.providerId) && (originalReservation.toUserId == result.customerId))
+                                        {
+                                            return callback(null);
+                                        }
+                                        else
+                                        {
+                                        return callback({
+                                            name: "Error at create user rating",
+                                            message: "Invalid operation."
+                                            }, null);
+                                        }
+                                     }
+                                }
+                                 else {
+                                return callback({
+                                    name: "Error at create user rating",
+                                    message: "Invalid operation."
+                                }, null);
+                                }
+                                
+                                
+                            }, connection);
+
+                        },
+                        //*******************************************************************************************            
+                           //method to validate if the user does not have performed a rating
                         function check(callback) {
                             userRatingData.getUserRatingByReservationIdToUserIdFromUserId(userRating.reservationId, userRating.toUserId, userRating.fromUserId, function(err, result) {
                                 return callback(err, result);
-                            }, null);
+                            }, connection);
 
                         },
+                          //*******************************************************************************************            
                         //method to prepare the data    
                         function prepare(data,callback) {
                             if (Object.keys(data)
@@ -164,14 +218,57 @@ userRatingLogic.prototype.createUserRating = function(userRating, resultMethod) 
                                 return callback(null);
                             }
                         },
-                        //method to create the userRating    
-                        function createUserRating(callback) {
+                          //*******************************************************************************************            
+                        //method to create the userRating
+                          function createUserRating(callback) {
                             userRatingData.addUserRating(userRating, function(err, result) {
-                                if (err) {
-                                    return connection.rollback(function() {
-                                        callback(err, null);
-                                    });
-                                }
+                                
+                                        return callback(err, result);
+                                    
+                                },connection);
+
+
+                            },
+                            //*******************************************************************************************              
+                            //method to get the total value of the user rating
+                          function getTotalUserRating(callback) {
+                            userRatingData.getTotalRatingOfUser(userRating.toUserId, function(err, result) {
+                                
+                                        return callback(err, result);
+                                    
+                                },connection);
+
+
+                            },
+                           //*******************************************************************************************                 
+                         //method to update the Users value
+                          function updateUserRating(callback,data) {
+
+                              if(userRating.isForProvider)
+                              {
+                                 providerL.updateProviderRating(userRating.toUserId,data.totalCount, function(err, result) {
+                                
+                                        return callback(err, result);
+                                    
+                                },connection);
+                              }
+                              else
+                              {
+                                  userRatingData.addUserRating(userRating.toUserId,data.totalCount, function(err, result) {
+                                
+                                        return callback(err, result);
+                                    
+                                },connection);
+
+                              }
+                            
+
+
+                            },    
+                        //*******************************************************************************************                 
+                         //commit the process
+                        function commitProcess(callback) {
+                      
                                 //if no error commit
                                 connection.commit(function(err) {
                                     if (err) {
@@ -182,16 +279,19 @@ userRatingLogic.prototype.createUserRating = function(userRating, resultMethod) 
                                         logger.log("debug", "commit", userRating);
                                         return callback(null, result);
                                     }
-                                });
-
-
-                            }, connection);
-
+                            });
                         }
+
+                        
                     ],
                     function(err, result) {
+                        if(err)
+                        {
+                            connection.rollback(function() {});
+                        }
                         connection.release();
                         userRatingData = null;
+                        providerL = null;
                         userL = null;
                         return resultMethod(err, result);
                     });
@@ -200,6 +300,7 @@ userRatingLogic.prototype.createUserRating = function(userRating, resultMethod) 
         });
     } catch (err) {
         userRatingData = null;
+         providerL = null;
         userL = null;
         return resultMethod(err, null);
     }

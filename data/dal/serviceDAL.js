@@ -24,7 +24,7 @@ var serviceDAL = function()
 //Method to Select Services By Type Id 
 //*******************************************************************************************
 serviceDAL.prototype.getServiceByTypeId = function(id,cultureCode, resultMethod,connection) {
-    var getServiceByTypeIdQuery ="SELECT s.`ServiceId` , sl.`Name` , s.`Type` , s.`CreationDate` , s.`ModificationDate` , s.`IsActive` FROM `chameleon`.`Service` s inner join `chameleon`.`ServiceType` st on s.`Type` = st.`ServiceTypeId` INNER JOIN `chameleon`.`Service_Local` sl on  s.`ServiceId` = sl.`ServiceId` INNER JOIN `chameleon`.`Culture` cu on cu.`CultureId` = sl.`CultureId`  WHERE s.`IsActive` =1 AND cu.`IsActive` = 1 AND st.`IsActive` AND s.`Type` = ? AND cu.`CultureCode`=? ORDER BY s.`Name`";
+    var getServiceByTypeIdQuery ="SELECT s.`ServiceId` , sl.`Name` , s.`Type` , s.`CreationDate` , s.`ModificationDate` , s.`IsActive` FROM `chameleon`.`Service` s inner join `chameleon`.`ServiceType` st on s.`Type` = st.`ServiceTypeId` INNER JOIN `chameleon`.`Service_Local` sl on  s.`ServiceId` = sl.`ServiceId` INNER JOIN `chameleon`.`Culture` cu on cu.`CultureCode` = sl.`CultureCode`  WHERE s.`IsActive` =1 AND cu.`IsActive` = 1 AND st.`IsActive` AND s.`Type` = ? AND cu.`CultureCode`=? ORDER BY s.`Name`";
                 serviceDAL.prototype.getByArguments(getServiceByTypeIdQuery,[id,cultureCode],function (err,result)
                 {
                     logger.log("debug","getServiceByTypeId" , result);

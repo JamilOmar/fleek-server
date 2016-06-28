@@ -17,7 +17,7 @@ var hooks ={
        
        
        
-    authenticationController.authenticate('facebook-token', { session : false }, function(err, user, info){
+    authenticationController.authenticate('facebook-token', { session : false }, function(err, user, info){      
     if(err || user==false)
     {
         var response = new responseWs();

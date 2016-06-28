@@ -32,7 +32,7 @@ serviceTypeDAL.prototype.getServiceTypeById = function(id,cultureCode, resultMet
 //Method to Select a Service Type
 //*******************************************************************************************
 serviceTypeDAL.prototype.getServiceType = function(cultureCode, resultMethod,connection) {
-    var getServiceTypeQuery ="SELECT st.`ServiceTypeId` , stl.`Name` , st.`PictureUrl`, st.`CreationDate` , st.`ModificationDate`,st.`IsActive` FROM `chameleon`.`ServiceType` st INNER JOIN `chameleon`.`ServiceType_Local` stl on st.`ServiceTypeId` = stl.`ServiveTypeId` INNER JOIN `chameleon`.`Culture` cu on cu.`CultureId` = stl.`CultureId`  WHERE st.`IsActive` = 1 AND cu.`CultureCode` =? AND cu.`IsActive` = 1  ORDER BY stl.`Name`";
+    var getServiceTypeQuery ="SELECT st.`ServiceTypeId` , stl.`Name` , st.`PictureUrl`, st.`CreationDate` , st.`ModificationDate`,st.`IsActive` FROM `chameleon`.`ServiceType` st INNER JOIN `chameleon`.`ServiceType_Local` stl on st.`ServiceTypeId` = stl.`ServiveTypeId` INNER JOIN `chameleon`.`Culture` cu on cu.`CultureCode` = stl.`CultureCode`  WHERE st.`IsActive` = 1 AND cu.`CultureCode` =? AND cu.`IsActive` = 1  ORDER BY stl.`Name`";
                 serviceTypeDAL.prototype.getByArguments(getServiceTypeQuery,cultureCode,function (err,result)
                 {
                     logger.log("debug","getServiceType" , result);

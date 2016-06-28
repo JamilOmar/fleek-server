@@ -128,7 +128,7 @@ router.put('/updatePassword', function(req, res) {
 
         var userL = new userLogic();
         var response = new responseWs();
-        userL.getUserById(req.params.key,function(err,result){  
+        userL.checkUser(req.params.key,function(err,result){  
               userL = null;
               if(err)
                 {

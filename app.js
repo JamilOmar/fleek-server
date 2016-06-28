@@ -6,11 +6,18 @@ module.exports = function() {
     const config = require('config');
     const passport = require('passport');
     const logger = require('./utilities/logger');
+    const notificationsEngine = require('./utilities/notificationsEngine');
     var bodyParser = require('body-parser');
     var app = express();
     var hooks = require('./security/hooks/');
   
     app.disable('x-powered-by');
+    app.use(function(req, res, next) {
+   res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST,PUT,DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, X-Auth-Token , Authorization, Accept, Access-Control-Allow-Headers");
+  next();
+});
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(passport.initialize());
@@ -43,7 +50,9 @@ module.exports = function() {
     app.use('/v1/reservationService', reservationService);
     var authenticationService = require('./routes/authenticationService');
     app.use('/v1/authenticationService', authenticationService);
-    
+    //notifications engine
+    var notificationsEngineL = new notificationsEngine();
+    notificationsEngineL.start();
     
     
     //globar error handler

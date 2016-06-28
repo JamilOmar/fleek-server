@@ -360,6 +360,74 @@ providerLogic.prototype.updateProvider = function (provider, resultMethod) {
 };
 //*******************************************************************************************
 //
+//update provider Rating
+//Internal Only not for Service
+//*******************************************************************************************
+providerLogic.prototype.updateProviderRating = function (id,rating, resultMethod,connection) {
+    var providerData = new providerDAL();
+    var contextUser = context.getUser();
+    var userL = new userLogic();
+    try {
+                //mod_vasync , waterfall for better order
+                mod_vasync.waterfall([
+//validate
+//*******************************************************************************************
+                function validateEntity(callback)
+                        {
+                            providerLogic.prototype.self.validate(provider, function (err, result) {
+                                return callback(err);
+                            })
+                },                    
+                        //*******************************************************************************************            
+                        function check(callback) {
+                            providerData.getProviderById(provider.id, function (err, result) {
+                                return callback(err, result);
+                            }, null);
+
+                        },
+                        //Prepare the data for insertion
+                        //*******************************************************************************************                     
+                        function prepare(data, callback) {
+
+                            if (Object.keys(data)
+                                .length <= 0) {
+                                return callback({
+                                    name: "Error at create the provider",
+                                    message: "There provider does not exists."
+                                }, null);
+                            } else {
+                                var localDate = new Date();
+                                provider.modificationDate = localDate;
+                                provider.isActive = undefined;
+                                provider.creationDate = undefined;
+                                return callback(null);
+
+                            }
+                        },
+
+//method to update the provider
+//*******************************************************************************************    
+                function updateProvider(callback)
+                        {
+                            providerData.updateProvider(provider, provider.id, function (err, result) {
+                                
+                                        callback(err, null);
+                            }, connection);
+        },
+        ],
+                    function (err, result) {
+                     
+                        providerData = null;
+                        return resultMethod(err, result);
+                    });
+    } catch (err) {
+        providerData = null;
+        return resultMethod(err, null);
+    }
+
+};
+//*******************************************************************************************
+//
 //get provider by Id
 //
 //*******************************************************************************************

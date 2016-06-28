@@ -213,14 +213,14 @@ userLogic.prototype.createUser = function(user, resultMethod) {
                         },
                         //store the information under cache
                         //******************************************************************************************* 
-                        function saveInCache(data, callback) {
+                        /*function saveInCache(data, callback) {
                             var cacheL = new cache();
                             cacheL.saveCache(constants.REDIS_USER + user.id, data, function(err, result) {
                                 cacheL = null;
                                 return callback(err, result);
                             });
 
-                        },
+                        },*/
                         //send the email
                         //*******************************************************************************************                 
                         function sendEmail(data, callback) {
@@ -331,7 +331,7 @@ userLogic.prototype.updateUser = function(user, resultMethod) {
                             }, connection);
                         },
                         //*******************************************************************************************
-                        function saveInCache(data, callback) {
+                       /* function saveInCache(data, callback) {
                             try {
                                 var cacheL = new cache();
                                 cacheL.saveCache(constants.REDIS_USER + user.id, data, function(err, result) {
@@ -341,7 +341,7 @@ userLogic.prototype.updateUser = function(user, resultMethod) {
                             } catch (err) {
                                 return callback(err);
                             }
-                        }
+                        }*/
                     ],
                     function(err, result) {
                         connection.release();
@@ -351,6 +351,61 @@ userLogic.prototype.updateUser = function(user, resultMethod) {
 
             });
         });
+    } catch (err) {
+        userData = null;
+        return resultMethod(err, null);
+    }
+
+};
+//******************************************************************************************* 
+//
+//update users Rating
+//Internal Only not for Service
+//*******************************************************************************************
+userLogic.prototype.updateUserRating = function(id,rating, resultMethod,connection) {
+    var userData = new userDAL();
+    try {
+                //mod_vasync , waterfall for better order
+                mod_vasync.waterfall([
+                        //*******************************************************************************************   
+                        function getById(callback) {
+
+                            userLogic.prototype.self.checkUser(user.id, function(err, result) {
+                                return callback(err, result);
+                            }, connection);
+                        },
+                        //update the user
+                        //*******************************************************************************************    
+
+                        function updateUser(data, callback) {
+
+                            if (Object.keys(data)
+                                .length <= 0 ) {
+                                return callback({
+                                    name: "Invalid Update",
+                                    message: "User is not allowed."
+                                }, null);
+                            } else {
+                                user.modificationDate = new Date();
+                                //no update 
+                                user.username = undefined;
+                                user.email = undefined;
+                                user.password = undefined;
+                                user.creationDate = undefined;
+                                user.isActive = undefined;
+                                user.rating = rating;
+                                userData.updateUser(user, user.id, function(err, result) {
+                                        return callback(err, null);
+                                    },connection);
+                            }
+                        }
+                    ],
+                    function(err, result) {
+                      
+                        userData = null;
+                        return resultMethod(err, result);
+                    });
+    
     } catch (err) {
         userData = null;
         return resultMethod(err, null);
@@ -477,14 +532,14 @@ userLogic.prototype.updatePassword = function(userId, password, newPassword, res
                         },
                         //store the data on cache
                         //******************************************************************************************* 
-                        function saveInCache(data, callback) {
+                        /*function saveInCache(data, callback) {
                             var cacheL = new cache();
                             cacheL.saveCache(constants.REDIS_USER + data.id, data, function(err, result) {
                                 cacheL = null;
                                 return callback(err, result);
                             });
 
-                        },
+                        },*/
                         //send the email
                         //*******************************************************************************************                     
                         function sendEmail(data, callback) {
@@ -563,7 +618,7 @@ userLogic.prototype.checkUser = function(id, resultMethod, connection) {
 //from Cache
 //
 //*******************************************************************************************
-userLogic.prototype.getUserById = function(id, resultMethod) {
+/*userLogic.prototype.getUserById = function(id, resultMethod) {
     var userData = new userDAL();
     var cacheL = new cache();
     mod_vasync.waterfall([
@@ -608,6 +663,7 @@ userLogic.prototype.getUserById = function(id, resultMethod) {
         return resultMethod(err, result);
     });
 };
+*/
 //*******************************************************************************************
 //
 //select User By Username
@@ -734,14 +790,14 @@ userLogic.prototype.blockUser = function(user, resultMethod) {
                             }, connection);
                         },
                         //*******************************************************************************************        
-                        function saveInCache(data, callback) {
+                       /* function saveInCache(data, callback) {
                             var cacheL = new cache();
                             cacheL.saveCache(constants.REDIS_USER + user.id, data, function(err, result) {
                                 cacheL = null;
                                 return callback(err, result);
                             });
 
-                        }
+                        }*/
                         //*******************************************************************************************          
                     ],
                     function(err, result) {
@@ -817,14 +873,14 @@ userLogic.prototype.unblockUser = function(user, resultMethod) {
                             }, connection);
                         },
                         //*******************************************************************************************        
-                        function saveInCache(data, callback) {
+                      /*  function saveInCache(data, callback) {
                             var cacheL = new cache();
                             cacheL.saveCache(constants.REDIS_USER + user.id, data, function(err, result) {
                                 cacheL = null;
                                 return callback(err, result);
                             });
 
-                        }
+                        }*/
                         //*******************************************************************************************          
                     ],
                     function(err, result) {
@@ -898,14 +954,14 @@ userLogic.prototype.deactivateUser = function(user, resultMethod) {
                         },
 
                         //*******************************************************************************************         
-                        function removeCache(data, callback) {
+                     /*   function removeCache(data, callback) {
                             var cacheL = new cache();
                             cacheL.deleteCache(constants.REDIS_USER + user.id, function(err, result) {
                                 cacheL = null;
                                 return callback(err, result);
                             });
 
-                        }
+                        }*/
                         //******************************************************************************************* 
                     ],
                     function(err, result) {
