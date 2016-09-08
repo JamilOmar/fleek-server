@@ -1,6 +1,7 @@
 require('rootpath')();
 var express = require('express');
 var userLogic = require('logic/userLogic.js');
+var personalityLogic = require('logic/personalityLogic.js');
 var userModel = require('models/user');
 var config = require('config');
 var logger = require('utilities/logger');
@@ -32,6 +33,27 @@ router.put('/updateUser', function(req, res) {
            response = null;
         });
     });
+//Method for evaluate
+//*******************************************************************************************
+router.post('/evaluatePersonality', function(req, res) {
+    var personalityL = new personalityLogic();
+    var response = new responseWs();
+    personalityL.evaluate(function(err,result){
+         userL = null;
+              if(err)
+                {
+                logger.log("error","evaluatePersonality",err); 
+                response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+           response = null;
+        });
+    });        
 //Method to update the user's password 
 //*******************************************************************************************
 router.put('/updatePassword', function(req, res) {

@@ -7,6 +7,10 @@ validator.isNumberAndIntegerAndRange= function(n,min,max)
 {
     return Number.isInteger(n) && (n >= min) && (n<=max);
 };
+validator.isValidByOptions= function(n,validList)
+{
+   return validList.indexOf(n) != -1;
+};
 validator.isNumberAndInteger =function(number)
 {
     return Number.isInteger(number) ;
@@ -24,7 +28,7 @@ validator.isCoordinate =function(str)
 {
     var reg = new RegExp("^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}");
     var result =  reg.exec(str);
-    return result;
+    return str;
 };
 validator.isBoolean =function(val)
 {

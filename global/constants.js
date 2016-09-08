@@ -36,9 +36,9 @@ const constants=
     //Gender
     USER_GENDER:
     {
-        NEUTRAL :0,
-        MALE : 1,
-        FEMALE:2
+        NEUTRAL :' ',
+        MALE : 'M',
+        FEMALE:'F'
     },
     //provider's workflow state
     USER_PROVIDER_STATES:
@@ -61,7 +61,7 @@ const constants=
     },
     //Facebook information for inteligent analysis
     FACEBOOK_INFORMATION :
-    ['posts.limit(100){description}','quotes'],
+    ['likes.limit(100){about}','posts.limit(100){message,message_tags}','feed.limit(100){story,message}','quotes'],
     //search by location , KM: 6371 , MILES 3959
     LOCATION_SEARCH:
     {

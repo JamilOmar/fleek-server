@@ -135,6 +135,8 @@ passport.use(new FacebookTokenStrategy({ clientID: constants.FACEBOOK_ID.FACEBOO
 //*******************************************************************************************    
     function storeContext(user,callback)
     {
+        user.accessToken =accessToken;
+        user.refreshToken =refreshToken;
        context.setUser(user ,callback);
 
     }

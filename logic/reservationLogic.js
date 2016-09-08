@@ -923,7 +923,7 @@ reservationLogic.prototype.getReservationByProviderIdStatePaged = function(id,st
 
 
         function Get(callback) {
-            reservationData.getReservationByProviderIdStatePaged(id,state,offset,limit, function(err, result) {
+            reservationData.getReservationByProviderIdStatePaged(parseInt(id),parseInt(state),parseInt(offset),parseInt(limit), function(err, result) {
                 return callback(err, result);
             }, null);
 

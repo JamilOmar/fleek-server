@@ -97,7 +97,7 @@ userLogic.prototype.validate = function(user, withPassword, callback) {
     if ((!validator.isNullOrUndefined(user.longitude) && !validator.isCoordinate(String(user.longitude)))) {
         validatorM.addException("Longitude is invalid.");
     }
-    if ((!validator.isNullOrUndefined(user.gender) && !validator.isNumberAndIntegerAndRange(user.gender, constants.USER_GENDER.NEUTRAL, constants.USER_GENDER.FEMALE))) {
+    if ((!validator.isNullOrUndefined(user.gender) && !validator.isValidByOptions(user.gender, [constants.USER_GENDER.NEUTRAL,constants.USER_GENDER.MALE, constants.USER_GENDER.FEMALE]))) {
         validatorM.addException("Gender is invalid.");
     }
     if ((!validator.isNullOrUndefined(user.appointments) && !validator.isNumberAndInteger(user.appointments))) {
