@@ -25,7 +25,9 @@ const constants=
     {
         SUBMITED : 0,
         APPROVED :1,
-        COMPLETED :2,
+        COMPLETED_PROVIDER:2,
+        COMPLETED_CUSTOMER:3,
+        COMPLETED :4,
         CANCELED :-1
         
     },

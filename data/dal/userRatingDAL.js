@@ -40,7 +40,7 @@ userRatingDAL.prototype.getTotalRatingOfUser = function ( toUserId, resultMethod
     var getTotalRatingOfUserQuery = "SELECT  IFNULL(SUM(userRating.`Rating`),0) AS TotalRating  ,  IFNULL(COUNT(userRating.`Rating`),0) TotalCount FROM `UserRating` userRating WHERE userRating.`IsActive` = 1 AND userRating.`ToUserId` = ?";
     userRatingDAL.prototype.getByArguments(getTotalRatingOfUserQuery, toUserId, function (err, result) {
         logger.log("debug", "getTotalRatingOfUser", result);
-        return resultMethod(err, userRatingDAL.prototype.self.mapperSqlToModel(result));
+        return resultMethod(err, userRatingDAL.prototype.self.mapperSqlToModelTotalRating(result));
     }, connection);
 };
 //Method to add User Rating
@@ -92,8 +92,8 @@ userRatingDAL.prototype.mapperSqlToModelTotalRating = function (data) {
             if (data != null && data.length > 0) {
                 data = data[0];
                 var totalRating = {};
-                userRating.totalRating = data.TotalRating;
-                userRating.totalCount = data.TotalCount;
+                totalRating.totalRating = data.TotalRating;
+                totalRating.totalCount = data.TotalCount;
               
                 return totalRating;
             } else {

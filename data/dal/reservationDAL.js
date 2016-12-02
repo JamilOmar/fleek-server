@@ -12,6 +12,9 @@ var util = require('util');
 var logger = require('utilities/logger');
 var userModel  = require('models/user');
 //*******************************************************************************************
+//constants
+var constants = require('global/constants');
+//*******************************************************************************************
 
 var reservationDAL = function()
 {
@@ -125,6 +128,16 @@ reservationDAL.prototype.getReservationByProviderIdStatePaged = function(id,stat
                 reservationDAL.prototype.getByArguments(getReservationByProviderIdStatePagedQuery,[id,state,offset,limit],function (err,result)
                 {
                     logger.log("debug","getReservationByProviderIdStatePaged",[id,state,offset,limit] , result);
+                    return resultMethod(err,reservationDAL.prototype.self.mapperSqlToModelCollection(result));
+                },connection);  
+};
+//Method to select the Pending Reservation by Provider Id 
+//*******************************************************************************************
+reservationDAL.prototype.getReservationByProviderIdPagedPending = function(id,offset,limit, resultMethod,connection) {
+    var getReservationByProviderIdPagedPendingQuery ="SELECT DISTINCT reservation.`ReservationId` ,reservation.`ProviderScheduleId`,  reservation.`Address` , reservation.`CancelationReason` , reservation.`Date` , reservation.`EndTime` , reservation.`StartTime`, reservation.`Latitude` , reservation.`Longitude`, reservation.`State` , reservation.`CreationDate` , reservation.`ModificationDate` , reservation.`IsActive` ,customer.`UserId` as 'customer_UserId', customer.`Name` as 'customer_Name', customer.`Lastname` as 'customer_Lastname', customer.`Username` as 'customer_Username' , customer.`PictureUrl` as 'customer_PictureUrl',customer.`FacebookId` as 'customer_FacebookId',provider.`UserId` as 'provider_UserId', provider.`Name` as 'provider_Name', provider.`Lastname` as 'provider_Lastname', provider.`Username` as 'provider_Username' , provider.`PictureUrl` as 'provider_PictureUrl',provider.`FacebookId` as 'provider_FacebookId'   FROM `Reservation` reservation INNER JOIN `User` customer ON customer.`UserId` = reservation.`CustomerId` INNER JOIN `User` provider ON provider.`UserId` = reservation.`ProviderId` WHERE  reservation.`IsActive` = 1 AND customer.`IsActive` =1 AND provider.`IsActive` = 1 AND provider.`IsBlocked` = 0 AND customer.`IsBlocked` = 0 AND reservation.`ProviderId` =? AND (reservation.`State` !=? OR reservation.`State` !=? ) Order by Date ASC LIMIT ?,?";
+                reservationDAL.prototype.getByArguments(getReservationByProviderIdPagedPendingQuery,[id,constants.REQUEST_STATES_RESERVATION.COMPLETED,constants.REQUEST_STATES_RESERVATION.CANCELED,offset,limit],function (err,result)
+                {
+                    logger.log("debug","getReservationByProviderIdPagedPending",[id,constants.REQUEST_STATES_RESERVATION.COMPLETED,constants.REQUEST_STATES_RESERVATION.CANCELED,offset,limit] , result);
                     return resultMethod(err,reservationDAL.prototype.self.mapperSqlToModelCollection(result));
                 },connection);  
 };

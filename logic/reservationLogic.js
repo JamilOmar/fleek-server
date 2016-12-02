@@ -13,7 +13,8 @@ var reservationDAL = require('data/dal/reservationDAL');
 var providerScheduleDAL = require('data/dal/providerScheduleDAL');
 var providerScheduleDayDAL = require('data/dal/providerScheduleDayDAL');
 var providerScheduleExceptionDAL = require('data/dal/providerScheduleExceptionDAL');
-var reservationDetailLogic = require('./reservationDetailLogic')
+var reservationDetailLogic = require('./reservationDetailLogic');
+var userRatingLogic = require('./userRatingLogic')
 var logger = require('utilities/logger');
 var uuid = require('node-uuid');
 var moment = require('moment');
@@ -136,8 +137,9 @@ reservationLogic.prototype.validateTime = function(reservation, providerSchedule
                             if (((startTimeReservation >= rStartTime && startTimeReservation <= rEndTime) ||
                                     (endTimeReservation >= rStartTime && endTimeReservation <= rEndTime)) &&
                                 reservation.date.isSame(dataRequested[i].date) &&
-                                dataRequested[i].id != reservation.id &&
-                                dataRequested[i].state != constants.REQUEST_STATES_RESERVATION.CANCELED
+                                dataRequested[i].id != reservation.id &&(
+                                dataRequested[i].state == constants.REQUEST_STATES_RESERVATION.CANCELED ||
+                                dataRequested[i].state == constants.REQUEST_STATES_RESERVATION.COMPLETED  )
                             ) {
 
                                 isValid = false;
@@ -523,7 +525,7 @@ reservationLogic.prototype.createReservation = function(reservation, resultMetho
                             reservation.modificationDate = localDate;
                             reservation.creationDate = localDate;
                             reservation.isActive = true;
-                            reservation.state = constants.REQUEST_STATES_RESERVATION.APPROVED;
+                            reservation.state = constants.REQUEST_STATES_RESERVATION.SUBMITED;
                             reservation.date = reservation.date.toISOString();
                             callback(null);
                         },
@@ -631,11 +633,20 @@ reservationLogic.prototype.approvalReservationValidation = function(contextUser,
 
                 case constants.REQUEST_STATES_RESERVATION.CANCELED:
                     // the person who is accepting is the customer's friend
-                    verification = (originalReservation.providerId == contextUser.id || originalReservation.customerId == contextUser.id && originalReservation.state != constants.REQUEST_STATES_RESERVATION.COMPLETED);
+                    verification = (originalReservation.providerId == contextUser.id || originalReservation.customerId == contextUser.id );
                     break;
-                case constants.REQUEST_STATES_RESERVATION.COMPLETED:
-                    // the person who is accepting is the customer's friend
+                
+                case constants.REQUEST_STATES_RESERVATION.COMPLETED_PROVIDER:
+                    // reservation completed by the provider
                     verification = (originalReservation.providerId == contextUser.id && originalReservation.state == constants.REQUEST_STATES_RESERVATION.APPROVED);
+                    break;
+                case constants.REQUEST_STATES_RESERVATION.COMPLETED_CUSTOMER:
+                    // reservation completed by the customer
+                    verification = (originalReservation.providerId == contextUser.id  && originalReservation.state == constants.REQUEST_STATES_RESERVATION.COMPLETED_PROVIDER);
+                    break;            
+                case constants.REQUEST_STATES_RESERVATION.COMPLETED:
+                    // complete the reservation request
+                    verification = (originalReservation.providerId == contextUser.id && originalReservation.state == constants.REQUEST_STATES_RESERVATION.COMPLETED_CUSTOMER);
                     break;
                 default:
                     verification = false;
@@ -652,6 +663,7 @@ reservationLogic.prototype.approvalReservationValidation = function(contextUser,
     //*******************************************************************************************
 reservationLogic.prototype.approvalReservation = function(reservation, resultMethod) {
     var reservationData = new reservationDAL();
+    var userRatingL = new userRatingLogic();
     var contextUser = context.getUser();
     try {
         //create a connection for the transaction
@@ -693,8 +705,6 @@ reservationLogic.prototype.approvalReservation = function(reservation, resultMet
                                 if (reservationLogic.prototype.self.approvalReservationValidation(contextUser, reservation, data)) {
                                     //prepare data
                                     reservation.modificationDate = new Date();
-                                    reservation.customerId = undefined;
-                                    reservation.providerId = undefined;
                                     reservation.creationDate = undefined;
                                     reservation.isActive = undefined;
 
@@ -708,11 +718,46 @@ reservationLogic.prototype.approvalReservation = function(reservation, resultMet
 
                             }
                         },
+//Create rating if is required
+//*******************************************************************************************
+                        function createRating(callback)
+                        {
+                            
+                            if(reservation.state == constants.REQUEST_STATES_RESERVATION.COMPLETED_PROVIDER|| reservation.state == constants.REQUEST_STATES_RESERVATION.COMPLETED_CUSTOMER)
+                            {
+                                reservation.reservationRate.reservationId = reservation.id;
+                                if(reservation.state == constants.REQUEST_STATES_RESERVATION.COMPLETED_PROVIDER)
+                                {
+
+
+                                    reservation.reservationRate.fromUserId = reservation.providerId;
+                                    reservation.reservationRate.toUserId = reservation.customerId;
+                                }
+                                else
+                                {
+
+                                    reservation.reservationRate.fromUserId = reservation.customerId;
+                                    reservation.reservationRate.toUserId = reservation.providerId;
+                                    reservation.reservationRate.isForProvider =true;
+                                    //complete the reservation after the customer's rating
+                                    reservation.state =constants.REQUEST_STATES_RESERVATION.COMPLETED;
+                                }
+                            userRatingL.createUserRating(reservation.reservationRate,function(err,result)
+                            {
+                                return callback(err, result);
+
+                            },connection);
+                            }
+                            else{
+
+                                return callback(null, null);
+                            }
+                        },                        
 //update
 //*******************************************************************************************   
-                        function updateReservation(callback) {
+                        function updateReservation(data,callback) {
                             reservationData.updateReservation(reservation, reservation.id, function(err, result) {
-                                if (err) {
+                                   if (err) {
                                     return connection.rollback(function() {
                                         callback(err, null);
                                     });
@@ -728,10 +773,7 @@ reservationLogic.prototype.approvalReservation = function(reservation, resultMet
                                         return callback(null, reservation);
                                     }
                                 });
-
-
-                            }, connection);
-
+                        },connection);
                         },
 //get information by id
 //*******************************************************************************************            
@@ -745,6 +787,7 @@ reservationLogic.prototype.approvalReservation = function(reservation, resultMet
                     function(err, result) {
                         connection.release();
                         reservationData = null;
+                        userRatingL=null;
                         return resultMethod(err, result);
                     });
 
@@ -752,6 +795,7 @@ reservationLogic.prototype.approvalReservation = function(reservation, resultMet
         });
     } catch (err) {
         reservationData = null;
+        userRatingL = null;
         return resultMethod(err, null);
     }
 
@@ -924,6 +968,41 @@ reservationLogic.prototype.getReservationByProviderIdStatePaged = function(id,st
 
         function Get(callback) {
             reservationData.getReservationByProviderIdStatePaged(parseInt(id),parseInt(state),parseInt(offset),parseInt(limit), function(err, result) {
+                return callback(err, result);
+            }, null);
+
+        }
+    ], function(err, result) {
+        reservationData = null;
+        return resultMethod(err, result);
+    });
+};
+//*******************************************************************************************
+//
+//Method to Select the pending reservations By Provider Id
+//
+//*******************************************************************************************
+reservationLogic.prototype.getReservationByProviderIdPagedPending = function(id,offset,limit, resultMethod) {
+    var contextUser = context.getUser();
+    var reservationData = new reservationDAL();
+    mod_vasync.waterfall([
+        //*******************************************************************************************            
+        function authorize(callback) {
+            if (contextUser.id == id) {
+                return callback(null);
+            } else {
+                return callback({
+                    name: "Not Authorized",
+                    message: "Invalid operation."
+                }, null);
+            }
+
+        },
+        //******************************************************************************************* 
+
+
+        function Get(callback) {
+            reservationData.getReservationByProviderIdPagedPending(parseInt(id),parseInt(offset),parseInt(limit), function(err, result) {
                 return callback(err, result);
             }, null);
 

@@ -357,6 +357,7 @@ userLogic.prototype.updateUser = function(user, resultMethod) {
     }
 
 };
+
 //******************************************************************************************* 
 //
 //update users Rating
@@ -370,16 +371,16 @@ userLogic.prototype.updateUserRating = function(id,rating, resultMethod,connecti
                         //*******************************************************************************************   
                         function getById(callback) {
 
-                            userLogic.prototype.self.checkUser(user.id, function(err, result) {
+                            userLogic.prototype.self.checkUser(id, function(err, result) {
                                 return callback(err, result);
                             }, connection);
                         },
                         //update the user
                         //*******************************************************************************************    
 
-                        function updateUser(data, callback) {
+                        function updateUser(user, callback) {
 
-                            if (Object.keys(data)
+                            if (Object.keys(user)
                                 .length <= 0 ) {
                                 return callback({
                                     name: "Invalid Update",

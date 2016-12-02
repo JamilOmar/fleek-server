@@ -1,6 +1,7 @@
 require('rootpath')();        
 var base  = require('./base.js');
 var reservationDetailModel = require('./reservationDetail.js');
+var userRatingModel =  require('./userRating.js');
 var reservation = function()
         {
            this.id = null;
@@ -19,6 +20,8 @@ var reservation = function()
            this.state = false;
            //only for this case, is requested for reservations Details
            this.reservationDetail = null;
+           //only for this case, are rates from the users
+            this.reservationRate = null;
            base.call(this);
         };
 reservation.prototype = new base();        
@@ -37,6 +40,7 @@ reservation.prototype.initializer = function (data)
         this.endTime = data.endTime;
         this.state = data.state;
         this.reservationDetail = [];
+     
         if( data.reservationDetail != undefined)
         {
             data.reservationDetail.forEach(function(element) {
@@ -45,7 +49,13 @@ reservation.prototype.initializer = function (data)
             this.reservationDetail.push(reservationD);
             }, this);
         }
+        if( data.reservationRate != undefined)
+        {
+            this.reservationRate = new  userRatingModel();
+            this.reservationRate.initializer(data.reservationRate);
+           
+        }
 }        
 
 //********************************************************************************************
-module.exports = reservation;
+module.exports = Object.freeze(reservation);

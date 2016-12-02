@@ -166,6 +166,28 @@ router.get('/getReservationByProviderIdStatePaged/', function(req, res) {
         });
 });
 
+//Method to get the pending reservations by provider Id and Paged
+//*******************************************************************************************
+router.get('/getReservationByProviderIdPagedPending/', function(req, res) {
+    var reservationL = new reservationLogic();
+    var response = new responseWs();
+    reservationL.getReservationByProviderIdPagedPending(req.query.id,req.query.offset,req.query.limit,function(err,result){  
+              reservationL = null;
+              if(err)
+                {
+                logger.log("error","getReservationByProviderIdPagedPending",err);
+                    response.createResponse(null, config.get('chameleon.responseWs.codeError'));
+                res.json(response);
+                }
+            else
+                {
+                 response.createResponse(result, config.get('chameleon.responseWs.codeSuccess'));    
+                res.json(response);
+                }
+            response = null;
+        });
+});
+
 //Method to get the reservation by customer Id , State and Paged
 //*******************************************************************************************
 router.get('/getReservationByCustomerIdStatePaged/', function(req, res) {

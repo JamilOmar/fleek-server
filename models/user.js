@@ -63,4 +63,4 @@ user.prototype.basicInformation = function(id, name ,lastname, username, picture
            this.modificationDate = undefined; 
 }; 
 //********************************************************************************************
-module.exports = user;
+module.exports = Object.freeze(user);
