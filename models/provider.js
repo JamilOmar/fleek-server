@@ -1,7 +1,8 @@
 require('rootpath')();        
-var base  = require('./base.js');   
-var provider = function()
-        {
+let base  = require('./base.js');   
+class provider extends base
+{
+        constructor(){
            this.id = null;
            this.latitude = null;
            this.longitude = null;
@@ -14,11 +15,11 @@ var provider = function()
            this.state = null;
            this.user = null;
            this.address = null;
-           base.call(this);
+           super();
           
         };
-provider.prototype = new base();
-provider.prototype.initializer = function (data)
+
+initializer(data)
 {
            this.id = data.id;
            this.latitude = data.latitude;
@@ -32,6 +33,7 @@ provider.prototype.initializer = function (data)
            this.state = data.state;
            this.address = data.address;
       
+}
 }
 //********************************************************************************************
  module.exports =  provider;

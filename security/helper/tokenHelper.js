@@ -1,34 +1,34 @@
 require('rootpath')();
-var logger = require('utilities/logger');
-var moment = require('moment');
-var jwt = require('jwt-simple');
-var config = require('config');
+const logger = require('utilities/logger'),
+moment = require('moment'),
+jwt = require('jwt-simple'),
+config = require('config');
 //*******************************************************************************************
 //
 //token helper
 //
 //*******************************************************************************************
-var tokenHelper =
+class tokenHelper 
 {
 
 //generate token
 //*******************************************************************************************
-generateToken : function(item){  
-    var expires = moment().add('days', 15).valueOf();
-    var token = jwt.encode({
+generateToken(item){  
+    let expires = moment().add('days', 15).valueOf();
+    let token = jwt.encode({
         id: item,
         exp: expires
     }, "Fl33kk@pp2016P@$$w0rdG3n");
   
     return token;
-},
+};
 //validate jwt token
 //*******************************************************************************************
-checkToken : function(token){  
+checkToken(token){  
     
     try
     {
-       var decoded = jwt.decode(token, "Fl33kk@pp2016P@$$w0rdG3n");
+       let decoded = jwt.decode(token, "Fl33kk@pp2016P@$$w0rdG3n");
        return decoded;
     }
     catch(err)
@@ -36,7 +36,7 @@ checkToken : function(token){
          logger.log("error","checkToken" , err);
          return null;
     }
-}
+};
 }
 //*******************************************************************************************
 module.exports = tokenHelper;

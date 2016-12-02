@@ -1,22 +1,26 @@
-var base = function()
-        {
-           this.creationDate = null;
-           this.modificationDate = null;
-           this.isActive = false; 
-        };
-//******************************************************
-base.prototype.deactivate = function()
+
+
+class Base{
+
+constructor()
 {
+    this.creationDate = null;
+    this.modificationDate = null;
+    this.isActive = false; 
+};
+//******************************************************    
+deactivate(){
     this.modificationDate = new Date();
     this.isActive =false;
-}
+
+};
 //******************************************************
-base.prototype.refreshModification = function()
+refreshModification()
 {
     this.modificationDate =new Date();
-}
+};
 //******************************************************
-base.prototype.create = function()
+create()
 {
     var date = new Date();
     this.creationDate = date;
@@ -24,9 +28,10 @@ base.prototype.create = function()
     this.isActive =true;
 }
 //******************************************************
-base.prototype.IsEmpty =function()
+IsEmpty()
 {
      return  this.id == null;
 }
+}
 //********************************************************************************************
-module.exports =  base;
+module.exports =  Base;
