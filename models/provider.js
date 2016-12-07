@@ -1,6 +1,6 @@
 require('rootpath')();        
-let base  = require('./base.js');   
-class provider extends base
+let Base  = require('./base.js');   
+class Provider extends Base
 {
         constructor(){
            this.id = null;
@@ -36,5 +36,5 @@ initializer(data)
 }
 }
 //********************************************************************************************
- module.exports =  provider;
+ module.exports =  Provider();
  

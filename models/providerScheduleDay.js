@@ -1,17 +1,17 @@
 require('rootpath')();        
-var base  = require('./base.js');   
-var providerScheduleDay = function()
-        {
+let Base  = require('./base.js');   
+class ProviderScheduleDay extends Base
+{        constructor(){
            this.id = null;
            this.providerScheduleId = null;
            this.startTime = null;
            this.endTime = null; 
            this.dayOfWeek = null;
-           base.call(this);
+           super();
           
         };
-providerScheduleDay.prototype = new base();
-providerScheduleDay.prototype.initializer = function (data)
+//********************************************************************************************
+initializer(data)
 {
            this.id = data.id;
            this.providerScheduleId = data.providerScheduleId;
@@ -19,7 +19,8 @@ providerScheduleDay.prototype.initializer = function (data)
            this.endTime = data.endTime; 
            this.dayOfWeek = data.dayOfWeek;
       
+};
 }
 //********************************************************************************************
-        module.exports = providerScheduleDay;
+        module.exports = ProviderScheduleDay;
    

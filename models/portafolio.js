@@ -1,7 +1,7 @@
 require('rootpath')();        
-let base  = require('./base.js');   
+let Base  = require('./base.js');   
 
-class portafolio extends base {
+class Portafolio extends Base {
 constructor(){
         this.id = null;
         this.reservationId = null;
@@ -25,4 +25,4 @@ initializer(data)
 };
 }
 //********************************************************************************************
- module.exports =  portafolio;
+ module.exports =  Portafolio;

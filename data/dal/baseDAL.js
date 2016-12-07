@@ -1,64 +1,66 @@
-        require('rootpath')();
-        var config = require('config');
-        var mysql     =    require('mysql');
-        var logger = require('utilities/logger');
-        var pool      =    mysql.createPool({
-            connectionLimit : config.get('chameleon.dbConfig.connectionLimit'), 
-            host     : config.get('chameleon.dbConfig.host'),
-            user     : config.get('chameleon.dbConfig.user'),
-            password : config.get('chameleon.dbConfig.password'),
-            database : config.get('chameleon.dbConfig.database'),
-            supportBigNumbers : config.get('chameleon.dbConfig.supportBigNumbers'),
-        });
+'use strict';
+require('rootpath')();
+const config = require('config');
+let mysql     =    require('mysql');
+const logger = require('utilities/logger');
+let pool      =    mysql.createPool({
+    connectionLimit : config.get('chameleon.dbConfig.connectionLimit'), 
+    host     : config.get('chameleon.dbConfig.host'),
+    user     : config.get('chameleon.dbConfig.user'),
+    password : config.get('chameleon.dbConfig.password'),
+    database : config.get('chameleon.dbConfig.database'),
+    supportBigNumbers : config.get('chameleon.dbConfig.supportBigNumbers'),
+});
 //Creation of the connection Object
 //*******************************************************************************************
-        var baseDAL = function()
-        {
-           this.pool = pool;
-           baseDAL.prototype.self = this;
-        };
+class BaseDAL {
+    constructor()
+    {
+      this.pool = pool;
+    }
+
+         
 //Generic escape method
 //*******************************************************************************************
-        baseDAL.prototype.escape = function(value) {
-            return mysql.escape(value);
-        }
+escape(value) 
+{
+    return mysql.escape(value);
+}
 
 //Generic query method
 //*******************************************************************************************
-        baseDAL.prototype.query = function(createUserQuery,data, resultMethod,connection) {
-            if(connection !=null )
-            {
+query(createUserQuery,data, resultMethod,connection) {
+if(connection !=null )
+{
                
-                 // Use the connection
-                    connection.query(createUserQuery ,data, function(err, result) {
+ // Use the connection
+connection.query(createUserQuery ,data, function(err, result) {
                    return resultMethod(err,result);
                 });
-            }
-            else{
-                baseDAL.prototype.self.pool.getConnection(function(err, connection) {
+}
+else{
+    this.pool.getConnection(function(err, connection) {
 
-                     if(connection == null) // not connection to database
-                    {
-                        return resultMethod(new Error("Error at Connection"),null);      
-                    }
-                    // Use the connection 
-                    connection.query(createUserQuery ,data, function(errData, result) {
-                    connection.release();
-                    return resultMethod(errData,result);
-                    });
-                });
-            };
-        };
+     if(connection == null || err) // not connection to database
+    {
+        return resultMethod(new Error("Error at Connection " + err));   
+    }
+            // Use the connection 
+            connection.query(createUserQuery ,data, function(errData, result) {
+            connection.release();
+            return resultMethod(errData,result);
+            });
+        });
+    };
+};
 
 //Generic method with extra argument
 //*******************************************************************************************
-        baseDAL.prototype.queryWithArgument = function(createUserQuery,data,argument, resultMethod,connection) {
+queryWithArgument(createUserQuery,data,argument,resultMethod,connection) {
             if(connection !=null )
             {
                 var parameters = [];
-                
                 var argumentsList = [];
-                
                 //check if it has more than one argument
                 if( Object.prototype.toString.call( argument ) === '[object Array]' ) {
                     argument.forEach(function(element) {
@@ -80,11 +82,11 @@
                 });
             }
             else{
-                baseDAL.prototype.self.pool.getConnection(function(err, connection) {
+                this.pool.getConnection(function(err, connection) {
 
-                     if(connection == null) // not connection to database
+                    if(connection == null || err) // not connection to database
                     {
-                        return resultMethod(new Error("Error at Connection"),null);      
+                        return resultMethod(new Error("Error at Connection " + err));   
                     }
                     // Use the connection 
                     connection.query(createUserQuery ,[data,argument], function(errData, result) {
@@ -93,12 +95,12 @@
                     });
                 });
             };
-        };
+    };
 
 
 //Generic Get Method
 //*******************************************************************************************
-        baseDAL.prototype.get = function( createUserQuery,resultMethod,connection) {
+get( createUserQuery,resultMethod,connection) {
                 
             if(connection !=null )
             {
@@ -109,10 +111,10 @@
             }
             else{
                   
-                baseDAL.prototype.self.pool.getConnection(function(err, connection) {
-                    if(connection == null) // not connection to database
+                this.pool.getConnection(function(err, connection) {
+                    if(connection == null || err) // not connection to database
                     {
-                        return resultMethod(new Error("Error at Connection"),null);   
+                        return resultMethod(new Error("Error at Connection " + err));   
                     }
                     // Use the connection 
                     connection.query(createUserQuery , function(errData, rows) {
@@ -125,7 +127,7 @@
         };
 //Generic Get by Arguments Method
 //*******************************************************************************************
-        baseDAL.prototype.getByArguments = function(createUserQuery,argument, resultMethod,connection) {
+getByArguments(createUserQuery,argument, resultMethod,connection) {
                 
             if(connection !=null )
             {
@@ -137,10 +139,10 @@
             }
             else{
                   
-                baseDAL.prototype.self.pool.getConnection(function(err, connection) {
-                    if(connection == null) // not connection to database
+                this.pool.getConnection(function(err, connection) {
+                    if(connection == null || err) // not connection to database
                     {
-                        return resultMethod(new Error("Error at Connection"),null);    
+                        return resultMethod(new Error("Error at Connection " + err));   
                     }
                     // Use the connection 
                     connection.query(createUserQuery,argument , function(errData, rows) {
@@ -153,7 +155,7 @@
         };
 //Generic Get NonQuery Result
 //*******************************************************************************************
-        baseDAL.prototype.nonQueryResult = function(data)
+nonQueryResult(data)
         {
          
             if( data!=null )
@@ -166,5 +168,6 @@
 
             }
         }
+}
         //********************************************************************************************
-module.exports = baseDAL;
+module.exports = BaseDAL;
